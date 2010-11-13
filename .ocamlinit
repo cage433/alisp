@@ -3,3 +3,4 @@
 #use "token.ml"
 #use "lexer.ml"
 #use "ast.ml"
+#use "parser.ml"
