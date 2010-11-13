@@ -1,0 +1,5 @@
+#load "dynlink.cma"
+#load "camlp4o.cma"
+#use "token.ml"
+#use "lexer.ml"
+#use "ast.ml"
