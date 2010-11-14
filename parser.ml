@@ -10,4 +10,7 @@ module Parser =
         | [< 'Token.Int n >] -> Ast.Int n
         | [< 'Token.Symbol s >] -> Ast.Symbol s
         | [< 'Token.LeftParen; 'Token.Symbol sym; args = parse_args []; 'Token.RightParen >] -> Ast.Operation(sym, Array.of_list args)
+    and parse = parser
+        [< expr=parse_expr; stream = parse >] -> expr :: stream
+      | [<>] -> []
   end;;

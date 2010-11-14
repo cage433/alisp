@@ -1,0 +1,3 @@
+<{lexer,parser}.ml>: use_camlp4, pp(camlp4of)
+<{codegen}.ml>: use_llvm, use_llvm_analysis
+<*.{byte,native}>: g++, use_llvm, use_llvm_analysis
