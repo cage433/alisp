@@ -1,4 +1,1 @@
-module Token = 
-  struct
-    type token = LeftParen | RightParen | Float of float 
-  end;;
+type token = LeftParen | RightParen | Symbol of string | Float of float 
