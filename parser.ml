@@ -6,8 +6,8 @@ module Parser =
         [< expr = parse_expr; args = parse_args (expr::accumulator) >] -> List.rev args
         | [<>] -> accumulator
       in parser
-        [< 'Token.Float x >] -> Ast.Float x
-        | [< 'Token.LeftParen; 'Token.Symbol sym; args = parse_args []; 'Token.RightParen >] -> Ast.Operation(sym, Array.of_list args)
+        [< 'Token.LeftParen; 'Token.Symbol sym; args = parse_args []; 'Token.RightParen >] -> Ast.Operation(sym, Array.of_list args)
+        | [< 'Token.Float x >] -> Ast.Float x
     and parse = parser
         [< expr=parse_expr; stream = parse >] -> expr :: stream
       | [<>] -> []
