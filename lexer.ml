@@ -9,8 +9,9 @@ let rec lex = parser
       Buffer.add_char buffer c;
       lex_number buffer stream
 
-  | [< ''('; stream=lex >] -> [< 'Token.LeftParen ; stream >]
-  | [< '')'; stream=lex >] -> [< 'Token.RightParen ; stream >]
+  | [< '')'; stream >] -> [< 'Token.RightParen ; lex stream >]
+  | [< ''('; stream >] -> [< 'Token.LeftParen ; lex stream >]
+  | [< '';'; stream >] -> [< 'Token.SemiColon ; lex stream >]
     
   (* symbol *)
   | [< ' ('a' .. 'z' | 'A' .. 'Z' as c); stream >] ->
@@ -31,4 +32,4 @@ and lex_identifier buffer = parser
       Buffer.add_char buffer c;
       lex_identifier buffer stream
 
-  | [<stream=lex>] -> [< 'Token.Symbol (Buffer.contents buffer); stream >]
+  | [<stream>] -> [< 'Token.Symbol (Buffer.contents buffer); lex stream >]
