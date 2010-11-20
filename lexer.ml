@@ -14,11 +14,7 @@ let rec lex = parser
   | [< '';'; stream >] -> [< 'Token.SemiColon ; lex stream >]
     
   (* symbol *)
-  | [< ' ('a' .. 'z' | 'A' .. 'Z' as c); stream >] ->
-      let buffer = Buffer.create 1 in
-      Buffer.add_char buffer c;
-      lex_identifier buffer stream
-
+  | [< ' ('*' | '+' | '-' | '/' as c) ; stream >] -> [< 'Token.Symbol (Char.escaped c); lex stream >] 
   | [<>] -> [<>]
 
 and lex_number buffer = parser
@@ -27,9 +23,3 @@ and lex_number buffer = parser
       lex_number buffer stream
   | [<stream=lex>] -> [< 'Token.Float (float_of_string (Buffer.contents buffer)); stream >]
 
-and lex_identifier buffer = parser
-  | [< ' ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '_' as c); stream >] ->
-      Buffer.add_char buffer c;
-      lex_identifier buffer stream
-
-  | [<stream>] -> [< 'Token.Symbol (Buffer.contents buffer); lex stream >]
