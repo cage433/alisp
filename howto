@@ -1,0 +1,7 @@
+g++ -g alisp.cpp -rdynamic -I/usr/lib/llvm-2.8/include  -DNDEBUG -D_GNU_SOURCE -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+-L/usr/lib/llvm-2.8/lib  -lpthread -lffi -ldl -lm 
+-lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMMCParser -lLLVMX86AsmPrinter -lLLVMX86Info -lLLVMJIT -lLLVMExecutionEngine -lLLVMCodeGen -lLLVMScalarOpts -lLLVMInstCombine -lLLVMTransformUtils -lLLVMipa -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMCore -lLLVMSupport -lLLVMSystem -L/usr/lib/llvm-2.8/lib -O3 -o alisp
+
+
+
+g++ -g alisp.cpp -rdynamic `llvm-config --cppflags --ldflags --libs core jit native` -O3 -o alisp
