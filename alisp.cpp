@@ -16,6 +16,21 @@
 #include <list>
 using namespace llvm;
 
+// Grammar is
+//
+// Top Level Expressions := Expression
+//                       := Definition
+//
+// Expression            := (Call) | Number | Identifier | (Operator Call)
+//
+// Definition            := (def Identifier ( Identifier* ) Expression)
+//
+// Call                  := Identifier Expression*
+//
+// Operator Call         := Op Expression*
+//
+// Op                    := '*' | '+'
+
 
 //===----------------------------------------------------------------------===//
 // Lexer
@@ -172,6 +187,11 @@ static int getNextToken() {
   fprintf(stderr, "Curr tok %d\n", CurTok);
   return CurTok;
 }
+static void eatParen(){
+  gettok();
+  if (CurTok != ')')
+    throw "Expected right paren";
+}
 
 
 /// Error* - These are little helper functions for error handling.
@@ -194,10 +214,8 @@ static ExprAST *ParseNumberExpr() {
   return Result;
 }
 
-/// call expr ::= '(' oper expression* ')'
+/// call expr ::=  Identifier Expression* 
 static ExprAST *ParseCallExpr() {
-  if (CurTok == '(')
-    getNextToken();
 
   std::string IdName = IdentifierStr;
   
@@ -231,7 +249,7 @@ static ExprAST *ParseExpression() {
   default: return Error("unknown token when expecting an expression");
   case tok_identifier: return ParseIdentifierExpr();
   case tok_number:     return ParseNumberExpr();
-  case '(':            return ParseCallExpr();
+  case '(':            ExprAST *call = ParseCallExpr(); eatParen(); return call;
   }
 }
 //
