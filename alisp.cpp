@@ -216,6 +216,7 @@ static ExprAST *ParseNumberExpr() {
 
 /// call expr ::=  Identifier Expression* 
 static ExprAST *ParseCallExpr() {
+  printf("In ParseCallExpr ");
 
   std::string IdName = IdentifierStr;
   
@@ -249,7 +250,7 @@ static ExprAST *ParseExpression() {
   default: return Error("unknown token when expecting an expression");
   case tok_identifier: return ParseIdentifierExpr();
   case tok_number:     return ParseNumberExpr();
-  case '(':            ExprAST *call = ParseCallExpr(); eatParen(); return call;
+  case '(':            getNextToken();ExprAST *call = ParseCallExpr(); eatParen(); return call;
   }
 }
 //
@@ -290,6 +291,7 @@ static FunctionAST *ParseDefinition() {
 
 /// toplevelexpr ::= expression
 static FunctionAST *ParseTopLevelExpr() {
+  printf("In ParseTopLevelExpr\n");
   if (ExprAST *E = ParseExpression()) {
     // Make an anonymous proto.
     PrototypeAST *Proto = new PrototypeAST("", std::vector<std::string>());
