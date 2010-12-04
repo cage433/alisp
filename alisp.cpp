@@ -117,22 +117,22 @@ public:
   ExprAST(int exprType) : ExprType(exprType) {}
   virtual ~ExprAST() {}
   virtual Value *Codegen() = 0;
+  int ExprType(){return ExprType;}
 };
 
 /// NumberExprAST - Expression class for numeric literals like "1.0".
-class NumberExprAST : public ExprAST(exp_number) {
+class NumberExprAST : public ExprAST {
   double Val;
 public:
-  NumberExprAST(double val) : Val(val) {}
+  NumberExprAST(double val) : ExprAST(exp_number), Val(val) {}
   virtual Value *Codegen();
 };
 
 /// VariableExprAST - Expression class for referencing a variable, like "a".
 class VariableExprAST : public ExprAST {
-  std::string Name;
 public:
-  virtual int ExpressionType() = {return exp_identifier;}
-  VariableExprAST(const std::string &name) : Name(name) {}
+  std::string Name;
+  VariableExprAST(const std::string &name) : ExprAST(exp_identifier), Name(name) {}
   virtual Value *Codegen();
 };
 
@@ -142,8 +142,7 @@ class OperatorCallExprAST : public ExprAST {
   std::vector<ExprAST*> Args;
 public:
   OperatorCallExprAST(std::string op, std::vector<ExprAST*> &args)
-    : Op(op), Args(args) {}
-  virtual int ExpressionType() = {return exp_operator_call;}
+    : ExprAST(exp_operator_call), Op(op), Args(args) {}
   Value *BinOpValue(Value* L, Value* R);
   Value *Fold(Value* Init, std::list<Value*> Vals); 
   Value *InitValue();
@@ -157,8 +156,7 @@ class CallExprAST : public ExprAST {
   std::vector<ExprAST*> Args;
 public:
   CallExprAST(const std::string &callee, std::vector<ExprAST*> &args)
-    : Callee(callee), Args(args) {}
-  virtual int ExpressionType() = {return exp_function_call;}
+    : ExprAST(exp_function_call), Callee(callee), Args(args) {}
   virtual Value *Codegen();
 };
 
@@ -205,11 +203,13 @@ class DefinitionAST : public ExprAST{
   PrototypeAST *Proto;
   ExprAST *Body;
 public:
-  DefinitionAST(PrototypeAST *proto, ExprAST *body){}
-  virtual int ExpressionType() = {return exp_definition;}
+  DefinitionAST(PrototypeAST *proto, ExprAST *body) : ExprAST(exp_definition){}
 };
 
-void ExprAST::HandleAsTopLevelExpression(){
+static void HandleAsTopLevelExpression(ExprAST *expr){
+  switch(expr.ExprType()){
+    case exp_number
+
   PrototypeAST *Proto = new PrototypeAST("", std::vector<std::string>());
   FunctionAST *F = new FunctionAST(Proto, this);
   if (Function *LF = F->Codegen()) {
