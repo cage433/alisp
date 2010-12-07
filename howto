@@ -4,4 +4,4 @@ g++ -g alisp.cpp -rdynamic -I/usr/lib/llvm-2.8/include  -DNDEBUG -D_GNU_SOURCE -
 
 
 
-g++ -g alisp.cpp -rdynamic `llvm-config --cppflags --ldflags --libs core jit native` -O3 -o alisp
+g++ -g alisp.cpp -rdynamic `llvm-config-2.8 --cppflags --ldflags --libs core jit native` -O3 -o alisp

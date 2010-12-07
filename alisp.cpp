@@ -493,6 +493,7 @@ static void MainLoop() {
         case tok_def: HandleDefinition(); break;
         default: HandleTopLevelExpression(); break;
       }
+      eatParen();
     }
     case tok_eof:    return;
     default:         HandleTopLevelExpression(); break;
