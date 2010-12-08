@@ -67,15 +67,6 @@ static int gettok() {
   while (isspace(LastChar))
     LastChar = getchar();
 
-  if (isalpha(LastChar)) { // identifier: [a-zA-Z][a-zA-Z0-9]*
-    IdentifierStr = LastChar;
-    while (isalnum((LastChar = getchar())))
-      IdentifierStr += LastChar;
-
-    if (IdentifierStr == "def") return tok_def;
-    return tok_identifier;
-  }
-
   if (isdigit(LastChar) || LastChar == '.') {   // Number: [0-9.]+
     std::string NumStr;
     do {
@@ -86,6 +77,16 @@ static int gettok() {
     NumVal = strtod(NumStr.c_str(), 0);
     return tok_number;
   }
+
+  if (isalpha(LastChar) || LastChar == '+' || LastChar == '*') { // identifier: [a-zA-Z][a-zA-Z0-9]*
+    IdentifierStr = LastChar;
+    while (isalnum((LastChar = getchar())) || LastChar == '+' || LastChar == '*')
+      IdentifierStr += LastChar;
+
+    if (IdentifierStr == "def") return tok_def;
+    return tok_identifier;
+  }
+
 
   if (LastChar == '#') {
     // Comment until end of line.
@@ -109,6 +110,8 @@ static int gettok() {
 //===----------------------------------------------------------------------===//
 // Abstract Syntax Tree (aka Parse Tree)
 //===----------------------------------------------------------------------===//
+class FunctionAST; 
+class PrototypeAST; 
 
 /// ExprAST - Base class for all expression nodes.
 class ExprAST {
@@ -117,7 +120,9 @@ public:
   ExprAST(int exprType) : ExprType(exprType) {}
   virtual ~ExprAST() {}
   virtual Value *Codegen() = 0;
-  int ExprType(){return ExprType;}
+  virtual FunctionAST * TopLevelFunction();
+  virtual void HandleTopLevel();
+  int GetExprType(){return ExprType;}
 };
 
 /// NumberExprAST - Expression class for numeric literals like "1.0".
@@ -183,18 +188,6 @@ public:
   FunctionAST(PrototypeAST *proto, ExprAST *body)
     : Proto(proto), Body(body) {}
 
-  void HandleAsTopLevelExpression(){
-    if (Function *LF = Codegen()) {
-      // JIT the function, returning a function pointer.
-      void *FPtr = TheExecutionEngine->getPointerToFunction(LF);
-      
-      // Cast it to the right type (takes no arguments, returns a double) so we
-      // can call it as a native function.
-      double (*FP)() = (double (*)())(intptr_t)FPtr;
-      fprintf(stderr, "Evaluated to %f\n", FP());
-    }
-  }
-  
   Function *Codegen();
 };
 
@@ -204,23 +197,18 @@ class DefinitionAST : public ExprAST{
   ExprAST *Body;
 public:
   DefinitionAST(PrototypeAST *proto, ExprAST *body) : ExprAST(exp_definition){}
+  FunctionAST * TopLevelFunction(){
+    return new FunctionAST(Proto, Body);
+  }
+  Function *Codegen(){
+    return TopLevelFunction()->Codegen();
+  }
+  virtual void HandleTopLevel();
 };
 
-static void HandleAsTopLevelExpression(ExprAST *expr){
-  switch(expr.ExprType()){
-    case exp_number
-
+FunctionAST *ExprAST::TopLevelFunction(){
   PrototypeAST *Proto = new PrototypeAST("", std::vector<std::string>());
-  FunctionAST *F = new FunctionAST(Proto, this);
-  if (Function *LF = F->Codegen()) {
-    // JIT the function, returning a function pointer.
-    void *FPtr = TheExecutionEngine->getPointerToFunction(LF);
-    
-    // Cast it to the right type (takes no arguments, returns a double) so we
-    // can call it as a native function.
-    double (*FP)() = (double (*)())(intptr_t)FPtr;
-    fprintf(stderr, "Evaluated to %f\n", FP());
-  }
+  return new FunctionAST(Proto, this);
 }
 
 //===----------------------------------------------------------------------===//
@@ -233,7 +221,7 @@ static void HandleAsTopLevelExpression(ExprAST *expr){
 static int CurTok;
 static int getNextToken() {
   CurTok = gettok();
-  fprintf(stderr, "Curr tok %d\n", CurTok);
+  //fprintf(stderr, "Curr tok %d\n", CurTok);
   return CurTok;
 }
 static void eatParen(){
@@ -265,7 +253,7 @@ static ExprAST *ParseNumberExpr() {
 
 /// call expr ::=  Identifier Expression* 
 static ExprAST *ParseCallExpr() {
-  printf("In ParseCallExpr ");
+  //printf("In ParseCallExpr ");
 
   std::string IdName = IdentifierStr;
   getNextToken();  // eat identifier.
@@ -275,12 +263,13 @@ static ExprAST *ParseCallExpr() {
       ExprAST *Arg = ParseExpression();
       if (!Arg) return 0;
       Args.push_back(Arg);
+      getNextToken();
 
       if (CurTok == ')') break;
 
-      getNextToken();
     }
   }
+  //printf("IDName = %s\n", IdName.c_str());
   if (IdName == "+" || IdName == "*")
     return new OperatorCallExprAST(IdName, Args);
   else
@@ -290,7 +279,9 @@ static ExprAST *ParseCallExpr() {
 static DefinitionAST *ParseDefinition();
 
 static ExprAST *ParseInnerParenExpr(){
-  if (IdentifierStr == "defun"){
+  fprintf(stderr, "Parsing def\n");
+  //printf("In ParseInnerParenExpr IdentifierStr= %s\n", IdentifierStr.c_str());
+  if (IdentifierStr == "def"){
     return ParseDefinition();
   } else {
     return ParseCallExpr();
@@ -306,7 +297,7 @@ static ExprAST *ParseExpression() {
   default: return Error("unknown token when expecting an expression");
   case tok_identifier: return ParseIdentifierExpr();
   case tok_number:     return ParseNumberExpr();
-  case '(':            getNextToken();ExprAST *exp = ParseInnerParenExpr(); eatParen(); return exp;
+  case '(':            getNextToken();ExprAST *exp = ParseInnerParenExpr(); return exp;
   }
 }
 //
@@ -336,18 +327,24 @@ static PrototypeAST *ParsePrototype() {
 
 /// definition ::= 'def' prototype expression
 static DefinitionAST *ParseDefinition() {
+
+  fprintf(stderr, "ParseDefinition being\n");
   getNextToken();  // eat def.
+  fprintf(stderr, "ParsePrototype being\n");
   PrototypeAST *Proto = ParsePrototype();
+
   if (Proto == 0) return 0;
+  fprintf(stderr, "ParseExpression being\n");
 
   if (ExprAST *Body = ParseExpression())
     return new DefinitionAST(Proto, Body);
+  fprintf(stderr, "Returning 0\n");
   return 0;
 }
 
 /// toplevelexpr ::= expression
 static FunctionAST *ParseTopLevelExpr() {
-  printf("In ParseTopLevelExpr\n");
+  //printf("In ParseTopLevelExpr\n");
   if (ExprAST *E = ParseExpression()) {
     // Make an anonymous proto.
     PrototypeAST *Proto = new PrototypeAST("", std::vector<std::string>());
@@ -503,71 +500,43 @@ Function *FunctionAST::Codegen() {
 }
 
 
+void ExprAST::HandleTopLevel() {
+   //Evaluate a top-level expression into an anonymous function.
+  if (FunctionAST *F = TopLevelFunction()) {
+    if (Function *LF = F->Codegen()) {
+       //JIT the function, returning a function pointer.
+      void *FPtr = TheExecutionEngine->getPointerToFunction(LF);
+      
+       //Cast it to the right type (takes no arguments, returns a double) so we
+       //can call it as a native function.
+      double (*FP)() = (double (*)())(intptr_t)FPtr;
+      fprintf(stderr, "Evaluated to %f\n", FP());
+    }
+  } 
+}
+
+void DefinitionAST::HandleTopLevel(){
+  if (FunctionAST *F = TopLevelFunction()) {
+    if (Function *LF = F->Codegen()) {
+      LF->dump();
+    }
+  } 
+}
+
+
 //===----------------------------------------------------------------------===//
 // Top-Level parsing and JIT Driver
 //===----------------------------------------------------------------------===//
 
-//
-//static void HandleDefinition() {
-//  if (FunctionAST *F = ParseDefinition()) {
-//    if (Function *LF = F->Codegen()) {
-//      LF->dump();
-//    }
-//  } else {
-//    // Skip token for error recovery.
-//    getNextToken();
-//  }
-//}
-//
-//static void HandleTopLevelExpression() {
-//  // Evaluate a top-level expression into an anonymous function.
-//  if (FunctionAST *F = ParseTopLevelExpr()) {
-//    if (Function *LF = F->Codegen()) {
-//      // JIT the function, returning a function pointer.
-//      void *FPtr = TheExecutionEngine->getPointerToFunction(LF);
-//      
-//      // Cast it to the right type (takes no arguments, returns a double) so we
-//      // can call it as a native function.
-//      double (*FP)() = (double (*)())(intptr_t)FPtr;
-//      fprintf(stderr, "Evaluated to %f\n", FP());
-//    }
-//  } else {
-//    // Skip token for error recovery.
-//    getNextToken();
-//  }
-//}
-//
 static void MainLoop() {
   while (1) {
-    fprintf(stderr, "ready");
-    ExpAst *E = ParseExpression();
-    switch (E->ExpressionType()){
-      case exp_definition:
-        
-    }
+    ExprAST *E = ParseExpression();
+    E->HandleTopLevel();
+    fprintf(stderr, "ready> ");
+    getNextToken();
   }
 }
 
-//
-///// top ::= definition | external | expression | ';'
-//static void MainLoop() {
-//  while (1) {
-//    fprintf(stderr, "ready> ");
-//    switch (CurTok) {
-//    case '(': {
-//      getNextToken();
-//      switch (CurTok) {
-//        case tok_def: HandleDefinition(); break;
-//        default: HandleTopLevelExpression(); break;
-//      }
-//      eatParen();
-//    }
-//    case tok_eof:    return;
-//    default:         HandleTopLevelExpression(); break;
-//    }
-//    getNextToken();
-//  }
-//}
 //
 //===----------------------------------------------------------------------===//
 // Main driver code.
