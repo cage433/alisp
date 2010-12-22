@@ -112,18 +112,17 @@ static int gettok() {
 
 /// ExprAST - Base class for all expression nodes.
 class ExprAST {
+  int ExprType;
 public:
+  ExprAST(int exprType) : ExprType(exprType) {}
   virtual ~ExprAST() {}
   virtual Value *Codegen() = 0;
-  virtual int ExpressionType() = 0;
-  virtual void HandleAsTopLevelExpression();
 };
 
 /// NumberExprAST - Expression class for numeric literals like "1.0".
-class NumberExprAST : public ExprAST {
+class NumberExprAST : public ExprAST(exp_number) {
   double Val;
 public:
-  virtual int ExpressionType() = {return exp_number;}
   NumberExprAST(double val) : Val(val) {}
   virtual Value *Codegen();
 };
