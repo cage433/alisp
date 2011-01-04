@@ -198,6 +198,7 @@ class DefinitionAST : public ExprAST{
 public:
   DefinitionAST(PrototypeAST *proto, ExprAST *body) : ExprAST(exp_definition){}
   FunctionAST * TopLevelFunction(){
+    fprintf(stderr, "Making top level def func\n");
     return new FunctionAST(Proto, Body);
   }
   Function *Codegen(){
@@ -429,13 +430,17 @@ Value *CallExprAST::Codegen() {
 }
 
 Function *PrototypeAST::Codegen() {
+  fprintf(stderr, "Building Proto codegen\n");
   // Make the function type:  double(double,double) etc.
   std::vector<const Type*> Doubles(Args.size(),
                                    Type::getDoubleTy(getGlobalContext()));
+  fprintf(stderr, "Made doubles array\n");
   FunctionType *FT = FunctionType::get(Type::getDoubleTy(getGlobalContext()),
                                        Doubles, false);
+  fprintf(stderr, "Made function type\n");
   
   Function *F = Function::Create(FT, Function::ExternalLinkage, Name, TheModule);
+  fprintf(stderr, "Created function\n");
   
   // If F conflicted, there was already something named 'Name'.  If it has a
   // body, don't allow redefinition or reextern.
@@ -471,11 +476,15 @@ Function *PrototypeAST::Codegen() {
 }
 
 Function *FunctionAST::Codegen() {
+  fprintf(stderr, "Clearing named values\n");
   NamedValues.clear();
+  fprintf(stderr, "Building proto code\n");
   
   Function *TheFunction = Proto->Codegen();
+  fprintf(stderr, "Have made prototype\n");
   if (TheFunction == 0)
     return 0;
+  fprintf(stderr, "Proto succeeded\n");
   
   // Create a new basic block to start insertion into.
   BasicBlock *BB = BasicBlock::Create(getGlobalContext(), "entry", TheFunction);
@@ -516,8 +525,11 @@ void ExprAST::HandleTopLevel() {
 }
 
 void DefinitionAST::HandleTopLevel(){
+  fprintf(stderr, "Handling def top level\n");
   if (FunctionAST *F = TopLevelFunction()) {
+    fprintf(stderr, "Have top level func\n");
     if (Function *LF = F->Codegen()) {
+      fprintf(stderr, "Have codegen\n");
       LF->dump();
     }
   } 
@@ -531,6 +543,8 @@ void DefinitionAST::HandleTopLevel(){
 static void MainLoop() {
   while (1) {
     ExprAST *E = ParseExpression();
+    fprintf(stderr, "Have expression\n");
+
     E->HandleTopLevel();
     fprintf(stderr, "ready> ");
     getNextToken();
