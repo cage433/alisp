@@ -48,14 +48,6 @@ enum Token {
   tok_identifier = -3, tok_number = -4
 };
 
-enum Expression {
-    exp_number = 1,
-    exp_identifier = 2,
-    exp_definition = 3,
-    exp_operator_call = 4,
-    exp_function_call = 5
-};
-
 static std::string IdentifierStr;  // Filled in if tok_identifier
 static double NumVal;              // Filled in if tok_number
 
@@ -115,21 +107,18 @@ class PrototypeAST;
 
 /// ExprAST - Base class for all expression nodes.
 class ExprAST {
-  int ExprType;
 public:
-  ExprAST(int exprType) : ExprType(exprType) {}
   virtual ~ExprAST() {}
   virtual Value *Codegen() = 0;
   virtual FunctionAST * TopLevelFunction();
   virtual void HandleTopLevel();
-  int GetExprType(){return ExprType;}
 };
 
 /// NumberExprAST - Expression class for numeric literals like "1.0".
 class NumberExprAST : public ExprAST {
   double Val;
 public:
-  NumberExprAST(double val) : ExprAST(exp_number), Val(val) {}
+  NumberExprAST(double val) : ExprAST(), Val(val) {}
   virtual Value *Codegen();
 };
 
@@ -137,7 +126,7 @@ public:
 class VariableExprAST : public ExprAST {
 public:
   std::string Name;
-  VariableExprAST(const std::string &name) : ExprAST(exp_identifier), Name(name) {}
+  VariableExprAST(const std::string &name) : ExprAST(), Name(name) {}
   virtual Value *Codegen();
 };
 
@@ -147,7 +136,7 @@ class OperatorCallExprAST : public ExprAST {
   std::vector<ExprAST*> Args;
 public:
   OperatorCallExprAST(std::string op, std::vector<ExprAST*> &args)
-    : ExprAST(exp_operator_call), Op(op), Args(args) {}
+    : ExprAST(), Op(op), Args(args) {}
   Value *BinOpValue(Value* L, Value* R);
   Value *Fold(Value* Init, std::list<Value*> Vals); 
   Value *InitValue();
@@ -161,7 +150,7 @@ class CallExprAST : public ExprAST {
   std::vector<ExprAST*> Args;
 public:
   CallExprAST(const std::string &callee, std::vector<ExprAST*> &args)
-    : ExprAST(exp_function_call), Callee(callee), Args(args) {}
+    : ExprAST(), Callee(callee), Args(args) {}
   virtual Value *Codegen();
 };
 
@@ -196,7 +185,7 @@ class DefinitionAST : public ExprAST{
   PrototypeAST *Proto;
   ExprAST *Body;
 public:
-  DefinitionAST(PrototypeAST *proto, ExprAST *body) : ExprAST(exp_definition), Proto(proto), Body(body){}
+  DefinitionAST(PrototypeAST *proto, ExprAST *body) : ExprAST(), Proto(proto), Body(body){}
   FunctionAST * TopLevelFunction(){
     fprintf(stderr, "Making top level def func\n");
     return new FunctionAST(Proto, Body);
