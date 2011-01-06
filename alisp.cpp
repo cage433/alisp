@@ -196,7 +196,7 @@ class DefinitionAST : public ExprAST{
   PrototypeAST *Proto;
   ExprAST *Body;
 public:
-  DefinitionAST(PrototypeAST *proto, ExprAST *body) : ExprAST(exp_definition){}
+  DefinitionAST(PrototypeAST *proto, ExprAST *body) : ExprAST(exp_definition), Proto(proto), Body(body){}
   FunctionAST * TopLevelFunction(){
     fprintf(stderr, "Making top level def func\n");
     return new FunctionAST(Proto, Body);
@@ -283,7 +283,8 @@ static ExprAST *ParseInnerParenExpr(){
   fprintf(stderr, "Parsing def\n");
   //printf("In ParseInnerParenExpr IdentifierStr= %s\n", IdentifierStr.c_str());
   if (IdentifierStr == "def"){
-    return ParseDefinition();
+    ExprAST *exp = ParseDefinition();
+    return exp;
   } else {
     return ParseCallExpr();
   }
@@ -337,8 +338,11 @@ static DefinitionAST *ParseDefinition() {
   if (Proto == 0) return 0;
   fprintf(stderr, "ParseExpression being\n");
 
-  if (ExprAST *Body = ParseExpression())
-    return new DefinitionAST(Proto, Body);
+  if (ExprAST *Body = ParseExpression()){
+    DefinitionAST *def = new DefinitionAST(Proto, Body);
+    getNextToken();  // eat paren.
+    return def;
+  }
   fprintf(stderr, "Returning 0\n");
   return 0;
 }
