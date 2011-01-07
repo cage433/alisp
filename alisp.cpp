@@ -187,7 +187,6 @@ class DefinitionAST : public ExprAST{
 public:
   DefinitionAST(PrototypeAST *proto, ExprAST *body) : ExprAST(), Proto(proto), Body(body){}
   FunctionAST * TopLevelFunction(){
-    fprintf(stderr, "Making top level def func\n");
     return new FunctionAST(Proto, Body);
   }
   Function *Codegen(){
@@ -211,7 +210,6 @@ FunctionAST *ExprAST::TopLevelFunction(){
 static int CurTok;
 static int getNextToken() {
   CurTok = gettok();
-  //fprintf(stderr, "Curr tok %d\n", CurTok);
   return CurTok;
 }
 static void eatParen(){
@@ -243,7 +241,6 @@ static ExprAST *ParseNumberExpr() {
 
 /// call expr ::=  Identifier Expression* 
 static ExprAST *ParseCallExpr() {
-  //printf("In ParseCallExpr ");
 
   std::string IdName = IdentifierStr;
   getNextToken();  // eat identifier.
@@ -259,7 +256,6 @@ static ExprAST *ParseCallExpr() {
 
     }
   }
-  //printf("IDName = %s\n", IdName.c_str());
   if (IdName == "+" || IdName == "*")
     return new OperatorCallExprAST(IdName, Args);
   else
@@ -269,8 +265,6 @@ static ExprAST *ParseCallExpr() {
 static DefinitionAST *ParseDefinition();
 
 static ExprAST *ParseInnerParenExpr(){
-  fprintf(stderr, "Parsing def\n");
-  //printf("In ParseInnerParenExpr IdentifierStr= %s\n", IdentifierStr.c_str());
   if (IdentifierStr == "def"){
     ExprAST *exp = ParseDefinition();
     return exp;
@@ -319,26 +313,21 @@ static PrototypeAST *ParsePrototype() {
 /// definition ::= 'def' prototype expression
 static DefinitionAST *ParseDefinition() {
 
-  fprintf(stderr, "ParseDefinition being\n");
   getNextToken();  // eat def.
-  fprintf(stderr, "ParsePrototype being\n");
   PrototypeAST *Proto = ParsePrototype();
 
   if (Proto == 0) return 0;
-  fprintf(stderr, "ParseExpression being\n");
 
   if (ExprAST *Body = ParseExpression()){
     DefinitionAST *def = new DefinitionAST(Proto, Body);
     getNextToken();  // eat paren.
     return def;
   }
-  fprintf(stderr, "Returning 0\n");
   return 0;
 }
 
 /// toplevelexpr ::= expression
 static FunctionAST *ParseTopLevelExpr() {
-  //printf("In ParseTopLevelExpr\n");
   if (ExprAST *E = ParseExpression()) {
     // Make an anonymous proto.
     PrototypeAST *Proto = new PrototypeAST("", std::vector<std::string>());
@@ -423,17 +412,13 @@ Value *CallExprAST::Codegen() {
 }
 
 Function *PrototypeAST::Codegen() {
-  fprintf(stderr, "Building Proto codegen\n");
   // Make the function type:  double(double,double) etc.
   std::vector<const Type*> Doubles(Args.size(),
                                    Type::getDoubleTy(getGlobalContext()));
-  fprintf(stderr, "Made doubles array\n");
   FunctionType *FT = FunctionType::get(Type::getDoubleTy(getGlobalContext()),
                                        Doubles, false);
-  fprintf(stderr, "Made function type\n");
   
   Function *F = Function::Create(FT, Function::ExternalLinkage, Name, TheModule);
-  fprintf(stderr, "Created function\n");
   
   // If F conflicted, there was already something named 'Name'.  If it has a
   // body, don't allow redefinition or reextern.
@@ -469,15 +454,11 @@ Function *PrototypeAST::Codegen() {
 }
 
 Function *FunctionAST::Codegen() {
-  fprintf(stderr, "Clearing named values\n");
   NamedValues.clear();
-  fprintf(stderr, "Building proto code\n");
   
   Function *TheFunction = Proto->Codegen();
-  fprintf(stderr, "Have made prototype\n");
   if (TheFunction == 0)
     return 0;
-  fprintf(stderr, "Proto succeeded\n");
   
   // Create a new basic block to start insertion into.
   BasicBlock *BB = BasicBlock::Create(getGlobalContext(), "entry", TheFunction);
@@ -518,11 +499,8 @@ void ExprAST::HandleTopLevel() {
 }
 
 void DefinitionAST::HandleTopLevel(){
-  fprintf(stderr, "Handling def top level\n");
   if (FunctionAST *F = TopLevelFunction()) {
-    fprintf(stderr, "Have top level func\n");
     if (Function *LF = F->Codegen()) {
-      fprintf(stderr, "Have codegen\n");
       LF->dump();
     }
   } 
@@ -536,7 +514,6 @@ void DefinitionAST::HandleTopLevel(){
 static void MainLoop() {
   while (1) {
     ExprAST *E = ParseExpression();
-    fprintf(stderr, "Have expression\n");
 
     E->HandleTopLevel();
     fprintf(stderr, "ready> ");
