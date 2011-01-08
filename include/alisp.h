@@ -20,15 +20,15 @@ typedef struct {
         };
 } typed_token;
 
-struct token_list{
+typedef struct token_list{
         typed_token *car;
         struct token_list *cdr;
-};
+} token_list;
 
 static typed_token LEFT_PAREN = {tok_left_paren, 0};
 static typed_token RIGHT_PAREN = {tok_right_paren, 0};
 
-struct token_list *getTokens(FILE *stream);
+token_list *getTokens(FILE *stream);
 int tokens_equal(typed_token *tok1, typed_token *tok2);
 
 #endif

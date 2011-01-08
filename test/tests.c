@@ -15,8 +15,8 @@ START_TEST(single_paren)
         char *code = "(";
         write_str_to_tmp_file(code);
         FILE *file = fopen(TMPFILE, "r");
-        struct token_list *tokens = getTokens(file);
-        struct token_list *expected_list = make_token_list(1, &LEFT_PAREN);
+        token_list *tokens = getTokens(file);
+        token_list *expected_list = make_token_list(1, &LEFT_PAREN);
         fail_unless(token_lists_equal(expected_list, tokens));
 }
 END_TEST
@@ -39,7 +39,7 @@ void foo(){
         char *code = "(";
         write_str_to_tmp_file(code);
         FILE *file = fopen("tmpfile", "r");
-        struct token_list *tokens = getTokens(file);
+        token_list *tokens = getTokens(file);
         int are_equal = tokens_equal(tokens->car, &LEFT_PAREN);
         printf("are equal %d\n", are_equal);
 }

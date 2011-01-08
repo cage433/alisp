@@ -49,7 +49,7 @@ int tokens_equal(typed_token *tok1, typed_token *tok2){
         }
 }
 
-int token_lists_equal(struct token_list *l1, struct token_list *l2){
+int token_lists_equal(token_list *l1, token_list *l2){
         while(l1 != NULL || l2 != NULL){
                 if (l1 == NULL || l2 == NULL)
                         return 0;
@@ -64,25 +64,25 @@ int token_lists_equal(struct token_list *l1, struct token_list *l2){
                 
 
 
-struct token_list *cons(typed_token *elt, struct token_list *list){
-        struct token_list *consed_list = (struct token_list *)malloc(sizeof(struct token_list));
+token_list *cons(typed_token *elt, token_list *list){
+        token_list *consed_list = (token_list *)malloc(sizeof(token_list));
         consed_list->car = elt;
         consed_list->cdr = list;
         return consed_list;
 }
 
-struct char_buffer{
+typedef struct char_buffer{
         char *array;
         int max_arr_length;
         int string_length;
-};
+} char_buffer;
 
 #include "stdarg.h"
 
-struct token_list *make_token_list(int size, ...){
+token_list *make_token_list(int size, ...){
         va_list(ap);
         va_start(ap, size);
-        struct token_list *list = NULL;
+        token_list *list = NULL;
         int i;
         for (i = 0; i < size; ++i){
                 typed_token * elt = va_arg(ap, typed_token *);
@@ -91,7 +91,7 @@ struct token_list *make_token_list(int size, ...){
         return list;
 }
 
-void increase_arr_size(struct char_buffer *fac){
+void increase_arr_size(char_buffer *fac){
         char *new_array = (char *)calloc(2 * fac->max_arr_length, sizeof(char));
         strcpy(new_array, fac->array);
         free(fac->array);
@@ -99,14 +99,14 @@ void increase_arr_size(struct char_buffer *fac){
         fac->max_arr_length = 2 * fac->max_arr_length;
 }
 
-void clear_char_buffer(struct char_buffer * buf){
+void clear_char_buffer(char_buffer * buf){
         free(buf->array);
         buf->array = (char *)calloc(10, sizeof(char));
         buf->max_arr_length = 10;
         buf->string_length = 0;
 }
 
-void add_char(char ch, struct char_buffer *fac){
+void add_char(char ch, char_buffer *fac){
         if (fac->string_length + 1 >= fac->max_arr_length){
                 increase_arr_size(fac);
         }
@@ -114,7 +114,7 @@ void add_char(char ch, struct char_buffer *fac){
         ++(fac->string_length);
 }
 
-typed_token *consume_identifier(struct char_buffer *buf, FILE *stream){
+typed_token *consume_identifier(char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isspace(ch) || ch == ')'){
@@ -137,7 +137,7 @@ typed_token *consume_identifier(struct char_buffer *buf, FILE *stream){
         }
 }
 
-typed_token *consume_double(struct char_buffer *buf, FILE *stream){
+typed_token *consume_double(char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
@@ -161,7 +161,7 @@ typed_token *consume_double(struct char_buffer *buf, FILE *stream){
         }
 }
 
-typed_token *consume_integer(struct char_buffer *buf, FILE *stream){
+typed_token *consume_integer(char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
@@ -189,9 +189,9 @@ typed_token *consume_integer(struct char_buffer *buf, FILE *stream){
 }
 
 
-struct token_list *getTokens(FILE *stream){
-        struct token_list *x = NULL;
-        struct char_buffer buf = {(char *) calloc(10, sizeof(char)), 10, 0};
+token_list *getTokens(FILE *stream){
+        token_list *x = NULL;
+        char_buffer buf = {(char *) calloc(10, sizeof(char)), 10, 0};
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (ch == '(')
@@ -217,7 +217,7 @@ struct token_list *getTokens(FILE *stream){
 //        FILE *stream = fopen(argv[1], "r");
 //        int ch;
 //
-//        struct token_list *toks = getTokens(stream);
+//        token_list *toks = getTokens(stream);
 //        while (toks != NULL){
 //                printtoken(toks->car);
 //                toks = toks->cdr;
