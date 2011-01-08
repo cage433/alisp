@@ -3,22 +3,7 @@
 #include "ctype.h"
 #include "string.h"
 
-enum token_type {
-        tok_left_paren,
-        tok_identifier,
-        tok_integer,
-        tok_double,
-        tok_right_paren
-};
-
-struct typed_token{
-        enum token_type type;
-        union {
-                int intValue;
-                double doubleValue;
-                char* identifierValue;
-        };
-};
+#include "alisp.h"
 
 void printtoken(struct typed_token *tok){
         switch(tok->type){
@@ -40,11 +25,31 @@ void printtoken(struct typed_token *tok){
         }
 }
 
+int tokens_equal(struct typed_token *tok1, struct typed_token *tok2){
+        switch(tok1->type){
+                case tok_left_paren:
+                        return tok2->type == tok_left_paren;
+                case tok_right_paren:
+                        return tok2->type == tok_right_paren;
+                case tok_integer:
+                        if (tok2->type == tok_integer)
+                                return tok1->intValue == tok2->intValue;
+                        else
+                                return 0;
+                case tok_double:
+                        if (tok2->type == tok_double)
+                                return tok1->doubleValue == tok2->doubleValue;
+                        else
+                                return 0;
+                case tok_identifier:
+                        if (tok2->type == tok_identifier)
+                                return strcmp(tok1->identifierValue, tok2->identifierValue) == 0;
+                        else
+                                return 0;
+        }
+}
+                
 
-struct token_list{
-        struct typed_token *car;
-        struct token_list *cdr;
-};
 
 struct token_list *cons(struct typed_token *elt, struct token_list *list){
         struct token_list *consed_list = (struct token_list *)malloc(sizeof(struct token_list));
@@ -52,9 +57,6 @@ struct token_list *cons(struct typed_token *elt, struct token_list *list){
         consed_list->cdr = list;
         return consed_list;
 }
-
-struct typed_token LEFT_PAREN = {tok_left_paren, 0};
-struct typed_token RIGHT_PAREN = {tok_right_paren, 0};
 
 struct char_buffer{
         char *array;
@@ -183,15 +185,15 @@ struct token_list *getTokens(FILE *stream){
         return x;
 }
 
-int main(int argc, char *argv[]){
-        printf("First arg is %s\n", argv[1]);
-        FILE *stream = fopen(argv[1], "r");
-        int ch;
-
-        struct token_list *toks = getTokens(stream);
-        while (toks != NULL){
-                printtoken(toks->car);
-                toks = toks->cdr;
-        }
-        return 0;
-}
+//int main(int argc, char *argv[]){
+//        printf("First arg is %s\n", argv[1]);
+//        FILE *stream = fopen(argv[1], "r");
+//        int ch;
+//
+//        struct token_list *toks = getTokens(stream);
+//        while (toks != NULL){
+//                printtoken(toks->car);
+//                toks = toks->cdr;
+//        }
+//        return 0;
+//}
