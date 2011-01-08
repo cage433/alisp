@@ -31,6 +31,7 @@ static typed_token RIGHT_PAREN = {tok_right_paren, 0};
 token_list *getTokens(FILE *stream);
 int tokens_equal(typed_token tok1, typed_token tok2);
 
+token_list *make_token_list(int size, ...);
 #endif
 
 

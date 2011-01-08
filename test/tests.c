@@ -21,6 +21,20 @@ START_TEST(single_paren)
 }
 END_TEST
 
+START_TEST(two_tokens)
+{
+        char *code = "( 45";
+        write_str_to_tmp_file(code);
+        FILE *file = fopen(TMPFILE, "r");
+        token_list *tokens = getTokens(file);
+        typed_token tok45;
+        tok45.type = tok_integer;
+        tok45.intValue =  45;
+        token_list *expected_list = make_token_list(2, LEFT_PAREN, tok45);
+        fail_unless(token_lists_equal(expected_list, tokens));
+}
+END_TEST
+
 Suite *
 test_suite (void)
 {
@@ -29,6 +43,7 @@ test_suite (void)
         /* Core test case */
         TCase *tc_core = tcase_create ("Core");
         tcase_add_test (tc_core, single_paren);
+        tcase_add_test (tc_core, two_tokens);
         suite_add_tcase (s, tc_core);
 
         return s;
