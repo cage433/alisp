@@ -104,6 +104,14 @@ typedef struct char_buffer{
         int string_length;
 } char_buffer;
 
+token_list *reverse_token_list(token_list *list){
+        token_list *reverse = NULL;
+        while (list != NULL){
+                reverse = cons(copy_token(list->car), reverse);
+                list = list->cdr;
+        }
+        return reverse;
+}
 
 token_list *make_token_list(int size, ...){
         va_list(ap);
@@ -114,7 +122,8 @@ token_list *make_token_list(int size, ...){
                 typed_token elt = va_arg(ap, typed_token);
                 list = cons(elt, list);
         }
-        return list;
+        token_list *result = reverse_token_list(list);
+        return result;
 }
 
 void increase_arr_size(char_buffer *fac){
@@ -248,7 +257,8 @@ token_list *getTokens(FILE *stream){
                 }
                 clear_char_buffer(&buf);
         }
-        return x;
+        token_list *result = reverse_token_list(x);
+        return result;
 }
 
 //int main(int argc, char *argv[]){
