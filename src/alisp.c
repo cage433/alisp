@@ -48,6 +48,19 @@ int tokens_equal(struct typed_token *tok1, struct typed_token *tok2){
                                 return 0;
         }
 }
+
+int token_lists_equal(struct token_list *l1, struct token_list *l2){
+        while(l1 != NULL || l2 != NULL){
+                if (l1 == NULL || l2 == NULL)
+                        return 0;
+                else if (tokens_equal(l1->car, l2->car)){
+                        l1 = l1->cdr;
+                        l2 = l2->cdr;
+                } else
+                        return 0;
+        }
+        return 1;
+}
                 
 
 
@@ -64,6 +77,20 @@ struct char_buffer{
         int string_length;
 };
 
+#include "stdarg.h"
+
+struct token_list *make_list(int size, ...){
+        va_list(ap);
+        va_start(ap, size);
+        struct token_list *list = NULL;
+        int i;
+        for (i = 0; i < size; ++i){
+                struct typed_token * elt = va_arg(ap, struct typed_token *);
+                list = cons(elt, list);
+        }
+        return list;
+}
+
 void increase_arr_size(struct char_buffer *fac){
         char *new_array = (char *)calloc(2 * fac->max_arr_length, sizeof(char));
         strcpy(new_array, fac->array);
@@ -76,7 +103,7 @@ void clear_char_buffer(struct char_buffer * buf){
         free(buf->array);
         buf->array = (char *)calloc(10, sizeof(char));
         buf->max_arr_length = 10;
-        buf ->string_length = 0;
+        buf->string_length = 0;
 }
 
 void add_char(char ch, struct char_buffer *fac){
