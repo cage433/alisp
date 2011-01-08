@@ -113,6 +113,18 @@ token_list *reverse_token_list(token_list *list){
         return reverse;
 }
 
+void free_token(typed_token tok){
+        if (tok.type == tok_identifier)
+                free(tok.identifierValue);
+}
+void free_token_list(token_list *list){
+        while (list != NULL){
+                free_token(list->car);
+                token_list *cdr = list->cdr;
+                free(list);
+                list = cdr;
+        }
+}
 token_list *make_token_list(int size, ...){
         va_list(ap);
         va_start(ap, size);
@@ -123,6 +135,7 @@ token_list *make_token_list(int size, ...){
                 list = cons(elt, list);
         }
         token_list *result = reverse_token_list(list);
+        free_token_list(list);
         return result;
 }
 
@@ -258,18 +271,7 @@ token_list *getTokens(FILE *stream){
                 clear_char_buffer(&buf);
         }
         token_list *result = reverse_token_list(x);
+        free_token_list(x);
         return result;
 }
 
-//int main(int argc, char *argv[]){
-//        printf("First arg is %s\n", argv[1]);
-//        FILE *stream = fopen(argv[1], "r");
-//        int ch;
-//
-//        token_list *toks = getTokens(stream);
-//        while (toks != NULL){
-//                printtoken(toks->car);
-//                toks = toks->cdr;
-//        }
-//        return 0;
-//}
