@@ -16,7 +16,7 @@ START_TEST(single_paren)
         write_str_to_tmp_file(code);
         FILE *file = fopen(TMPFILE, "r");
         struct token_list *tokens = getTokens(file);
-        struct token_list *expected_list = make_list(1, &LEFT_PAREN);
+        struct token_list *expected_list = make_token_list(1, &LEFT_PAREN);
         fail_unless(token_lists_equal(expected_list, tokens));
 }
 END_TEST

@@ -5,7 +5,7 @@
 
 #include "alisp.h"
 
-void printtoken(struct typed_token *tok){
+void printtoken(typed_token *tok){
         switch(tok->type){
                 case tok_left_paren:
                         printf("LEFT PAREN\n");
@@ -25,7 +25,7 @@ void printtoken(struct typed_token *tok){
         }
 }
 
-int tokens_equal(struct typed_token *tok1, struct typed_token *tok2){
+int tokens_equal(typed_token *tok1, typed_token *tok2){
         switch(tok1->type){
                 case tok_left_paren:
                         return tok2->type == tok_left_paren;
@@ -64,7 +64,7 @@ int token_lists_equal(struct token_list *l1, struct token_list *l2){
                 
 
 
-struct token_list *cons(struct typed_token *elt, struct token_list *list){
+struct token_list *cons(typed_token *elt, struct token_list *list){
         struct token_list *consed_list = (struct token_list *)malloc(sizeof(struct token_list));
         consed_list->car = elt;
         consed_list->cdr = list;
@@ -85,7 +85,7 @@ struct token_list *make_token_list(int size, ...){
         struct token_list *list = NULL;
         int i;
         for (i = 0; i < size; ++i){
-                struct typed_token * elt = va_arg(ap, struct typed_token *);
+                typed_token * elt = va_arg(ap, typed_token *);
                 list = cons(elt, list);
         }
         return list;
@@ -114,7 +114,7 @@ void add_char(char ch, struct char_buffer *fac){
         ++(fac->string_length);
 }
 
-struct typed_token *consume_identifier(struct char_buffer *buf, FILE *stream){
+typed_token *consume_identifier(struct char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isspace(ch) || ch == ')'){
@@ -124,7 +124,7 @@ struct typed_token *consume_identifier(struct char_buffer *buf, FILE *stream){
                         char *new_array = (char *)calloc(buf->string_length + 1, sizeof(char));
                         strcpy(new_array, buf->array);
 
-                        struct typed_token *tok = (struct typed_token *)malloc(sizeof(struct typed_token));
+                        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
                         tok->type = tok_identifier;
                         tok->identifierValue = new_array;
                         return tok;
@@ -137,7 +137,7 @@ struct typed_token *consume_identifier(struct char_buffer *buf, FILE *stream){
         }
 }
 
-struct typed_token *consume_double(struct char_buffer *buf, FILE *stream){
+typed_token *consume_double(struct char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
@@ -147,7 +147,7 @@ struct typed_token *consume_double(struct char_buffer *buf, FILE *stream){
                                 ungetc(ch, stream);
                         }
                         double num = atof(buf->array);
-                        struct typed_token *tok = (struct typed_token *)malloc(sizeof(struct typed_token));
+                        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
                         tok->type = tok_double;
                         tok->doubleValue = num;
                         return tok;
@@ -161,7 +161,7 @@ struct typed_token *consume_double(struct char_buffer *buf, FILE *stream){
         }
 }
 
-struct typed_token *consume_integer(struct char_buffer *buf, FILE *stream){
+typed_token *consume_integer(struct char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
@@ -174,7 +174,7 @@ struct typed_token *consume_integer(struct char_buffer *buf, FILE *stream){
                                 ungetc(ch, stream);
                         }
                         int num = atoi(buf->array);
-                        struct typed_token *tok = (struct typed_token *)malloc(sizeof(struct typed_token));
+                        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
                         tok->type = tok_integer;
                         tok->intValue = num;
                         return tok;
