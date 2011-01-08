@@ -79,7 +79,7 @@ struct char_buffer{
 
 #include "stdarg.h"
 
-struct token_list *make_list(int size, ...){
+struct token_list *make_token_list(int size, ...){
         va_list(ap);
         va_start(ap, size);
         struct token_list *list = NULL;
