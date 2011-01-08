@@ -10,6 +10,12 @@ void write_str_to_tmp_file(char *string){
         fclose(file);
 }
 
+START_TEST(make_token_list)
+{
+        token_list *list = make_token_list(1, LEFT_PAREN, RIGHT_PAREN);
+        fail_unless(tokens_equal(LEFT_PAREN, list->car));
+}
+END_TEST
 START_TEST(single_paren)
 {
         char *code = "(";
