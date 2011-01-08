@@ -2,11 +2,12 @@
 #include "stdlib.h"
 #include "ctype.h"
 #include "string.h"
+#include "stdarg.h"
 
 #include "alisp.h"
 
-void printtoken(typed_token *tok){
-        switch(tok->type){
+void printtoken(typed_token tok){
+        switch(tok.type){
                 case tok_left_paren:
                         printf("LEFT PAREN\n");
                         break;
@@ -14,40 +15,54 @@ void printtoken(typed_token *tok){
                         printf("RIGHT PAREN\n");
                         break;
                 case tok_integer:
-                        printf("INTEGER %d\n", tok->intValue);
+                        printf("INTEGER %d\n", tok.intValue);
                         break;
                 case tok_double:
-                        printf("DOUBLE %G\n", tok->doubleValue);
+                        printf("DOUBLE %G\n", tok.doubleValue);
                         break;
                 case tok_identifier:
-                        printf("IDENTIFIER %s\n", tok->identifierValue);
+                        printf("IDENTIFIER %s\n", tok.identifierValue);
                         break;
         }
 }
 
-int tokens_equal(typed_token *tok1, typed_token *tok2){
-        switch(tok1->type){
+int tokens_equal(typed_token tok1, typed_token tok2){
+        switch(tok1.type){
                 case tok_left_paren:
-                        return tok2->type == tok_left_paren;
+                        return tok2.type == tok_left_paren;
                 case tok_right_paren:
-                        return tok2->type == tok_right_paren;
+                        return tok2.type == tok_right_paren;
                 case tok_integer:
-                        if (tok2->type == tok_integer)
-                                return tok1->intValue == tok2->intValue;
+                        if (tok2.type == tok_integer)
+                                return tok1.intValue == tok2.intValue;
                         else
                                 return 0;
                 case tok_double:
-                        if (tok2->type == tok_double)
-                                return tok1->doubleValue == tok2->doubleValue;
+                        if (tok2.type == tok_double)
+                                return tok1.doubleValue == tok2.doubleValue;
                         else
                                 return 0;
                 case tok_identifier:
-                        if (tok2->type == tok_identifier)
-                                return strcmp(tok1->identifierValue, tok2->identifierValue) == 0;
+                        if (tok2.type == tok_identifier)
+                                return strcmp(tok1.identifierValue, tok2.identifierValue) == 0;
                         else
                                 return 0;
         }
 }
+
+typed_token copy_token(typed_token tok){
+        if (tok.type == tok_identifier){
+                int len = strlen(tok.identifierValue);
+                char *newIdentifierValue = (char *)calloc(len + 1, sizeof(char));
+                strcpy(newIdentifierValue, tok.identifierValue);
+                typed_token result;
+                result.type = tok_identifier;
+                result.identifierValue = newIdentifierValue;
+                return result;
+        } else
+                return tok;
+}
+
 
 int token_lists_equal(token_list *l1, token_list *l2){
         while(l1 != NULL || l2 != NULL){
@@ -64,9 +79,9 @@ int token_lists_equal(token_list *l1, token_list *l2){
                 
 
 
-token_list *cons(typed_token *elt, token_list *list){
+token_list *cons(typed_token elt, token_list *list){
         token_list *consed_list = (token_list *)malloc(sizeof(token_list));
-        consed_list->car = elt;
+        consed_list->car = copy_token(elt);
         consed_list->cdr = list;
         return consed_list;
 }
@@ -77,7 +92,6 @@ typedef struct char_buffer{
         int string_length;
 } char_buffer;
 
-#include "stdarg.h"
 
 token_list *make_token_list(int size, ...){
         va_list(ap);
@@ -85,7 +99,7 @@ token_list *make_token_list(int size, ...){
         token_list *list = NULL;
         int i;
         for (i = 0; i < size; ++i){
-                typed_token * elt = va_arg(ap, typed_token *);
+                typed_token elt = va_arg(ap, typed_token);
                 list = cons(elt, list);
         }
         return list;
@@ -114,7 +128,7 @@ void add_char(char ch, char_buffer *fac){
         ++(fac->string_length);
 }
 
-typed_token *consume_identifier(char_buffer *buf, FILE *stream){
+typed_token consume_identifier(char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isspace(ch) || ch == ')'){
@@ -123,11 +137,10 @@ typed_token *consume_identifier(char_buffer *buf, FILE *stream){
                         }
                         char *new_array = (char *)calloc(buf->string_length + 1, sizeof(char));
                         strcpy(new_array, buf->array);
-
-                        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
-                        tok->type = tok_identifier;
-                        tok->identifierValue = new_array;
-                        return tok;
+                        typed_token result;
+                        result.type = tok_identifier;
+                        result.identifierValue = new_array;
+                        return result;
                 } else if (ch == '(') {
                         printf("Unexpected left paren ");
                         exit(1);
@@ -137,7 +150,7 @@ typed_token *consume_identifier(char_buffer *buf, FILE *stream){
         }
 }
 
-typed_token *consume_double(char_buffer *buf, FILE *stream){
+typed_token consume_double(char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
@@ -147,10 +160,10 @@ typed_token *consume_double(char_buffer *buf, FILE *stream){
                                 ungetc(ch, stream);
                         }
                         double num = atof(buf->array);
-                        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
-                        tok->type = tok_double;
-                        tok->doubleValue = num;
-                        return tok;
+                        typed_token result;
+                        result.type = tok_double;
+                        result.doubleValue = num;
+                        return result;
                 } else if (ch == '(') {
                         printf("Unexpected left paren ");
                         exit(1);
@@ -161,7 +174,7 @@ typed_token *consume_double(char_buffer *buf, FILE *stream){
         }
 }
 
-typed_token *consume_integer(char_buffer *buf, FILE *stream){
+typed_token consume_integer(char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
@@ -174,10 +187,10 @@ typed_token *consume_integer(char_buffer *buf, FILE *stream){
                                 ungetc(ch, stream);
                         }
                         int num = atoi(buf->array);
-                        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
-                        tok->type = tok_integer;
-                        tok->intValue = num;
-                        return tok;
+                        typed_token result;
+                        result.type = tok_integer;
+                        result.intValue = num;
+                        return result;
                 } else if (ch == '(') {
                         printf("Unexpected left paren ");
                         exit(1);
@@ -195,9 +208,9 @@ token_list *getTokens(FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (ch == '(')
-                        x = cons(&LEFT_PAREN, x);
+                        x = cons(LEFT_PAREN, x);
                 else if (ch == ')')
-                        x = cons(&RIGHT_PAREN, x);
+                        x = cons(RIGHT_PAREN, x);
                 else if (isdigit(ch)){
                         add_char(ch, &buf);
                         x = cons(consume_integer(&buf, stream), x);

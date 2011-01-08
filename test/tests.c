@@ -16,7 +16,7 @@ START_TEST(single_paren)
         write_str_to_tmp_file(code);
         FILE *file = fopen(TMPFILE, "r");
         token_list *tokens = getTokens(file);
-        token_list *expected_list = make_token_list(1, &LEFT_PAREN);
+        token_list *expected_list = make_token_list(1, LEFT_PAREN);
         fail_unless(token_lists_equal(expected_list, tokens));
 }
 END_TEST
@@ -34,15 +34,6 @@ test_suite (void)
         return s;
 }
 
-void foo(){
-        int isequal = tokens_equal(&LEFT_PAREN, &LEFT_PAREN);
-        char *code = "(";
-        write_str_to_tmp_file(code);
-        FILE *file = fopen("tmpfile", "r");
-        token_list *tokens = getTokens(file);
-        int are_equal = tokens_equal(tokens->car, &LEFT_PAREN);
-        printf("are equal %d\n", are_equal);
-}
 
 int main (void)
 {
