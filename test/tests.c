@@ -10,7 +10,7 @@ void write_str_to_tmp_file(char *string){
         fclose(file);
 }
 
-START_TEST(single paren)
+START_TEST(single_paren)
 {
         char *code = "(";
         write_str_to_tmp_file(code);
@@ -29,7 +29,7 @@ test_suite (void)
 
         /* Core test case */
         TCase *tc_core = tcase_create ("Core");
-        tcase_add_test (tc_core, fred);
+        tcase_add_test (tc_core, single_paren);
         suite_add_tcase (s, tc_core);
 
         return s;
