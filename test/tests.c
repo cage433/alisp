@@ -10,7 +10,7 @@ void write_str_to_tmp_file(char *string){
         fclose(file);
 }
 
-START_TEST(fred)
+START_TEST(single paren)
 {
         char *code = "(";
         write_str_to_tmp_file(code);
