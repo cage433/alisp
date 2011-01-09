@@ -5,7 +5,7 @@
 #include "token.h"
 #include "lexer.h"
 
-char *TMPFILE = "tmpfile";
+char *TMPFILE = (char *)"tmpfile";
 void write_str_to_tmp_file(char *string){
         FILE *file = fopen(TMPFILE, "w");
         fputs(string, file);
@@ -20,13 +20,13 @@ START_TEST(test_make_token_list)
 END_TEST
 
 static char *codes[] = {
-        "(", 
-        "(45",
-        "( 45",
-        "34.6)",
-        "(fred)",
-        "(x(",
-        "( \
+        (char *)"(", 
+        (char *)"(45",
+        (char *)"( 45",
+        (char *)"34.6)",
+        (char *)"(fred)",
+        (char *)"(x(",
+        (char *)"( \
                 x\
                 (\
                 ",
@@ -41,10 +41,10 @@ token_list *expected_lists(int i){
                 case 3:
                         return make_token_list(2, double_token(34.6), RIGHT_PAREN);
                 case 4:
-                        return make_token_list(3, LEFT_PAREN, identifier_token("fred"), RIGHT_PAREN);
+                        return make_token_list(3, LEFT_PAREN, identifier_token((char *)"fred"), RIGHT_PAREN);
                 case 5:
                 case 6:
-                        return make_token_list(3, LEFT_PAREN, identifier_token("x"), LEFT_PAREN);
+                        return make_token_list(3, LEFT_PAREN, identifier_token((char *)"x"), LEFT_PAREN);
         }
 }
 
