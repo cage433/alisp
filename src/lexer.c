@@ -5,7 +5,7 @@
 #include "stdarg.h"
 
 #include "token.h"
-#include "alisp.h"
+#include "lexer.h"
 
 typedef struct char_buffer{
         char *array;
