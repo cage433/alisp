@@ -5,7 +5,27 @@
 #include "stdarg.h"
 
 #include "token.h"
+typed_token integer_token(int num){
+        typed_token tok;
+        tok.type = tok_integer;
+        tok.intValue = num;
+        return tok;
+}
 
+typed_token double_token(double num){
+        typed_token tok;
+        tok.type = tok_double;
+        tok.doubleValue = num;
+        return tok;
+}
+
+typed_token identifier_token(char *identifier){
+        typed_token tok;
+        tok.type = tok_identifier;
+        tok.identifierValue = calloc(1 + strlen(identifier), sizeof(char));
+        strcpy(tok.identifierValue, identifier);
+        return tok;
+}
 
 void printtoken(typed_token tok){
         switch(tok.type){
@@ -65,13 +85,7 @@ int tokens_equal(typed_token tok1, typed_token tok2){
 
 typed_token copy_token(typed_token tok){
         if (tok.type == tok_identifier){
-                int len = strlen(tok.identifierValue);
-                char *newIdentifierValue = (char *)calloc(len + 1, sizeof(char));
-                strcpy(newIdentifierValue, tok.identifierValue);
-                typed_token result;
-                result.type = tok_identifier;
-                result.identifierValue = newIdentifierValue;
-                return result;
+                return identifier_token(tok.identifierValue);
         } else
                 return tok;
 }

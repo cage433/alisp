@@ -18,6 +18,10 @@ typedef struct {
         };
 } typed_token;
 
+typed_token integer_token(int num);
+typed_token double_token(double num);
+typed_token identifier_token(char *identifier);
+
 typedef struct token_list{
         typed_token car;
         struct token_list *cdr;

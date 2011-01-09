@@ -37,66 +37,41 @@ void add_char(char ch, char_buffer *fac){
         ++(fac->string_length);
 }
 
-typed_token make_identifier_token(char_buffer *buf){
-        char *new_array = (char *)calloc(buf->string_length + 1, sizeof(char));
-        strcpy(new_array, buf->array);
-        typed_token result;
-        result.type = tok_identifier;
-        result.identifierValue = new_array;
-        return result;
+int isparen(char ch){
+        return ch == '(' || ch == ')';
 }
+
 typed_token consume_identifier(char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
-                if (isspace(ch) || ch == ')'){
-                        if (ch == ')'){
+                if (isspace(ch) || isparen(ch)){
+                        if (isparen(ch)){
                                 ungetc(ch, stream);
                         }
-                        return make_identifier_token(buf);
-                } else if (ch == '(') {
-                        printf("Unexpected left paren ");
-                        exit(1);
+                        return identifier_token(buf->array);
                 } else {
                         add_char(ch, buf);
                 }
         }
-        return make_identifier_token(buf);
+        return identifier_token(buf->array);
 }
 
-typed_token make_double_token(char_buffer *buf){
-        int num = atof(buf->array);
-        typed_token result;
-        result.type = tok_double;
-        result.intValue = num;
-        return result;
-}
 typed_token consume_double(char_buffer *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
                         add_char(ch, buf);
-                } else if (isspace(ch) || ch == ')'){
-                        if (ch == ')'){
+                } else if (isspace(ch) || isparen(ch)){
+                        if (isparen(ch)){
                                 ungetc(ch, stream);
                         }
-                        return make_double_token(buf);
-                } else if (ch == '(') {
-                        printf("Unexpected left paren ");
-                        exit(1);
+                        return double_token(atof(buf->array));
                 } else {
                         add_char(ch, buf);
                         return consume_identifier(buf, stream);
                 }
         }
-        return make_double_token(buf);
-}
-
-typed_token make_integer_token(char_buffer *buf){
-        int num = atoi(buf->array);
-        typed_token result;
-        result.type = tok_integer;
-        result.intValue = num;
-        return result;
+        return double_token(atof(buf->array));
 }
 
 typed_token consume_integer(char_buffer *buf, FILE *stream){
@@ -107,20 +82,17 @@ typed_token consume_integer(char_buffer *buf, FILE *stream){
                 } else if (ch == '.'){
                         add_char(ch, buf);
                         return consume_double(buf, stream);
-                } else if (isspace(ch) || ch == ')'){
-                        if (ch == ')'){
+                } else if (isspace(ch) || isparen(ch)){
+                        if (isparen(ch)){
                                 ungetc(ch, stream);
                         }
-                        return make_integer_token(buf);
-                } else if (ch == '(') {
-                        printf("Unexpected left paren ");
-                        exit(1);
+                        return integer_token(atoi(buf->array));
                 } else {
                         add_char(ch, buf);
                         return consume_identifier(buf, stream);
                 }
         }
-        return make_integer_token(buf);
+        return integer_token(atoi(buf->array));
 }
 
 

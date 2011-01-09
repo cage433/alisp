@@ -3,7 +3,7 @@
 #include "stdio.h"
 
 #include "token.h"
-#include "alisp.h"
+#include "lexer.h"
 
 char *TMPFILE = "tmpfile";
 void write_str_to_tmp_file(char *string){
@@ -19,30 +19,41 @@ START_TEST(test_make_token_list)
 }
 END_TEST
 
-START_TEST(single_paren)
+static char *codes[] = {
+        "(", 
+        "(45",
+        "( 45",
+        "34.6)",
+        "(fred)",
+        "(x(",
+};
+token_list *expected_lists(int i){
+        switch (i){
+                case 0:
+                        return make_token_list(1, LEFT_PAREN);
+                case 1:
+                case 2:
+                        return make_token_list(2, LEFT_PAREN, integer_token(45));
+                case 3:
+                        return make_token_list(2, double_token(34.6), RIGHT_PAREN);
+                case 4:
+                        return make_token_list(3, LEFT_PAREN, identifier_token("fred"), RIGHT_PAREN);
+                case 5:
+                        return make_token_list(3, LEFT_PAREN, identifier_token("x"), LEFT_PAREN);
+        }
+}
+
+START_TEST(test_lexer)
 {
-        char *code = "(";
+        char *code = codes[_i];
         write_str_to_tmp_file(code);
         FILE *file = fopen(TMPFILE, "r");
         token_list *tokens = getTokens(file);
-        token_list *expected_list = make_token_list(1, LEFT_PAREN);
+        token_list *expected_list = expected_lists(_i);
         fail_unless(token_lists_equal(expected_list, tokens));
 }
 END_TEST
 
-START_TEST(two_tokens)
-{
-        char *code = "( 45";
-        write_str_to_tmp_file(code);
-        FILE *file = fopen(TMPFILE, "r");
-        token_list *tokens = getTokens(file);
-        typed_token tok45;
-        tok45.type = tok_integer;
-        tok45.intValue =  45;
-        token_list *expected_list = make_token_list(2, LEFT_PAREN, tok45);
-        fail_unless(token_lists_equal(expected_list, tokens));
-}
-END_TEST
 
 Suite *
 test_suite (void)
@@ -52,8 +63,7 @@ test_suite (void)
         /* Core test case */
         TCase *tc_core = tcase_create ("Core");
         tcase_add_test (tc_core, test_make_token_list);
-        tcase_add_test (tc_core, single_paren);
-        tcase_add_test (tc_core, two_tokens);
+        tcase_add_loop_test (tc_core, test_lexer, 0, 6);
         suite_add_tcase (s, tc_core);
 
         return s;
