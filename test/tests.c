@@ -1,7 +1,9 @@
 #include "stdlib.h"
 #include "check.h"
-#include "alisp.h"
 #include "stdio.h"
+
+#include "token.h"
+#include "alisp.h"
 
 char *TMPFILE = "tmpfile";
 void write_str_to_tmp_file(char *string){
