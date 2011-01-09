@@ -14,8 +14,8 @@ file "tests.o" => ["test/tests.cpp", "include/lexer.h", "include/token.h"] do
   sh "g++ -ggdb -I include/ -c test/tests.cpp"
 end
 
-file "tests" => ["tests.o", "lexer.o", "token.o"] do
-  sh "g++ -ggdb -I include/ -lcheck token.o lexer.o tests.o -o tests"
+file "tests" => ["parser.o", "tests.o", "lexer.o", "token.o"] do
+  sh "g++ -ggdb -I include/ -lcheck parser.o token.o lexer.o tests.o -o tests"
 end
 
 task :run_tests => ["tests"] do
