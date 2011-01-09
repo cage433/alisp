@@ -37,6 +37,7 @@ token_list *reverse_token_list(token_list *list);
 
 void free_token_list(token_list *list);
 token_list *make_token_list(int size, ...);
+int token_lists_equal(token_list *l1, token_list *l2);
 #endif
 
 

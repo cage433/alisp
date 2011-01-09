@@ -22,7 +22,7 @@ typed_token double_token(double num){
 typed_token identifier_token(char *identifier){
         typed_token tok;
         tok.type = tok_identifier;
-        tok.identifierValue = calloc(1 + strlen(identifier), sizeof(char));
+        tok.identifierValue = (char *)calloc(1 + strlen(identifier), sizeof(char));
         strcpy(tok.identifierValue, identifier);
         return tok;
 }
