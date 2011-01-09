@@ -26,6 +26,10 @@ static char *codes[] = {
         "34.6)",
         "(fred)",
         "(x(",
+        "( \
+                x\
+                (\
+                ",
 };
 token_list *expected_lists(int i){
         switch (i){
@@ -39,6 +43,7 @@ token_list *expected_lists(int i){
                 case 4:
                         return make_token_list(3, LEFT_PAREN, identifier_token("fred"), RIGHT_PAREN);
                 case 5:
+                case 6:
                         return make_token_list(3, LEFT_PAREN, identifier_token("x"), LEFT_PAREN);
         }
 }
@@ -63,7 +68,7 @@ test_suite (void)
         /* Core test case */
         TCase *tc_core = tcase_create ("Core");
         tcase_add_test (tc_core, test_make_token_list);
-        tcase_add_loop_test (tc_core, test_lexer, 0, 6);
+        tcase_add_loop_test (tc_core, test_lexer, 0, 7);
         suite_add_tcase (s, tc_core);
 
         return s;
