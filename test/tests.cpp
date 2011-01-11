@@ -1,9 +1,11 @@
+#include <iostream>
 #include "stdlib.h"
 #include "check.h"
 #include "stdio.h"
 
 #include "token.h"
 #include "lexer.h"
+
 
 char *TMPFILE = (char *)"tmpfile";
 void write_str_to_tmp_file(char *string){
@@ -75,8 +77,9 @@ test_suite (void)
 }
 
 
-int main (void)
+int main ()
 {
+        cout <<"I'm here\n";
         int number_failed;
         Suite *s = test_suite ();
         SRunner *sr = srunner_create (s);
