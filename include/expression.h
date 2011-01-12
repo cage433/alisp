@@ -8,61 +8,42 @@ class Expression{
 };
 
 class IntegerExpression : public Expression{
-    public:
-        IntegerExpression(int _num){
-            num = _num;
-        }
-    private:
         int num;
+    public:
+        IntegerExpression(int _num) : num(_num){}
 };
 
 class DoubleExpression : public Expression{
-    public:
-        DoubleExpression(double _num){
-            num = _num;
-        }
-    private:
         double num;
+    public:
+        DoubleExpression(double _num) : num(_num){}
 };
 
 
 class IdentifierExpression : public Expression{
-    public:
-        IdentifierExpression(){}
-        IdentifierExpression(string _str){
-            str = _str;
-        }
-    private:
         string str;
+    public:
+        IdentifierExpression(string _str) : str(_str){}
 };
 
 class DefinitionExpression : public Expression{
+            IdentifierExpression name; 
+            vector<IdentifierExpression> variableNames;
+            Expression body;
     public:
         DefinitionExpression(
             const IdentifierExpression& _name, 
             const vector<IdentifierExpression>& _variableNames,
             const Expression& _body
-        ){
-            name = _name;
-            variableNames = _variableNames;
-            body = _body;
-        }
-    private:
-            IdentifierExpression name; 
-            vector<IdentifierExpression> variableNames;
-            Expression body;
+        ) : name(_name), variableNames(_variableNames), body(_body){}
 };
 
 class FunctionCallExpression : public Expression{
+            IdentifierExpression name; 
+            vector<IdentifierExpression> variableNames;
     public:
         FunctionCallExpression(
             const IdentifierExpression& _name, 
             const vector<IdentifierExpression>& _variableNames
-        ){
-            name = _name;
-            variableNames = _variableNames;
-        }
-    private:
-            IdentifierExpression name; 
-            vector<IdentifierExpression> variableNames;
+        ) : name(_name), variableNames(_variableNames){}
 };

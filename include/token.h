@@ -17,10 +17,9 @@ class Token {
 };
 
 class IntegerToken : public Token{
+        int num;
     public:
-        IntegerToken(int _num){
-            num = _num;
-        }
+        IntegerToken(int _num) : num(_num){}
 
         virtual string toString() {
             stringstream s;
@@ -35,16 +34,12 @@ class IntegerToken : public Token{
                 return false;
             }
         }
-            
-    private:
-        int num;
 };
 
 class DoubleToken : public Token{
+        double num;
     public:
-        DoubleToken(double _num){
-            num = _num;
-        }
+        DoubleToken(double _num) :num(_num){}
 
         virtual string toString() {
             stringstream s;
@@ -59,8 +54,6 @@ class DoubleToken : public Token{
                 return false;
             }
         }
-    private:
-        double num;
 };
 
 class LeftParenToken : public Token{
@@ -95,13 +88,9 @@ class RightParenToken : public Token{
 };
 
 class IdentifierToken : public Token{
+        string identifier;
     public:
-        IdentifierToken(string _identifier){
-            identifier = _identifier;
-        }
-        IdentifierToken(const char *_identifier){
-            identifier = string(_identifier);
-        }
+        IdentifierToken(string _identifier) : identifier(_identifier){}
 
         virtual string toString() {
             return identifier;
@@ -115,8 +104,6 @@ class IdentifierToken : public Token{
                 return false;
             }
         }
-    private:
-        string identifier;
 };
 #endif
 
