@@ -40,10 +40,10 @@ class DefinitionExpression : public Expression{
 
 class FunctionCallExpression : public Expression{
             IdentifierExpression name; 
-            vector<IdentifierExpression> variableNames;
+            vector<Expression> arguments;
     public:
         FunctionCallExpression(
             const IdentifierExpression& _name, 
-            const vector<IdentifierExpression>& _variableNames
-        ) : name(_name), variableNames(_variableNames){}
+            const vector<Expression>& _arguments
+        ) : name(_name), arguments(_arguments){}
 };

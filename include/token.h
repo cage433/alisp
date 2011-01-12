@@ -14,13 +14,15 @@ enum TokenType {
     RightParenTokenType,
     IdentifierTokenType
 };
+
 class Token {
     public:
-        virtual string toString() = 0;
-        virtual bool operator== (const Token& tok) = 0;
-        bool operator != (const Token& tok) {
+        virtual string toString() const = 0;
+        virtual bool operator== (const Token& tok) const = 0;
+        bool operator != (const Token& tok) const {
             return ! (*this == tok);
         }
+        virtual TokenType tokenType() = 0;
 };
 
 class IntegerToken : public Token{
@@ -28,12 +30,12 @@ class IntegerToken : public Token{
     public:
         IntegerToken(int _num) : num(_num){}
 
-        virtual string toString() {
+        virtual string toString() const {
             stringstream s;
             s << num;
             return s.str();
         };
-        bool operator==(const Token& tok){
+        bool operator==(const Token& tok) const {
             try {
                 const IntegerToken& other = dynamic_cast<const IntegerToken&>(tok);
                 return num == other.num;
@@ -41,6 +43,8 @@ class IntegerToken : public Token{
                 return false;
             }
         }
+        virtual TokenType tokenType(){return IntegerTokenType;}
+        int getNum(){return num;}
 };
 
 class DoubleToken : public Token{
@@ -48,12 +52,12 @@ class DoubleToken : public Token{
     public:
         DoubleToken(double _num) :num(_num){}
 
-        virtual string toString() {
+        virtual string toString() const {
             stringstream s;
             s << num;
             return s.str();
         }
-        bool operator==(const Token& tok){
+        bool operator==(const Token& tok) const{
             try {
                 const DoubleToken& other = dynamic_cast<const DoubleToken&>(tok);
                 return num == other.num;
@@ -61,14 +65,16 @@ class DoubleToken : public Token{
                 return false;
             }
         }
+        virtual TokenType tokenType(){return DoubleTokenType;}
+        int getNum(){return num;}
 };
 
 class LeftParenToken : public Token{
     public:
-        virtual string toString() {
+        virtual string toString() const {
             return string("Left Paren");
         }
-        bool operator==(const Token& tok){
+        bool operator==(const Token& tok) const {
             try {
                 const LeftParenToken& other = dynamic_cast<const LeftParenToken&>(tok);
                 return true;
@@ -76,14 +82,15 @@ class LeftParenToken : public Token{
                 return false;
             }
         }
+        virtual TokenType tokenType(){return LeftParenTokenType;}
 };
 
 class RightParenToken : public Token{
     public:
-        virtual string toString() {
+        virtual string toString() const {
             return string("Right Paren");
         }
-        bool operator==(const Token& tok){
+        bool operator==(const Token& tok) const {
             try {
                 const RightParenToken& other = dynamic_cast<const RightParenToken&>(tok);
                 return true;
@@ -91,7 +98,7 @@ class RightParenToken : public Token{
                 return false;
             }
         }
-    private:
+        virtual TokenType tokenType(){return RightParenTokenType;}
 };
 
 class IdentifierToken : public Token{
@@ -99,11 +106,11 @@ class IdentifierToken : public Token{
     public:
         IdentifierToken(string _identifier) : identifier(_identifier){}
 
-        virtual string toString() {
+        virtual string toString() const {
             return identifier;
         }
 
-        bool operator==(const Token& tok){
+        bool operator==(const Token& tok) const{
             try {
                 const IdentifierToken& other = dynamic_cast<const IdentifierToken&>(tok);
                 return identifier == other.identifier;
@@ -111,6 +118,8 @@ class IdentifierToken : public Token{
                 return false;
             }
         }
+        virtual TokenType tokenType(){return IdentifierTokenType;}
+        string getIdentifier(){return identifier;}
 };
 #endif
 
