@@ -7,6 +7,13 @@
 
 using namespace std;
 
+enum TokenType {
+    IntegerTokenType,
+    DoubleTokenType,
+    LeftParenTokenType,
+    RightParenTokenType,
+    IdentifierTokenType
+};
 class Token {
     public:
         virtual string toString() = 0;
