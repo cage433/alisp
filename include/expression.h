@@ -27,7 +27,9 @@ class IntegerExpression : public Expression{
     public:
         IntegerExpression(int _num) : num(_num){}
         virtual string toString() const {
-            return "Integer Expression " + num;
+            stringstream s;
+            s << "Integer Expression " << num;
+            return s.str();
         };
         bool operator==(const Expression& exp) const {
             try {

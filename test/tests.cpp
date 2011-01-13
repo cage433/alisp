@@ -12,8 +12,8 @@ class ExampleTestSuite : public Test::Suite
 {
 public:
     ExampleTestSuite(){
-        TEST_ADD(ExampleTestSuite::test_token_equality);
-        TEST_ADD(ExampleTestSuite::test_token_recognition);
+//        TEST_ADD(ExampleTestSuite::test_token_equality);
+//        TEST_ADD(ExampleTestSuite::test_token_recognition);
         TEST_ADD(ExampleTestSuite::test_parse_integer);
     }
 private:
@@ -67,9 +67,9 @@ void ExampleTestSuite::test_token_recognition(){
 void ExampleTestSuite::test_parse_integer(){
     vector<shared_ptr<Expression> > exps = parseExpressions("12");
     TEST_ASSERT(exps.size() == 1);
-    cerr << "Finished\n\n";
-    //cerr << "Exp = " << exps[0];
-    //TEST_ASSERT(*exps[0] == IntegerExpression(12));
+    cout << "Exp = " << (*exps[0]).toString() << "\n" << flush;
+    cout << "Finished\n\n" << flush;
+    TEST_ASSERT(*exps[0] == IntegerExpression(12));
 }
 
 int main(){

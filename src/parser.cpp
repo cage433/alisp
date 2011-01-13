@@ -91,7 +91,7 @@ shared_ptr<Expression> consumeExpression(deque<shared_ptr<Token> >& tokens){
         case LeftParenTokenType: 
             return consumeParenExpression(tokens);
         case IntegerTokenType:{
-            int num = ((IntegerToken&)tokens.front()).getNum();
+            int num = ((IntegerToken&)(*tokens.front())).getNum();
             tokens.pop_front();
             return IntegerExpression(num).sharedPtr();
         }
