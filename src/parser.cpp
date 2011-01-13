@@ -29,35 +29,36 @@ void eatToken(deque<shared_ptr<Token> >& tokens, const Token& tok){
     tokens.pop_front();
 }
 
-shared_ptr<IdentifierExpression> consumeIdentifierExpression(deque<shared_ptr<Token> >& tokens){
+IdentifierExpression consumeIdentifierExpression(deque<shared_ptr<Token> >& tokens){
     if (tokens.empty())
         throw ParserException("No more tokens, can't consume identifier expression ");
     if (tokens.front()->tokenType() != IdentifierTokenType)
         throw ParserException("Unexpected token " + tokens.front()->toString());
-    IdentifierToken& tok = (IdentifierToken&)(*tokens.front());
+    string identifier = ((IdentifierToken&)(*tokens.front())).getIdentifier();
     tokens.pop_front();
-    return shared_ptr<IdentifierExpression>(new IdentifierExpression(tok.getIdentifier()));
+    return IdentifierExpression(identifier);
 }
 
-shared_ptr<Expression> consumeFunctionCallExpression(deque<shared_ptr<Token> >& tokens){
+FunctionCallExpression consumeFunctionCallExpression(deque<shared_ptr<Token> >& tokens){
     eatToken(tokens, LeftParenToken());
-    IdentifierToken& functionNameToken = (IdentifierToken&)(*tokens.front());
-    IdentifierExpression functionNameExpression = IdentifierExpression(functionNameToken.getIdentifier());
-    vector<shared_ptr<Expression> > arguments;
+    
+    IdentifierExpression functionNameExpression = consumeIdentifierExpression(tokens);
 
+    vector<shared_ptr<Expression> > arguments;
     while(!tokens.empty() && *(tokens.front()) != RightParenToken()){
         arguments.push_back(shared_ptr<Expression>(consumeExpression(tokens)));
     }
+
     eatToken(tokens, RightParenToken());
 
-    return shared_ptr<Expression>(new FunctionCallExpression(functionNameExpression, arguments));
+    return FunctionCallExpression(functionNameExpression, arguments);
 }
 
-shared_ptr<Expression> consumeDefinitionExpression(deque<shared_ptr<Token> >& tokens){
+DefinitionExpression consumeDefinitionExpression(deque<shared_ptr<Token> >& tokens){
     eatToken(tokens, LeftParenToken());
     eatToken(tokens, IdentifierToken("def"));
-    shared_ptr<IdentifierExpression> functionNameExpression = consumeIdentifierExpression(tokens);
-    vector<shared_ptr<IdentifierExpression> > variables;
+    IdentifierExpression functionNameExpression = consumeIdentifierExpression(tokens);
+    vector<IdentifierExpression> variables;
     eatToken(tokens, LeftParenToken());
 
     while(!tokens.empty() && *(tokens.front()) != RightParenToken()){
@@ -67,7 +68,7 @@ shared_ptr<Expression> consumeDefinitionExpression(deque<shared_ptr<Token> >& to
     shared_ptr<Expression> body = consumeExpression(tokens);
     eatToken(tokens, RightParenToken());
 
-    return shared_ptr<Expression>(new DefinitionExpression(*functionNameExpression, variables, body));
+    return DefinitionExpression(functionNameExpression, variables, body);
 }
 
 shared_ptr<Expression> consumeParenExpression(deque<shared_ptr<Token> >& tokens){
@@ -78,10 +79,10 @@ shared_ptr<Expression> consumeParenExpression(deque<shared_ptr<Token> >& tokens)
 
     if (firstToken == IdentifierToken("def")){
         tokens.push_front(shared_ptr<Token>(new LeftParenToken()));
-        return consumeDefinitionExpression(tokens);
+        return consumeDefinitionExpression(tokens).sharedPtr();
     } else {
         tokens.push_front(shared_ptr<Token>(new LeftParenToken()));
-        return consumeFunctionCallExpression(tokens);
+        return consumeFunctionCallExpression(tokens).sharedPtr();
     }
 }
 
@@ -92,21 +93,20 @@ shared_ptr<Expression> consumeExpression(deque<shared_ptr<Token> >& tokens){
         case IntegerTokenType:{
             int num = ((IntegerToken&)tokens.front()).getNum();
             tokens.pop_front();
-            return shared_ptr<Expression>(new IntegerExpression(num));
+            return IntegerExpression(num).sharedPtr();
         }
         case DoubleTokenType: {
             double num = ((DoubleToken&)tokens.front()).getNum();
             tokens.pop_front();
-            return shared_ptr<Expression>(new DoubleExpression(num));
+            return IntegerExpression(num).sharedPtr();
         }
         case IdentifierTokenType: 
-            return consumeIdentifierExpression(tokens);
+            return consumeIdentifierExpression(tokens).sharedPtr();
         case RightParenTokenType:
             throw ParserException("Unexpected right parenthesis");
         default:
             throw ParserException("Unexpected token " + tokens.front()->toString());
     }
-    shared_ptr<Token>& tok = tokens.front();
 }
 
 

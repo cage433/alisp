@@ -9,6 +9,8 @@
 using namespace std;
 using namespace boost;
 
+class Expression;
+
 class Expression{
     public:
         virtual string toString() const = 0;
@@ -16,6 +18,8 @@ class Expression{
         bool operator != (const Expression& exp) const {
             return ! (*this == exp);
         }
+        virtual Expression *newCopy() = 0;
+        shared_ptr<Expression> sharedPtr() {return shared_ptr<Expression>(newCopy());}
 };
 
 class IntegerExpression : public Expression{
@@ -33,6 +37,7 @@ class IntegerExpression : public Expression{
                 return false;
             }
         }
+        virtual Expression *newCopy() {return new IntegerExpression(*this);}
 };
 
 class DoubleExpression : public Expression{
@@ -52,6 +57,7 @@ class DoubleExpression : public Expression{
                 return false;
             }
         }
+        virtual Expression *newCopy() {return new DoubleExpression(*this);}
 };
 
 
@@ -70,26 +76,26 @@ class IdentifierExpression : public Expression{
                 return false;
             }
         }
+        virtual Expression *newCopy() {return new IdentifierExpression(*this);}
 };
 
 class DefinitionExpression : public Expression{
             IdentifierExpression name; 
-            vector<shared_ptr<IdentifierExpression> > variableNames;
+            vector<IdentifierExpression> variableNames;
             shared_ptr<Expression> body;
     public:
         DefinitionExpression(
             const IdentifierExpression& _name, 
-            const vector<shared_ptr<IdentifierExpression> >& _variableNames,
+            const vector<IdentifierExpression>& _variableNames,
             const shared_ptr<Expression>& _body
         ) : name(_name), variableNames(_variableNames), body(_body){}
 
         virtual string toString() const {
             stringstream s;
             s << "Definition\nName " << name.toString() << "\nVariables\n";
-            vector<shared_ptr<IdentifierExpression> > copy(variableNames);
-
-            for (vector<shared_ptr<IdentifierExpression> >::iterator exp = copy.begin(); exp != copy.end(); ++exp){
-                s << "\t" << (*exp)->toString() << "\n";
+            vector<IdentifierExpression> copy = vector<IdentifierExpression>(variableNames);
+            for (vector<IdentifierExpression>::iterator exp = copy.begin(); exp != copy.end(); ++exp){
+                s << "\t" << (*exp).toString() << "\n";
             }
             s << "Body\n" << body->toString();
             return s.str();
@@ -105,6 +111,7 @@ class DefinitionExpression : public Expression{
                 return false;
             }
         }
+        virtual Expression *newCopy() {return new DefinitionExpression(*this);}
 };
 
 class FunctionCallExpression : public Expression{
@@ -136,6 +143,7 @@ class FunctionCallExpression : public Expression{
                 return false;
             }
         }
+        virtual Expression *newCopy() {return new FunctionCallExpression(*this);}
 };
 
 #endif
