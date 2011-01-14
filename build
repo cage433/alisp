@@ -1,0 +1,1 @@
+g++ -g alisp.cpp -rdynamic `llvm-config-2.8 --cppflags --ldflags --libs core jit native` -o alisp

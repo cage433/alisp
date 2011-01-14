@@ -1,8 +1,17 @@
-task :default => ["token.o"]
+task :default => [:run_tests]
 
 file "token.o" => ["cpp_src/token.cpp", "cpp_include/token.h"] do
   sh "g++ -ggdb -I cpp_include/ -c cpp_src/token.cpp"
 end
+
+file "tests.o" => ["cpp_test/tests.cpp", "cpp_include/token.h"] do
+  sh "g++ -ggdb -I cpp_include/ -c cpp_test/tests.cpp"
+end
+
+file "tests" => ["tests.o", "token.o"] do
+  sh "g++ -ggdb -I cpp_include/ -lcpptest token.o tests.o -o tests"
+end
+    
 #
 #file "lexer.o" => ["cpp_src/lexer.cpp", "cpp_include/lexer.h", "cpp_include/token.h"] do
 #  sh "g++ -ggdb -I cpp_include/ -c cpp_src/lexer.cpp"
@@ -20,6 +29,6 @@ end
 #  sh "g++ -ggdb -I cpp_include/ -lcheck parser.o token.o lexer.o cpp_tests.o -o cpp_tests"
 #end
 #
-#task :run_cpp_tests => ["cpp_tests"] do
-#  system('./cpp_tests')
-#end
+task :run_tests => ["tests"] do
+  system('./tests')
+end
