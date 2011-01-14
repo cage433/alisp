@@ -11,6 +11,9 @@ class Token {
     public:
         virtual string toString() = 0;
         virtual bool operator== (const Token& tok) = 0;
+        bool operator != (const Token& tok) {
+            return ! (*this == tok);
+        }
 };
 
 class IntegerToken : public Token{
@@ -96,9 +99,21 @@ class IdentifierToken : public Token{
         IdentifierToken(string _identifier){
             identifier = _identifier;
         }
+        IdentifierToken(const char *_identifier){
+            identifier = string(_identifier);
+        }
 
         virtual string toString() {
             return identifier;
+        }
+
+        bool operator==(const Token& tok){
+            try {
+                const IdentifierToken& other = dynamic_cast<const IdentifierToken&>(tok);
+                return identifier == other.identifier;
+            } catch (std::bad_cast&) {
+                return false;
+            }
         }
     private:
         string identifier;
