@@ -1,90 +1,66 @@
-#include <iostream>
-#include "stdlib.h"
-#include "check.h"
-#include "stdio.h"
-
-#include "token.h"
+#include <cpptest.h>
+#include <stdlib.h>
+#include <token.h>
 #include "lexer.h"
+#include <iostream>
+#include <sstream>
+using namespace std;
 
-
-char *TMPFILE = (char *)"tmpfile";
-void write_str_to_tmp_file(char *string){
-        FILE *file = fopen(TMPFILE, "w");
-        fputs(string, file);
-        fclose(file);
-}
-
-START_TEST(test_make_token_list)
+class ExampleTestSuite : public Test::Suite 
 {
-        token_list *list = make_token_list(2, LEFT_PAREN, RIGHT_PAREN);
-        fail_unless(tokens_equal(LEFT_PAREN, list->car));
-}
-END_TEST
-
-static char *codes[] = {
-        (char *)"(", 
-        (char *)"(45",
-        (char *)"( 45",
-        (char *)"34.6)",
-        (char *)"(fred)",
-        (char *)"(x(",
-        (char *)"( \
-                x\
-                (\
-                ",
+public:
+    ExampleTestSuite(){
+        TEST_ADD(ExampleTestSuite::test_token_equality);
+        TEST_ADD(ExampleTestSuite::test_token_recognition);
+    }
+private:
+    void test_token_equality();
+    void test_token_recognition();
 };
-token_list *expected_lists(int i){
-        switch (i){
-                case 0:
-                        return make_token_list(1, LEFT_PAREN);
-                case 1:
-                case 2:
-                        return make_token_list(2, LEFT_PAREN, integer_token(45));
-                case 3:
-                        return make_token_list(2, double_token(34.6), RIGHT_PAREN);
-                case 4:
-                        return make_token_list(3, LEFT_PAREN, identifier_token((char *)"fred"), RIGHT_PAREN);
-                case 5:
-                case 6:
-                        return make_token_list(3, LEFT_PAREN, identifier_token((char *)"x"), LEFT_PAREN);
-        }
+
+void ExampleTestSuite::test_token_equality(){
+    TEST_ASSERT(LeftParenToken() == LeftParenToken());
+    TEST_ASSERT(RightParenToken() == RightParenToken());
+    TEST_ASSERT(LeftParenToken() != RightParenToken());
+    TEST_ASSERT(IntegerToken(3) == IntegerToken(3));
+    TEST_ASSERT(IntegerToken(3) != IntegerToken(5));
+    TEST_ASSERT(IdentifierToken("fred") == IdentifierToken("fred"));
+    TEST_ASSERT(IdentifierToken("fred") != IdentifierToken("mike"));
+    TEST_ASSERT(DoubleToken(3.5) == DoubleToken(3.5));
+    TEST_ASSERT(DoubleToken(3.5) != DoubleToken(5.2));
+};
+        
+
+void ExampleTestSuite::test_token_recognition(){
+    vector<shared_ptr<Token> > tokens = readTokens("(");
+    TEST_ASSERT(tokens.size() == 1);
+    TEST_ASSERT(*tokens[0] == LeftParenToken());
+
+    tokens = readTokens("0.5 ( fred) 34 ");
+    TEST_ASSERT(tokens.size() == 5);
+    TEST_ASSERT(*tokens[0] == DoubleToken(0.5));
+    TEST_ASSERT(*tokens[1] == LeftParenToken());
+    TEST_ASSERT(*tokens[2] == IdentifierToken("fred"));
+    TEST_ASSERT(*tokens[3] == RightParenToken());
+    TEST_ASSERT(*tokens[4] == IntegerToken(34));
+    //TEST_ASSERT(*tokens[5] == IdentifierToken("34a"));
+    tokens = readTokens(")34");
+    TEST_ASSERT(tokens.size() == 2);
+    TEST_ASSERT(*tokens[0] == RightParenToken());
+    TEST_ASSERT(*tokens[1] == IntegerToken(34));
+
+    tokens = readTokens("34a");
+    TEST_ASSERT(tokens.size() == 1);
+    TEST_ASSERT(*tokens[0] == IdentifierToken("34a"));
+
+    tokens = readTokens("12 34a");
+    TEST_ASSERT(tokens.size() == 2);
+    TEST_ASSERT(*tokens[0] == IntegerToken(12));
+    TEST_ASSERT(*tokens[1] == IdentifierToken("34a"));
 }
 
-START_TEST(test_lexer)
-{
-        char *code = codes[_i];
-        write_str_to_tmp_file(code);
-        FILE *file = fopen(TMPFILE, "r");
-        token_list *tokens = getTokens(file);
-        token_list *expected_list = expected_lists(_i);
-        fail_unless(token_lists_equal(expected_list, tokens));
-}
-END_TEST
-
-
-Suite *
-test_suite (void)
-{
-        Suite *s = suite_create ("alisp");
-
-        /* Core test case */
-        TCase *tc_core = tcase_create ("Core");
-        tcase_add_test (tc_core, test_make_token_list);
-        tcase_add_loop_test (tc_core, test_lexer, 0, 7);
-        suite_add_tcase (s, tc_core);
-
-        return s;
-}
-
-
-int main ()
-{
-        cout <<"I'm here\n";
-        int number_failed;
-        Suite *s = test_suite ();
-        SRunner *sr = srunner_create (s);
-        srunner_run_all (sr, CK_NORMAL);
-        number_failed = srunner_ntests_failed (sr);
-        srunner_free (sr);
-        return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+int main(){
+    Test::TextOutput output(Test::TextOutput::Verbose);
+    ExampleTestSuite ets;
+    return ets.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

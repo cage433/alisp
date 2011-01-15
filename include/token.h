@@ -1,43 +1,122 @@
 #ifndef TOKEN_INCLUDE
 #define TOKEN_INCLUDE
 
-enum token_type {
-        tok_left_paren,
-        tok_identifier,
-        tok_integer,
-        tok_double,
-        tok_right_paren
+#include <string>
+#include <sstream>
+#include <typeinfo>
+
+using namespace std;
+
+class Token {
+    public:
+        virtual string toString() = 0;
+        virtual bool operator== (const Token& tok) = 0;
+        bool operator != (const Token& tok) {
+            return ! (*this == tok);
+        }
 };
 
-typedef struct {
-        enum token_type type;
-        union {
-                int intValue;
-                double doubleValue;
-                char* identifierValue;
+class IntegerToken : public Token{
+    public:
+        IntegerToken(int _num){
+            num = _num;
+        }
+
+        virtual string toString() {
+            stringstream s;
+            s << num;
+            return s.str();
         };
-} typed_token;
+        bool operator==(const Token& tok){
+            try {
+                const IntegerToken& other = dynamic_cast<const IntegerToken&>(tok);
+                return num == other.num;
+            } catch (std::bad_cast& foo) {
+                return false;
+            }
+        }
+            
+    private:
+        int num;
+};
 
-typed_token integer_token(int num);
-typed_token double_token(double num);
-typed_token identifier_token(char *identifier);
+class DoubleToken : public Token{
+    public:
+        DoubleToken(double _num){
+            num = _num;
+        }
 
-typedef struct token_list{
-        typed_token car;
-        struct token_list *cdr;
-} token_list;
+        virtual string toString() {
+            stringstream s;
+            s << num;
+            return s.str();
+        }
+        bool operator==(const Token& tok){
+            try {
+                const DoubleToken& other = dynamic_cast<const DoubleToken&>(tok);
+                return num == other.num;
+            } catch (std::bad_cast&) {
+                return false;
+            }
+        }
+    private:
+        double num;
+};
 
-static typed_token LEFT_PAREN = {tok_left_paren, 0};
-static typed_token RIGHT_PAREN = {tok_right_paren, 0};
+class LeftParenToken : public Token{
+    public:
+        virtual string toString() {
+            return string("Left Paren");
+        }
+        bool operator==(const Token& tok){
+            try {
+                const LeftParenToken& other = dynamic_cast<const LeftParenToken&>(tok);
+                return true;
+            } catch (std::bad_cast&) {
+                return false;
+            }
+        }
+};
 
-int tokens_equal(typed_token tok1, typed_token tok2);
-token_list *cons(typed_token elt, token_list *list);
+class RightParenToken : public Token{
+    public:
+        virtual string toString() {
+            return string("Right Paren");
+        }
+        bool operator==(const Token& tok){
+            try {
+                const RightParenToken& other = dynamic_cast<const RightParenToken&>(tok);
+                return true;
+            } catch (std::bad_cast&) {
+                return false;
+            }
+        }
+    private:
+};
 
-token_list *reverse_token_list(token_list *list);
+class IdentifierToken : public Token{
+    public:
+        IdentifierToken(string _identifier){
+            identifier = _identifier;
+        }
+        IdentifierToken(const char *_identifier){
+            identifier = string(_identifier);
+        }
 
-void free_token_list(token_list *list);
-token_list *make_token_list(int size, ...);
-int token_lists_equal(token_list *l1, token_list *l2);
+        virtual string toString() {
+            return identifier;
+        }
+
+        bool operator==(const Token& tok){
+            try {
+                const IdentifierToken& other = dynamic_cast<const IdentifierToken&>(tok);
+                return identifier == other.identifier;
+            } catch (std::bad_cast&) {
+                return false;
+            }
+        }
+    private:
+        string identifier;
+};
 #endif
-
 
