@@ -1,23 +1,12 @@
+require 'rake'
 task :default => [:run_tests]
 
-file "token.o" => ["src/token.cpp", "include/token.h"] do
-  sh "g++ -ggdb -I include/ -c src/token.cpp"
+rule(/\.o/ => [proc{|task_name| "src/" + task_name.sub(/\.o/, '.cpp')}] + FileList['include/*']) do |t| 
+  sh "g++ -ggdb -I include/ -c #{t.source}"
 end
 
-file "expression.o" => ["src/expression.cpp", "include/expression.h"] do
-  sh "g++ -ggdb -I include/ -c src/expression.cpp"
-end
-
-file "tests.o" => ["test/tests.cpp", "include/token.h"] do
-  sh "g++ -ggdb -I include/ -c test/tests.cpp"
-end
-
-file "lexer.o" => ["src/lexer.cpp", "include/token.h", "include/lexer.h"] do 
-  sh "g++ -ggdb -I include/ -c src/lexer.cpp"
-end
-
-file "tests" => ["tests.o", "token.o", "lexer.o", "expression.o"] do
-  sh "g++ -ggdb -I include/ -lcpptest token.o tests.o lexer.o -o tests"
+file "tests" => ["test/tests.cpp", "token.o", "lexer.o", "expression.o"] do
+  sh "g++ -ggdb -I include/ -lcpptest token.o test/tests.cpp lexer.o -o tests"
 end
     
 task :run_tests => ["tests"] do
