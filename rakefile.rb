@@ -8,8 +8,12 @@ file "tests.o" => ["cpp_test/tests.cpp", "cpp_include/token.h"] do
   sh "g++ -ggdb -I cpp_include/ -c cpp_test/tests.cpp"
 end
 
-file "tests" => ["tests.o", "token.o"] do
-  sh "g++ -ggdb -I cpp_include/ -lcpptest token.o tests.o -o tests"
+file "lexer.o" => ["cpp_src/lexer.cpp", "cpp_include/token.h", "cpp_include/lexer.h"] do 
+  sh "g++ -ggdb -I cpp_include/ -c cpp_src/lexer.cpp"
+end
+
+file "tests" => ["tests.o", "token.o", "lexer.o"] do
+  sh "g++ -ggdb -I cpp_include/ -lcpptest token.o tests.o lexer.o -o tests"
 end
     
 #

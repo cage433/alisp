@@ -1,15 +1,21 @@
 #include <cpptest.h>
 #include <stdlib.h>
 #include <token.h>
+#include "lexer.h"
+#include <iostream>
+#include <sstream>
+using namespace std;
 
 class ExampleTestSuite : public Test::Suite 
 {
 public:
     ExampleTestSuite(){
         TEST_ADD(ExampleTestSuite::test_token_equality);
+        TEST_ADD(ExampleTestSuite::test_token_recognition);
     }
 private:
     void test_token_equality();
+    void test_token_recognition();
 };
 
 void ExampleTestSuite::test_token_equality(){
@@ -25,6 +31,19 @@ void ExampleTestSuite::test_token_equality(){
 };
         
 
+void ExampleTestSuite::test_token_recognition(){
+    istringstream s;
+    s.str("(");
+    istream& foo = (istream&)s;
+    vector<shared_ptr<Token> > tokens = readTokens(foo);
+    cerr << "Num tokens returned " << tokens.size() << "\nthats all \n";
+    for (int i = 0; i < tokens.size(); ++i){
+        cerr << tokens[i]->toString() << "\n";
+    }
+    TEST_ASSERT(tokens.size() == 1);
+    
+    //vector<shared_ptr<Token> > tokens = readTokens(ss);
+}
 
 int main(){
     Test::TextOutput output(Test::TextOutput::Verbose);
