@@ -32,17 +32,31 @@ void ExampleTestSuite::test_token_equality(){
         
 
 void ExampleTestSuite::test_token_recognition(){
-    istringstream s;
-    s.str("(");
-    istream& foo = (istream&)s;
-    vector<shared_ptr<Token> > tokens = readTokens(foo);
-    cerr << "Num tokens returned " << tokens.size() << "\nthats all \n";
-    for (int i = 0; i < tokens.size(); ++i){
-        cerr << tokens[i]->toString() << "\n";
-    }
+    vector<shared_ptr<Token> > tokens = readTokens("(");
     TEST_ASSERT(tokens.size() == 1);
-    
-    //vector<shared_ptr<Token> > tokens = readTokens(ss);
+    TEST_ASSERT(*tokens[0] == LeftParenToken());
+
+    tokens = readTokens("0.5 ( fred) 34 ");
+    TEST_ASSERT(tokens.size() == 5);
+    TEST_ASSERT(*tokens[0] == DoubleToken(0.5));
+    TEST_ASSERT(*tokens[1] == LeftParenToken());
+    TEST_ASSERT(*tokens[2] == IdentifierToken("fred"));
+    TEST_ASSERT(*tokens[3] == RightParenToken());
+    TEST_ASSERT(*tokens[4] == IntegerToken(34));
+    //TEST_ASSERT(*tokens[5] == IdentifierToken("34a"));
+    tokens = readTokens(")34");
+    TEST_ASSERT(tokens.size() == 2);
+    TEST_ASSERT(*tokens[0] == RightParenToken());
+    TEST_ASSERT(*tokens[1] == IntegerToken(34));
+
+    tokens = readTokens("34a");
+    TEST_ASSERT(tokens.size() == 1);
+    TEST_ASSERT(*tokens[0] == IdentifierToken("34a"));
+
+    tokens = readTokens("12 34a");
+    TEST_ASSERT(tokens.size() == 2);
+    TEST_ASSERT(*tokens[0] == IntegerToken(12));
+    TEST_ASSERT(*tokens[1] == IdentifierToken("34a"));
 }
 
 int main(){

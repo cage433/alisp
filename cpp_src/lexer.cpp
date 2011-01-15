@@ -17,8 +17,7 @@ Token* consume_identifier(
     string& buffer)
 {
     char ch;
-    while (s.good()){
-        ch = s.get();
+    while (s.get(ch)){
         if (isspace(ch) || isparen(ch)){
             if (isparen(ch)){
                 s.unget();
@@ -28,6 +27,7 @@ Token* consume_identifier(
             buffer += ch;
         }
     }
+    return new IdentifierToken(buffer);
 }
 
 Token* consume_double(
@@ -35,8 +35,7 @@ Token* consume_double(
     string& buffer)
 {
     char ch;
-    while (s.good()){
-        ch = s.get();
+    while (s.get(ch)){
         if (isdigit(ch)){
             buffer += ch;
         } else if (isspace(ch) || isparen(ch)){
@@ -49,6 +48,7 @@ Token* consume_double(
             return consume_identifier(s, buffer);
         }
     }
+    return new DoubleToken(atof(buffer.c_str()));
 }
 
 Token* consume_integer(
@@ -56,8 +56,7 @@ Token* consume_integer(
     string& buffer)
 {
     char ch;
-    while (s.good()){
-        ch = s.get();
+    while (s.get(ch)){
         if (isdigit(ch)){
             buffer += ch;
         } else if (ch == '.'){
@@ -73,14 +72,14 @@ Token* consume_integer(
             return consume_identifier(s, buffer);
         }
     }
+    return new IntegerToken(atoi(buffer.c_str()));
 }
 
 vector<shared_ptr<Token> > readTokens(istream& s){
     vector<shared_ptr<Token> > tokens;
-    cerr << "Num tokens " << tokens.size() << "\nthats all \n";
-    string buffer = "";
     char ch;
-    while (s >> ch){
+    while (s.get(ch)){
+        string buffer = "";
         if (ch == '(')
             tokens.push_back(shared_ptr<Token>(new LeftParenToken()));
         else if (ch == ')')
@@ -96,6 +95,10 @@ vector<shared_ptr<Token> > readTokens(istream& s){
         }
     }
 
-    cerr << "Num tokens " << tokens.size() << "\nthats all \n";
     return tokens;
+}
+
+vector<shared_ptr<Token> > readTokens(const string& str){
+    istringstream s(str);
+    return readTokens(s);
 }
