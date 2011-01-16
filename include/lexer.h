@@ -1,3 +1,6 @@
+#ifndef ALISP_LEXER
+#define ALISP_LEXER
+
 #include "token.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>
@@ -6,3 +9,5 @@ using namespace boost;
 
 vector<shared_ptr<Token> > readTokens(istream& s);
 vector<shared_ptr<Token> > readTokens(const string& str);
+
+#endif

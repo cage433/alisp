@@ -1,5 +1,5 @@
-#ifndef TOKEN_INCLUDE
-#define TOKEN_INCLUDE
+#ifndef ALISP_TOKEN
+#define ALISP_TOKEN
 
 #include <string>
 #include <sstream>
@@ -31,9 +31,7 @@ class IntegerToken : public Token{
         IntegerToken(int _num) : num(_num){}
 
         virtual string toString() const {
-            stringstream s;
-            s << num;
-            return s.str();
+            return "Integer Token " + num;
         };
         bool operator==(const Token& tok) const {
             try {
@@ -54,7 +52,7 @@ class DoubleToken : public Token{
 
         virtual string toString() const {
             stringstream s;
-            s << num;
+            s << "Double token " << num;
             return s.str();
         }
         bool operator==(const Token& tok) const{
@@ -107,7 +105,7 @@ class IdentifierToken : public Token{
         IdentifierToken(string _identifier) : identifier(_identifier){}
 
         virtual string toString() const {
-            return identifier;
+            return "Identifier token " + identifier;
         }
 
         bool operator==(const Token& tok) const{

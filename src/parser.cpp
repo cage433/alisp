@@ -1,6 +1,7 @@
 #include "token.h"
 #include "expression.h"
 #include "parser.h"
+#include "lexer.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <istream>
@@ -89,22 +90,17 @@ shared_ptr<Expression> consumeExpression(deque<shared_ptr<Token> >& tokens){
         case LeftParenTokenType: 
             return consumeParenExpression(tokens);
         case IntegerTokenType:{
-            IntegerToken& integerToken = (IntegerToken&)tokens.front();
+            int num = ((IntegerToken&)tokens.front()).getNum();
             tokens.pop_front();
-            return shared_ptr<Expression>(new IntegerExpression(integerToken.getNum()));
+            return shared_ptr<Expression>(new IntegerExpression(num));
         }
         case DoubleTokenType: {
-            DoubleToken& doubleToken = (DoubleToken&)tokens.front();
+            double num = ((DoubleToken&)tokens.front()).getNum();
             tokens.pop_front();
-            return shared_ptr<Expression>(new DoubleExpression(doubleToken.getNum()));
+            return shared_ptr<Expression>(new DoubleExpression(num));
         }
-        case IdentifierTokenType: {
+        case IdentifierTokenType: 
             return consumeIdentifierExpression(tokens);
-//
-//            IdentifierToken& identifierToken = (IdentifierToken&)tokens.front();
-//            tokens.pop_front();
-//            return shared_ptr<Expression>(new IdentifierExpression(identifierToken.getIdentifier()));
-        }
         case RightParenTokenType:
             throw ParserException("Unexpected right parenthesis");
         default:
@@ -114,5 +110,15 @@ shared_ptr<Expression> consumeExpression(deque<shared_ptr<Token> >& tokens){
 }
 
 
-vector<shared_ptr<Expression> > parseExpressions(vector<shared_ptr<Token> >& tokens){
+vector<shared_ptr<Expression> > parseExpressions(deque<shared_ptr<Token> >& tokens){
+    vector<shared_ptr<Expression> > expressions;
+    while (! tokens.empty())
+        expressions.push_back(consumeExpression(tokens));
+    return expressions;
+}
+
+vector<shared_ptr<Expression> > parseExpressions(const string& str){
+    vector<shared_ptr<Token> > tokenVector = readTokens(str);
+    deque<shared_ptr<Token> > tokenDeque = deque<shared_ptr<Token> >(tokenVector.begin(), tokenVector.end());
+    return parseExpressions(tokenDeque);
 }

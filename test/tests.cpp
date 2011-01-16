@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <token.h>
 #include "lexer.h"
+#include "parser.h"
+#include "expression.h"
 #include <iostream>
 #include <sstream>
 using namespace std;
@@ -12,10 +14,13 @@ public:
     ExampleTestSuite(){
         TEST_ADD(ExampleTestSuite::test_token_equality);
         TEST_ADD(ExampleTestSuite::test_token_recognition);
+        TEST_ADD(ExampleTestSuite::test_parse_integer);
     }
 private:
     void test_token_equality();
     void test_token_recognition();
+    void test_parse_integer();
+
 };
 
 void ExampleTestSuite::test_token_equality(){
@@ -57,6 +62,14 @@ void ExampleTestSuite::test_token_recognition(){
     TEST_ASSERT(tokens.size() == 2);
     TEST_ASSERT(*tokens[0] == IntegerToken(12));
     TEST_ASSERT(*tokens[1] == IdentifierToken("34a"));
+}
+
+void ExampleTestSuite::test_parse_integer(){
+    vector<shared_ptr<Expression> > exps = parseExpressions("12");
+    TEST_ASSERT(exps.size() == 1);
+    cerr << "Finished\n\n";
+    //cerr << "Exp = " << exps[0];
+    //TEST_ASSERT(*exps[0] == IntegerExpression(12));
 }
 
 int main(){
