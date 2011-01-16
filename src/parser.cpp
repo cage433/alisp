@@ -66,7 +66,7 @@ shared_ptr<Expression> consumeDefinitionExpression(deque<shared_ptr<Token> >& to
     shared_ptr<Expression> body = consumeExpression(tokens);
     eatToken(tokens, RightParenToken());
 
-    return shared_ptr<Expression>(new DefinitionExpression(*functionNameExpression, variables, *body));
+    return shared_ptr<Expression>(new DefinitionExpression(*functionNameExpression, variables, body));
 }
 
 shared_ptr<Expression> consumeParenExpression(deque<shared_ptr<Token> >& tokens){
