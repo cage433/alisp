@@ -4,4 +4,4 @@
 #include <deque>
 using namespace std;
 using namespace boost;
-Expression* consumeExpression(deque<shared_ptr<Token> >& tokens);
+shared_ptr<Expression> consumeExpression(deque<shared_ptr<Token> >& tokens);

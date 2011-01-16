@@ -1,7 +1,9 @@
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 using namespace std;
+using namespace boost;
 
 class Expression{
     public:
@@ -28,22 +30,22 @@ class IdentifierExpression : public Expression{
 
 class DefinitionExpression : public Expression{
             IdentifierExpression name; 
-            vector<IdentifierExpression> variableNames;
+            vector<shared_ptr<IdentifierExpression> > variableNames;
             Expression body;
     public:
         DefinitionExpression(
             const IdentifierExpression& _name, 
-            const vector<IdentifierExpression>& _variableNames,
+            const vector<shared_ptr<IdentifierExpression> >& _variableNames,
             const Expression& _body
         ) : name(_name), variableNames(_variableNames), body(_body){}
 };
 
 class FunctionCallExpression : public Expression{
             IdentifierExpression name; 
-            vector<Expression> arguments;
+            vector<shared_ptr<Expression> > arguments;
     public:
         FunctionCallExpression(
             const IdentifierExpression& _name, 
-            const vector<Expression>& _arguments
+            const vector<shared_ptr<Expression> >& _arguments
         ) : name(_name), arguments(_arguments){}
 };
