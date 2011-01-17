@@ -64,7 +64,7 @@ class DoubleToken : public Token{
             }
         }
         virtual TokenType tokenType(){return DoubleTokenType;}
-        int getNum(){return num;}
+        double getNum(){return num;}
 };
 
 class LeftParenToken : public Token{

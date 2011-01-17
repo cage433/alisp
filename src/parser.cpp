@@ -8,6 +8,7 @@
 #include <exception>
 #include <string>
 #include <deque>
+#include <iostream>
 
 using namespace std;
 using namespace boost;
@@ -96,9 +97,9 @@ shared_ptr<Expression> consumeExpression(deque<shared_ptr<Token> >& tokens){
             return IntegerExpression(num).sharedPtr();
         }
         case DoubleTokenType: {
-            double num = ((DoubleToken&)tokens.front()).getNum();
+            double num = ((DoubleToken&)(*tokens.front())).getNum();
             tokens.pop_front();
-            return IntegerExpression(num).sharedPtr();
+            return DoubleExpression(num).sharedPtr();
         }
         case IdentifierTokenType: 
             return consumeIdentifierExpression(tokens).sharedPtr();

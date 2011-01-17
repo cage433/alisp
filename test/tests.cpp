@@ -15,11 +15,13 @@ public:
         TEST_ADD(ExampleTestSuite::test_token_equality);
         TEST_ADD(ExampleTestSuite::test_token_recognition);
         TEST_ADD(ExampleTestSuite::test_parse_integer);
+        TEST_ADD(ExampleTestSuite::test_parse_double);
     }
 private:
     void test_token_equality();
     void test_token_recognition();
     void test_parse_integer();
+    void test_parse_double();
 
 };
 
@@ -67,9 +69,13 @@ void ExampleTestSuite::test_token_recognition(){
 void ExampleTestSuite::test_parse_integer(){
     vector<shared_ptr<Expression> > exps = parseExpressions("12");
     TEST_ASSERT(exps.size() == 1);
-    cout << "Exp = " << (*exps[0]).toString() << "\n" << flush;
-    cout << "Finished\n\n" << flush;
     TEST_ASSERT(*exps[0] == IntegerExpression(12));
+}
+
+void ExampleTestSuite::test_parse_double(){
+    vector<shared_ptr<Expression> > exps = parseExpressions("12.5");
+    TEST_ASSERT(exps.size() == 1);
+    TEST_ASSERT(*exps[0] == DoubleExpression(12.5));
 }
 
 int main(){
