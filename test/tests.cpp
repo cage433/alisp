@@ -8,24 +8,28 @@
 #include <sstream>
 using namespace std;
 
-class ExampleTestSuite : public Test::Suite 
+class TestSuite : public Test::Suite 
 {
 public:
-    ExampleTestSuite(){
-        TEST_ADD(ExampleTestSuite::test_token_equality);
-        TEST_ADD(ExampleTestSuite::test_token_recognition);
-        TEST_ADD(ExampleTestSuite::test_parse_integer);
-        TEST_ADD(ExampleTestSuite::test_parse_double);
+    TestSuite(){
+        TEST_ADD(TestSuite::test_token_equality);
+        TEST_ADD(TestSuite::test_token_recognition);
+        TEST_ADD(TestSuite::test_parse_integer);
+        TEST_ADD(TestSuite::test_parse_double);
+        TEST_ADD(TestSuite::test_parse_identifier);
+        TEST_ADD(TestSuite::test_parse_function_call);
     }
 private:
     void test_token_equality();
     void test_token_recognition();
     void test_parse_integer();
     void test_parse_double();
+    void test_parse_identifier();
+    void test_parse_function_call();
 
 };
 
-void ExampleTestSuite::test_token_equality(){
+void TestSuite::test_token_equality(){
     TEST_ASSERT(LeftParenToken() == LeftParenToken());
     TEST_ASSERT(RightParenToken() == RightParenToken());
     TEST_ASSERT(LeftParenToken() != RightParenToken());
@@ -38,7 +42,7 @@ void ExampleTestSuite::test_token_equality(){
 };
         
 
-void ExampleTestSuite::test_token_recognition(){
+void TestSuite::test_token_recognition(){
     vector<shared_ptr<Token> > tokens = readTokens("(");
     TEST_ASSERT(tokens.size() == 1);
     TEST_ASSERT(*tokens[0] == LeftParenToken());
@@ -66,20 +70,34 @@ void ExampleTestSuite::test_token_recognition(){
     TEST_ASSERT(*tokens[1] == IdentifierToken("34a"));
 }
 
-void ExampleTestSuite::test_parse_integer(){
+void TestSuite::test_parse_integer(){
     vector<shared_ptr<Expression> > exps = parseExpressions("12");
     TEST_ASSERT(exps.size() == 1);
     TEST_ASSERT(*exps[0] == IntegerExpression(12));
 }
 
-void ExampleTestSuite::test_parse_double(){
+void TestSuite::test_parse_double(){
     vector<shared_ptr<Expression> > exps = parseExpressions("12.5");
     TEST_ASSERT(exps.size() == 1);
     TEST_ASSERT(*exps[0] == DoubleExpression(12.5));
 }
 
+void TestSuite::test_parse_identifier(){
+    vector<shared_ptr<Expression> > exps = parseExpressions("fred");
+    TEST_ASSERT(exps.size() == 1);
+    TEST_ASSERT(*exps[0] == IdentifierExpression("fred"));
+}
+
+void TestSuite::test_parse_function_call(){
+    vector<shared_ptr<Expression> > exps = parseExpressions("(fred 3)");
+    TEST_ASSERT(exps.size() == 1);
+    const FunctionCallExpression& other = dynamic_cast<const FunctionCallExpression&>(*exps[0]);
+    IdentifierExpression idExp = other.getName();
+    TEST_ASSERT(idExp == IdentifierExpression(string("fred")));
+}
+
 int main(){
     Test::TextOutput output(Test::TextOutput::Verbose);
-    ExampleTestSuite ets;
+    TestSuite ets;
     return ets.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

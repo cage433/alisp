@@ -124,6 +124,8 @@ class FunctionCallExpression : public Expression{
             const IdentifierExpression& _name, 
             const vector<shared_ptr<Expression> >& _arguments
         ) : name(_name), arguments(_arguments){}
+        
+        const IdentifierExpression getName() const { return name;}
 
         virtual string toString() const {
             stringstream s;
