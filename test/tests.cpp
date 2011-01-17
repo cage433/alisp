@@ -12,8 +12,8 @@ class ExampleTestSuite : public Test::Suite
 {
 public:
     ExampleTestSuite(){
-//        TEST_ADD(ExampleTestSuite::test_token_equality);
-//        TEST_ADD(ExampleTestSuite::test_token_recognition);
+        TEST_ADD(ExampleTestSuite::test_token_equality);
+        TEST_ADD(ExampleTestSuite::test_token_recognition);
         TEST_ADD(ExampleTestSuite::test_parse_integer);
     }
 private:
