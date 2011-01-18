@@ -18,6 +18,7 @@ public:
         TEST_ADD(TestSuite::test_parse_double);
         TEST_ADD(TestSuite::test_parse_identifier);
         TEST_ADD(TestSuite::test_parse_function_call);
+        TEST_ADD(TestSuite::test_parse_definition);
     }
 private:
     void test_token_equality();
@@ -26,6 +27,7 @@ private:
     void test_parse_double();
     void test_parse_identifier();
     void test_parse_function_call();
+    void test_parse_definition();
 
 };
 
@@ -96,6 +98,13 @@ void TestSuite::test_parse_function_call(){
     TEST_ASSERT(idExp == IdentifierExpression(string("fred")));
 }
 
+void TestSuite::test_parse_definition(){
+    vector<shared_ptr<Expression> > exps = parseExpressions("(def fred (x y) (foo x y))");
+    TEST_ASSERT(exps.size() == 1);
+    const DefinitionExpression& other = dynamic_cast<const DefinitionExpression&>(*exps[0]);
+    IdentifierExpression idExp = other.getName();
+    TEST_ASSERT(idExp == IdentifierExpression(string("fred")));
+}
 int main(){
     Test::TextOutput output(Test::TextOutput::Verbose);
     TestSuite ets;

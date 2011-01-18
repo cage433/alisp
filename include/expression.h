@@ -92,6 +92,8 @@ class DefinitionExpression : public Expression{
             const shared_ptr<Expression>& _body
         ) : name(_name), variableNames(_variableNames), body(_body){}
 
+        const IdentifierExpression getName() const { return name;}
+
         virtual string toString() const {
             stringstream s;
             s << "Definition\nName " << name.toString() << "\nVariables\n";
