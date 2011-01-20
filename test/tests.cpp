@@ -104,7 +104,6 @@ void TestSuite::test_parse_definition(){
     const DefinitionExpression& other = dynamic_cast<const DefinitionExpression&>(*exps[0]);
     IdentifierExpression idExp = other.getName();
     TEST_ASSERT(idExp == IdentifierExpression(string("fred")));
-    cout << other.toString() << "\n" << flush;
 }
 int main(){
     Test::TextOutput output(Test::TextOutput::Verbose);

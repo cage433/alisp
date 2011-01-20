@@ -6,7 +6,7 @@ rule(/\.o/ => [proc{|task_name| "src/" + task_name.sub(/\.o/, '.cpp')}] + FileLi
 end
 
 file "tests" => ["test/tests.cpp", "token.o", "lexer.o", "expression.o", "parser.o"] do
-  sh "g++ -ggdb -I include/ -lcpptest token.o test/tests.cpp lexer.o parser.o -o tests"
+  sh "g++ -ggdb -I include/ -lcpptest token.o test/tests.cpp lexer.o parser.o  expression.o -o tests"
 end
     
 task :run_tests => ["tests"] do
