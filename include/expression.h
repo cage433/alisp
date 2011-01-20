@@ -5,9 +5,15 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <sstream>
+#include "llvm/DerivedTypes.h"
+#include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
+#include "llvm/Analysis/Verifier.h"
+#include "llvm/Support/IRBuilder.h"
 
 using namespace std;
 using namespace boost;
+using namespace llvm;
 
 class Expression;
 
@@ -20,45 +26,25 @@ class Expression{
         }
         virtual Expression *newCopy() = 0;
         shared_ptr<Expression> sharedPtr() {return shared_ptr<Expression>(newCopy());}
+        //virtual Value *Codegen() = 0;
 };
 
 class IntegerExpression : public Expression{
         int num;
     public:
         IntegerExpression(int _num) : num(_num){}
-        virtual string toString() const {
-            stringstream s;
-            s << "Integer Expression " << num;
-            return s.str();
-        };
-        bool operator==(const Expression& exp) const {
-            try {
-                const IntegerExpression& other = dynamic_cast<const IntegerExpression&>(exp);
-                return num == other.num;
-            } catch (std::bad_cast& foo) {
-                return false;
-            }
-        }
+        string toString() const;
+        bool operator==(const Expression& exp) const;
         virtual Expression *newCopy() {return new IntegerExpression(*this);}
+        virtual Value *Codegen();
 };
 
 class DoubleExpression : public Expression{
         double num;
     public:
         DoubleExpression(double _num) : num(_num){}
-        virtual string toString() const {
-            stringstream s;
-            s << "Double Expression " << num;
-            return s.str();
-        }
-        bool operator==(const Expression& exp) const {
-            try {
-                const DoubleExpression& other = dynamic_cast<const DoubleExpression&>(exp);
-                return num == other.num;
-            } catch (std::bad_cast& foo) {
-                return false;
-            }
-        }
+        virtual string toString() const;
+        bool operator==(const Expression& exp) const;
         virtual Expression *newCopy() {return new DoubleExpression(*this);}
 };
 
@@ -67,17 +53,8 @@ class IdentifierExpression : public Expression{
         string identifier;
     public:
         IdentifierExpression(string _identifier) : identifier(_identifier){}
-        virtual string toString() const {
-            return "Identifier Expression " + identifier;
-        }
-        bool operator==(const Expression& exp) const {
-            try {
-                const IdentifierExpression& other = dynamic_cast<const IdentifierExpression&>(exp);
-                return identifier == other.identifier;
-            } catch (std::bad_cast& foo) {
-                return false;
-            }
-        }
+        virtual string toString() const;
+        bool operator==(const Expression& exp) const;
         virtual Expression *newCopy() {return new IdentifierExpression(*this);}
 };
 
@@ -110,26 +87,8 @@ class FunctionCallExpression : public Expression{
         
         const IdentifierExpression getName() const { return name;}
 
-        virtual string toString() const {
-            stringstream s;
-            s << "Function Call\n" << "Name " << name.toString() << "\nArguments\n";
-            vector<shared_ptr<Expression> > copy(arguments);
-
-            for (vector<shared_ptr<Expression> >::iterator exp = copy.begin(); exp != copy.end(); ++exp){
-                s << "\t" << (*exp)->toString() << "\n";
-            }
-            return s.str();
-
-        }
-        bool operator==(const Expression& exp) const {
-            try {
-                const FunctionCallExpression& other = dynamic_cast<const FunctionCallExpression&>(exp);
-                return name == other.name &&
-                    arguments == other.arguments;
-            } catch (std::bad_cast& foo) {
-                return false;
-            }
-        }
+        virtual string toString() const;
+        bool operator==(const Expression& exp) const;
         virtual Expression *newCopy() {return new FunctionCallExpression(*this);}
 };
 
