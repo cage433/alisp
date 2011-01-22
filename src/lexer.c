@@ -7,118 +7,121 @@
 #include "token.h"
 #include "lexer.h"
 
-typedef struct char_buffer{
-        char *array;
-        int max_arr_length;
-        int string_length;
-} char_buffer;
 
-
-void increase_arr_size(char_buffer *fac){
-        char *new_array = (char *)calloc(2 * fac->max_arr_length, sizeof(char));
-        strcpy(new_array, fac->array);
-        free(fac->array);
-        fac->array = new_array;
-        fac->max_arr_length = 2 * fac->max_arr_length;
-}
-
-void clear_char_buffer(char_buffer * buf){
-        free(buf->array);
-        buf->array = (char *)calloc(10, sizeof(char));
-        buf->max_arr_length = 10;
-        buf->string_length = 0;
-}
-
-void add_char(char ch, char_buffer *fac){
-        if (fac->string_length + 1 >= fac->max_arr_length){
-                increase_arr_size(fac);
-        }
-        fac->array[fac->string_length] = ch;
-        ++(fac->string_length);
-}
 
 int isparen(char ch){
         return ch == '(' || ch == ')';
 }
 
-typed_token consume_identifier(char_buffer *buf, FILE *stream){
+enum token_type consume_identifier(FILE *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isspace(ch) || isparen(ch)){
                         if (isparen(ch)){
                                 ungetc(ch, stream);
                         }
-                        return identifier_token(buf->array);
+                        return tok_identifier;
                 } else {
-                        add_char(ch, buf);
+                        putc(ch, buf);
                 }
         }
-        return identifier_token(buf->array);
+        return tok_identifier;
 }
 
-typed_token consume_double(char_buffer *buf, FILE *stream){
+enum token_type consume_double(FILE *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
-                        add_char(ch, buf);
+                        putc(ch, buf);
                 } else if (isspace(ch) || isparen(ch)){
                         if (isparen(ch)){
                                 ungetc(ch, stream);
                         }
-                        return double_token(atof(buf->array));
+                        return tok_double;
                 } else {
-                        add_char(ch, buf);
+                        putc(ch, buf);
                         return consume_identifier(buf, stream);
                 }
         }
-        return double_token(atof(buf->array));
+        return tok_double;
 }
 
-typed_token consume_integer(char_buffer *buf, FILE *stream){
+enum token_type consume_integer(FILE *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
-                        add_char(ch, buf);
+                        putc(ch, buf);
                 } else if (ch == '.'){
-                        add_char(ch, buf);
+                        putc(ch, buf);
                         return consume_double(buf, stream);
                 } else if (isspace(ch) || isparen(ch)){
                         if (isparen(ch)){
                                 ungetc(ch, stream);
                         }
-                        return integer_token(atoi(buf->array));
+                        return tok_integer;
                 } else {
-                        add_char(ch, buf);
+                        putc(ch, buf);
                         return consume_identifier(buf, stream);
                 }
         }
-        return integer_token(atoi(buf->array));
+        return tok_integer;
 }
+
+typed_token consume_token(FILE *stream){
+        // We know here that stream is not at EOF, 
+        // nor is its next character whitespace
+        typed_token tok;
+        int ch;
+        ch = getc(stream);
+        if (ch == '(')
+                tok = LEFT_PAREN;
+        else if (ch == ')')
+                tok = RIGHT_PAREN;
+        else {
+                char *p;
+                size_t s;
+                FILE *buf = open_memstream(&p, &s);
+                putc(ch, buf);
+                int token_type;
+                if (isdigit(ch))
+                        token_type = consume_integer(buf, stream);
+                else
+                        token_type = consume_identifier(buf, stream);
+                fflush(buf);
+                switch (token_type){
+                        case tok_identifier:
+                                tok = identifier_token(p);
+                                break;
+                        case tok_double:
+                                tok = double_token(atof(p));
+                                break;
+                        case tok_integer:
+                                tok = integer_token(atoi(p));
+                                break;
+
+                }
+                fclose(buf);
+                free(p);
+        }
+        return tok;
+}
+
 
 
 token_list *getTokens(FILE *stream){
         token_list *x = NULL;
-        char_buffer buf = {(char *) calloc(10, sizeof(char)), 10, 0};
         int ch;
         while ((ch = getc(stream)) != EOF){
-                if (ch == '(')
-                        x = cons(LEFT_PAREN, x);
-                else if (ch == ')')
-                        x = cons(RIGHT_PAREN, x);
-                else if (isdigit(ch)){
-                        add_char(ch, &buf);
-                        typed_token tok = consume_integer(&buf, stream);
+                if (isspace(ch)){
+                } else {
+                        ungetc(ch, stream);
+                        typed_token tok = consume_token(stream);
                         x = cons(tok, x);
-                } else if (isspace(ch))
-                {}
-                else {
-                        add_char(ch, &buf);
-                        x = cons(consume_identifier(&buf, stream), x);
                 }
-                clear_char_buffer(&buf);
         }
         token_list *result = reverse_token_list(x);
         free_token_list(x);
         return result;
 }
+
 
