@@ -1,5 +1,5 @@
-#ifndef ALISP_INCLUDE
-#define ALISP_INCLUDE
+#ifndef ALISP_LEXER
+#define ALISP_LEXER
 
 #include "stdio.h"
 

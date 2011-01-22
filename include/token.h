@@ -1,16 +1,16 @@
-#ifndef TOKEN_INCLUDE
-#define TOKEN_INCLUDE
+#ifndef ALISP_TOKEN
+#define ALISP_TOKEN
 
-enum token_type {
+typedef enum {
         tok_left_paren,
         tok_identifier,
         tok_integer,
         tok_double,
         tok_right_paren
-};
+} token_type;
 
 typedef struct {
-        enum token_type type;
+        token_type type;
         union {
                 int intValue;
                 double doubleValue;

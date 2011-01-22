@@ -13,7 +13,7 @@ int isparen(char ch){
         return ch == '(' || ch == ')';
 }
 
-enum token_type consume_identifier(FILE *buf, FILE *stream){
+token_type consume_identifier(FILE *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isspace(ch) || isparen(ch)){
@@ -28,7 +28,7 @@ enum token_type consume_identifier(FILE *buf, FILE *stream){
         return tok_identifier;
 }
 
-enum token_type consume_double(FILE *buf, FILE *stream){
+token_type consume_double(FILE *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
@@ -46,7 +46,7 @@ enum token_type consume_double(FILE *buf, FILE *stream){
         return tok_double;
 }
 
-enum token_type consume_integer(FILE *buf, FILE *stream){
+token_type consume_integer(FILE *buf, FILE *stream){
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isdigit(ch)){
