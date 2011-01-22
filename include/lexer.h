@@ -1,13 +1,9 @@
-#ifndef ALISP_LEXER
-#define ALISP_LEXER
+#ifndef ALISP_INCLUDE
+#define ALISP_INCLUDE
 
-#include "token.h"
-#include <boost/shared_ptr.hpp>
-#include <vector>
-#include <istream>
-using namespace boost;
+#include "stdio.h"
 
-vector<shared_ptr<Token> > readTokens(istream& s);
-vector<shared_ptr<Token> > readTokens(const string& str);
-
+token_list *getTokens(FILE *stream);
 #endif
+
+
