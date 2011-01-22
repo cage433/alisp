@@ -10,12 +10,15 @@
 #include "llvm/Module.h"
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/Support/IRBuilder.h"
+#include <cstdio>
 
 using namespace std;
 using namespace boost;
 using namespace llvm;
 
-class Expression;
+
+int Error(const char *Str);
+Value *ErrorV(const char *Str); 
 
 class Expression{
     public:
@@ -26,10 +29,13 @@ class Expression{
         }
         virtual Expression *newCopy() = 0;
         shared_ptr<Expression> sharedPtr() {return shared_ptr<Expression>(newCopy());}
-        //virtual Value *Codegen() = 0;
+        virtual Value *Codegen() = 0;
 };
 
-class IntegerExpression : public Expression{
+class AtomicExpression : public Expression{
+    virtual Function * topLevelFunction();
+};
+class IntegerExpression : public AtomicExpression{
         int num;
     public:
         IntegerExpression(int _num) : num(_num){}
@@ -46,6 +52,7 @@ class DoubleExpression : public Expression{
         virtual string toString() const;
         bool operator==(const Expression& exp) const;
         virtual Expression *newCopy() {return new DoubleExpression(*this);}
+        virtual Value *Codegen();
 };
 
 
@@ -56,7 +63,16 @@ class IdentifierExpression : public Expression{
         virtual string toString() const;
         bool operator==(const Expression& exp) const;
         virtual Expression *newCopy() {return new IdentifierExpression(*this);}
+        virtual Value *Codegen();
+        string getIdentifier(){return identifier;}
 };
+class Prototype{
+    IdentifierExpression name;
+    vector<IdentifierExpression> args;
+    public:
+    Prototype(const IdentifierExpression &_name, const vector<IdentifierExpression>& _args) : name(_name), args(_args){}
+    Function *Codegen();
+}
 
 class DefinitionExpression : public Expression{
             IdentifierExpression name; 
@@ -74,6 +90,7 @@ class DefinitionExpression : public Expression{
         virtual string toString() const; 
         bool operator==(const Expression& exp) const;
         virtual Expression *newCopy() {return new DefinitionExpression(*this);}
+        virtual Value *Codegen(){return ErrorV("Not supported");}
 };
 
 class FunctionCallExpression : public Expression{
@@ -90,6 +107,7 @@ class FunctionCallExpression : public Expression{
         virtual string toString() const;
         bool operator==(const Expression& exp) const;
         virtual Expression *newCopy() {return new FunctionCallExpression(*this);}
+        virtual Value *Codegen();
 };
 
 #endif

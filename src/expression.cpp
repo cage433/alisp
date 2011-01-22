@@ -1,11 +1,19 @@
 #include "expression.h"
+#include <map>
 
-#include "llvm/DerivedTypes.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
-#include "llvm/Analysis/Verifier.h"
-#include "llvm/Support/IRBuilder.h"
 using namespace llvm;
+
+static Module *TheModule;
+static std::map<std::string, Value*> NamedValues;
+static IRBuilder<> Builder(getGlobalContext());
+
+int Error(const char *Str) { fprintf(stderr, "Error: %s\n", Str);return 0;}
+Value *ErrorV(const char *Str) { Error(Str); return 0; }
+
+// AtomicExpression
+
+Function *AtomicExpression::topLevelFunction(){
+}
 
 // Definition
 string DefinitionExpression::toString() const {
@@ -53,6 +61,26 @@ bool FunctionCallExpression::operator==(const Expression& exp) const {
     }
 }
 
+Value *FunctionCallExpression::Codegen() {
+  // Look up the name in the global module table.
+  Function *CalleeF = TheModule->getFunction(name.getIdentifier());
+  if (CalleeF == 0)
+    return ErrorV("Unknown function referenced");
+  
+  // If argument mismatch error.
+  if (CalleeF->arg_size() != arguments.size())
+    return ErrorV("Incorrect # arguments passed");
+
+  std::vector<Value*> ArgsV;
+  for (unsigned i = 0, e = arguments.size(); i != e; ++i) {
+    ArgsV.push_back(arguments[i]->Codegen());
+    if (ArgsV.back() == 0) return 0;
+  }
+  
+  return Builder.CreateCall(CalleeF, ArgsV.begin(), ArgsV.end(), "calltmp");
+}
+
+
 // Integer
 
 string IntegerExpression::toString() const {
@@ -69,7 +97,7 @@ bool IntegerExpression::operator==(const Expression& exp) const {
     }
 }
 
-static IRBuilder<> Builder(getGlobalContext());
+
 Value *IntegerExpression::Codegen() {
   return ConstantInt::get(getGlobalContext(), APInt(32, num, true));
 }
@@ -90,6 +118,9 @@ bool DoubleExpression::operator==(const Expression& exp) const {
     }
 }
 
+Value *DoubleExpression::Codegen() {
+  return ConstantFP::get(getGlobalContext(), APFloat(num));
+}
 // Identifier
 
 string IdentifierExpression::toString() const {
@@ -102,4 +133,10 @@ bool IdentifierExpression::operator==(const Expression& exp) const {
     } catch (std::bad_cast& foo) {
         return false;
     }
+}
+
+Value *IdentifierExpression::Codegen() {
+  // Look this variable up in the function.
+  Value *V = NamedValues[identifier];
+  return V ? V : ErrorV("Unknown variable name");
 }
