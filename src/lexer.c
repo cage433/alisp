@@ -8,7 +8,6 @@
 #include "lexer.h"
 
 
-
 int isparen(char ch){
         return ch == '(' || ch == ')';
 }
@@ -116,7 +115,7 @@ token_list *getTokens(FILE *stream){
                 } else {
                         ungetc(ch, stream);
                         typed_token tok = consume_token(stream);
-                        x = cons(tok, x);
+                        x = cons_token(tok, x);
                 }
         }
         token_list *result = reverse_token_list(x);

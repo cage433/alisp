@@ -108,7 +108,7 @@ int token_lists_equal(token_list *l1, token_list *l2){
                 
 
 
-token_list *cons(typed_token elt, token_list *list){
+token_list *cons_token(typed_token elt, token_list *list){
         token_list *consed_list = (token_list *)malloc(sizeof(token_list));
         consed_list->car = copy_token(elt);
         consed_list->cdr = list;
@@ -118,7 +118,7 @@ token_list *cons(typed_token elt, token_list *list){
 token_list *reverse_token_list(token_list *list){
         token_list *reverse = NULL;
         while (list != NULL){
-                reverse = cons(copy_token(list->car), reverse);
+                reverse = cons_token(copy_token(list->car), reverse);
                 list = list->cdr;
         }
         return reverse;
@@ -143,7 +143,7 @@ token_list *make_token_list(int size, ...){
         int i;
         for (i = 0; i < size; ++i){
                 typed_token elt = va_arg(ap, typed_token);
-                list = cons(elt, list);
+                list = cons_token(elt, list);
         }
         token_list *result = reverse_token_list(list);
         free_token_list(list);

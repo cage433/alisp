@@ -31,7 +31,7 @@ static typed_token LEFT_PAREN = {tok_left_paren, 0};
 static typed_token RIGHT_PAREN = {tok_right_paren, 0};
 
 int tokens_equal(typed_token tok1, typed_token tok2);
-token_list *cons(typed_token elt, token_list *list);
+token_list *cons_token(typed_token elt, token_list *list);
 
 token_list *reverse_token_list(token_list *list);
 

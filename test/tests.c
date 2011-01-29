@@ -3,14 +3,8 @@
 #include "stdio.h"
 
 #include "token.h"
+#include "expression.h"
 #include "lexer.h"
-
-char *TMPFILE = "tmpfile";
-void write_str_to_tmp_file(char *string){
-        FILE *file = fopen(TMPFILE, "w");
-        fputs(string, file);
-        fclose(file);
-}
 
 START_TEST(test_make_token_list)
 {
@@ -51,9 +45,9 @@ token_list *expected_lists(int i){
 START_TEST(test_lexer)
 {
         char *code = codes[_i];
-        write_str_to_tmp_file(code);
-        FILE *file = fopen(TMPFILE, "r");
-        token_list *tokens = getTokens(file);
+        FILE *stream;
+        stream = fmemopen(code, strlen(code), "r");
+        token_list *tokens = getTokens(stream);
         token_list *expected_list = expected_lists(_i);
         fail_unless(token_lists_equal(expected_list, tokens));
 }
