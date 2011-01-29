@@ -53,7 +53,6 @@ START_TEST(test_lexer)
 }
 END_TEST
 
-
 Suite *
 test_suite (void)
 {
