@@ -5,6 +5,7 @@
 #include "token.h"
 #include "expression.h"
 #include "lexer.h"
+#include "list.h"
 
 START_TEST(test_make_token_list)
 {
@@ -53,6 +54,17 @@ START_TEST(test_lexer)
 }
 END_TEST
 
+START_TEST(test_list_length)
+{
+        List *l = NULL;
+        fail_unless(listlen(l) == 0);
+        l = cons("foo", l);
+        fail_unless(listlen(l) == 1);
+        l = cons("bar", l);
+        fail_unless(listlen(l) == 2);
+}
+END_TEST
+
 Suite *
 test_suite (void)
 {
@@ -60,6 +72,7 @@ test_suite (void)
 
         /* Core test case */
         TCase *tc_core = tcase_create ("Core");
+        tcase_add_test (tc_core, test_list_length);
         tcase_add_test (tc_core, test_make_token_list);
         tcase_add_loop_test (tc_core, test_lexer, 0, 7);
         suite_add_tcase (s, tc_core);
