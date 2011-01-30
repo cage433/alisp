@@ -4,6 +4,14 @@
 #include "stdio.h"
 #include "expression.h"
 
+static char* code[] = {
+        "10", 
+        "10 12",
+        "10.5",
+        "10.5 19"
+};
+
+
 START_TEST(test_parse_int)
 {
         expression *expected = make_integer_expression(10);        

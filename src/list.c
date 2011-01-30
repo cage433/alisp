@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "list.h"
+#include "stdarg.h"
      
 List *cons(void *car, List *list){
         List *consed_list = (List *)malloc(sizeof(List));
@@ -36,3 +37,18 @@ void free_list(List *l){
                 l = l1;
         }
 }
+
+List *make_list(int size, ...){
+        va_list(ap);
+        va_start(ap, size);
+        List *list = NULL;
+        int i;
+        for (i = 0; i < size; ++i){
+                void *elt = va_arg(ap, void*);
+                list = cons(elt, list);
+        }
+        List *result = reverse_list(list);
+        free_list(list);
+        return result;
+}
+

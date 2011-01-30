@@ -2,7 +2,6 @@
 #include "stdlib.h"
 #include "ctype.h"
 #include "string.h"
-#include "stdarg.h"
 
 #include "token.h"
 
@@ -108,20 +107,6 @@ int token_lists_equal(List *l1, List *l2){
                 }
         }
         return 1;
-}
-
-List *make_token_list(int size, ...){
-        va_list(ap);
-        va_start(ap, size);
-        List *list = NULL;
-        int i;
-        for (i = 0; i < size; ++i){
-                typed_token *elt = va_arg(ap, typed_token*);
-                list = cons(elt, list);
-        }
-        List *result = reverse_list(list);
-        free_list(list);
-        return result;
 }
 
 void free_tokens(List *tokens){
