@@ -3,10 +3,10 @@
 #include "string.h"
 
 
-expression make_integer_expression(int num){
-        expression exp;
-        exp.exp_type = exp_integer;
-        exp.int_value = num;
+expression *make_integer_expression(int num){
+        expression *exp = (expression *)malloc(sizeof(expression));
+        exp->exp_type = exp_integer;
+        exp->int_value = num;
         return exp;
 }
 
@@ -29,9 +29,23 @@ expression make_identifier_expression(char *identifier){
         return exp;
 }
 
-expression_list *cons_expression(expression elt, expression_list *list){
-        expression_list *consed_list = (expression_list *)malloc(sizeof(expression_list));
-        consed_list->car = elt;
-        consed_list->cdr = list;
-        return consed_list;
+int expressions_equal(expression *exp1, expression *exp2){
+        if (exp1->exp_type != exp2->exp_type)
+                return 0;
+        else if (exp1->exp_type == exp_integer)
+                return exp1->int_value == exp2->int_value;
+        else {
+                printf("Unimplemented\n");
+                exit(-1);
+        }
 }
+
+void print_expression(expression *exp){
+        if (exp->exp_type == exp_integer)
+                printf("Integer Expression %d\n", exp->int_value);
+        else {
+                printf("expression.c unimplemented\n");
+                exit(-1);
+        }
+}
+

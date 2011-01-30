@@ -5,12 +5,12 @@
 #include "test_suites.h"
 
 
-int main (void)
+int main ()
 {
         int number_failed;
-        Suite *s = test_token_suite ();
-        SRunner *sr = srunner_create (s);
+        SRunner *sr = srunner_create (test_token_suite());
         srunner_add_suite (sr, test_list_suite ());
+        srunner_add_suite (sr, test_parser_suite());
         srunner_run_all (sr, CK_NORMAL);
         number_failed = srunner_ntests_failed (sr);
         srunner_free (sr);

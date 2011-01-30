@@ -37,9 +37,6 @@ typedef struct expression {
     };
 } expression;
 
-typedef struct expression_list{
-        struct expression car;
-        struct expression_list *cdr;
-} expression_list;
-
+expression *make_integer_expression(int num);
+int expressions_equal(expression *exp1, expression *exp2);
 #endif

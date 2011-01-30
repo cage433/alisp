@@ -123,3 +123,11 @@ List *make_token_list(int size, ...){
         free_list(list);
         return result;
 }
+
+void free_tokens(List *tokens){
+        while(tokens != NULL){
+                free((typed_token *)(tokens->car));
+                tokens = tokens->cdr;
+        }
+}
+        
