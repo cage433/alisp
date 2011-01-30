@@ -2,8 +2,9 @@
 #define ALISP_LEXER
 
 #include "stdio.h"
+#include "list.h"
 
-token_list *getTokens(FILE *stream);
+List *getTokens(FILE *stream);
 #endif
 
 

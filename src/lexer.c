@@ -6,6 +6,7 @@
 
 #include "token.h"
 #include "lexer.h"
+#include "list.h"
 
 
 int isparen(char ch){
@@ -66,16 +67,16 @@ token_type consume_integer(FILE *buf, FILE *stream){
         return tok_integer;
 }
 
-typed_token consume_token(FILE *stream){
+typed_token *consume_token(FILE *stream){
         // We know here that stream is not at EOF, 
         // nor is its next character whitespace
-        typed_token tok;
+        typed_token *tok;
         int ch;
         ch = getc(stream);
         if (ch == '(')
-                tok = LEFT_PAREN;
+                tok = &LEFT_PAREN;
         else if (ch == ')')
-                tok = RIGHT_PAREN;
+                tok = &RIGHT_PAREN;
         else {
                 char *p;
                 size_t s;
@@ -107,19 +108,19 @@ typed_token consume_token(FILE *stream){
 
 
 
-token_list *getTokens(FILE *stream){
-        token_list *x = NULL;
+List *getTokens(FILE *stream){
+        List *x = NULL;
         int ch;
         while ((ch = getc(stream)) != EOF){
                 if (isspace(ch)){
                 } else {
                         ungetc(ch, stream);
-                        typed_token tok = consume_token(stream);
-                        x = cons_token(tok, x);
+                        typed_token *tok = consume_token(stream);
+                        x = cons(tok, x);
                 }
         }
-        token_list *result = reverse_token_list(x);
-        free_token_list(x);
+        List *result = reverse_list(x);
+        free_list(x);
         return result;
 }
 

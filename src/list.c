@@ -31,7 +31,6 @@ List *reverse_list(List *l){
 
 void free_list(List *l){
         while (l != NULL){
-                printf("Freeing\n");
                 List *l1 = l->cdr;
                 free(l);
                 l = l1;

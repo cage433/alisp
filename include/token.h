@@ -1,6 +1,8 @@
 #ifndef ALISP_TOKEN
 #define ALISP_TOKEN
 
+#include "list.h"
+
 typedef enum {
         tok_left_paren,
         tok_identifier,
@@ -18,25 +20,16 @@ typedef struct {
         };
 } typed_token;
 
-typed_token integer_token(int num);
-typed_token double_token(double num);
-typed_token identifier_token(char *identifier);
-
-typedef struct token_list{
-        typed_token car;
-        struct token_list *cdr;
-} token_list;
+typed_token *integer_token(int num);
+typed_token *double_token(double num);
+typed_token *identifier_token(char *identifier);
 
 static typed_token LEFT_PAREN = {tok_left_paren, 0};
 static typed_token RIGHT_PAREN = {tok_right_paren, 0};
 
-int tokens_equal(typed_token tok1, typed_token tok2);
-token_list *cons_token(typed_token elt, token_list *list);
+int tokens_equal(typed_token *tok1, typed_token *tok2);
+List *make_token_list(int size, ...);
 
-token_list *reverse_token_list(token_list *list);
-
-void free_token_list(token_list *list);
-token_list *make_token_list(int size, ...);
 #endif
 
 

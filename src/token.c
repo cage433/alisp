@@ -5,30 +5,31 @@
 #include "stdarg.h"
 
 #include "token.h"
-typed_token integer_token(int num){
-        typed_token tok;
-        tok.type = tok_integer;
-        tok.intValue = num;
+
+typed_token *integer_token(int num){
+        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
+        tok->type = tok_integer;
+        tok->intValue = num;
         return tok;
 }
 
-typed_token double_token(double num){
-        typed_token tok;
-        tok.type = tok_double;
-        tok.doubleValue = num;
+typed_token *double_token(double num){
+        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
+        tok->type = tok_double;
+        tok->doubleValue = num;
         return tok;
 }
 
-typed_token identifier_token(char *identifier){
-        typed_token tok;
-        tok.type = tok_identifier;
-        tok.identifierValue = calloc(1 + strlen(identifier), sizeof(char));
-        strcpy(tok.identifierValue, identifier);
+typed_token *identifier_token(char *identifier){
+        typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
+        tok->type = tok_identifier;
+        tok->identifierValue = calloc(1 + strlen(identifier), sizeof(char));
+        strcpy(tok->identifierValue, identifier);
         return tok;
 }
 
-void printtoken(typed_token tok){
-        switch(tok.type){
+void printtoken(typed_token *tok){
+        switch(tok->type){
                 case tok_left_paren:
                         printf("LEFT PAREN\n");
                         break;
@@ -36,13 +37,13 @@ void printtoken(typed_token tok){
                         printf("RIGHT PAREN\n");
                         break;
                 case tok_integer:
-                        printf("INTEGER %d\n", tok.intValue);
+                        printf("INTEGER %d\n", tok->intValue);
                         break;
                 case tok_double:
-                        printf("DOUBLE %G\n", tok.doubleValue);
+                        printf("DOUBLE %G\n", tok->doubleValue);
                         break;
                 case tok_identifier:
-                        printf("IDENTIFIER %s\n", tok.identifierValue);
+                        printf("IDENTIFIER %s\n", tok->identifierValue);
                         break;
                 default:
                         printf("Unexpected token\n");
@@ -50,7 +51,7 @@ void printtoken(typed_token tok){
         }
 }
 
-void print_token_list(token_list *toks){
+void print_token_list(List *toks){
         int i = 0;
         while (toks != NULL){
                 printf("Token %d\n", i++);
@@ -59,39 +60,42 @@ void print_token_list(token_list *toks){
         }
 }
 
-int tokens_equal(typed_token tok1, typed_token tok2){
-        switch(tok1.type){
+int tokens_equal(typed_token *tok1, typed_token *tok2){
+        switch(tok1->type){
                 case tok_left_paren:
-                        return tok2.type == tok_left_paren;
+                        return tok2->type == tok_left_paren;
                 case tok_right_paren:
-                        return tok2.type == tok_right_paren;
+                        return tok2->type == tok_right_paren;
                 case tok_integer:
-                        if (tok2.type == tok_integer)
-                                return tok1.intValue == tok2.intValue;
+                        if (tok2->type == tok_integer)
+                                return tok1->intValue == tok2->intValue;
                         else
                                 return 0;
                 case tok_double:
-                        if (tok2.type == tok_double)
-                                return tok1.doubleValue == tok2.doubleValue;
+                        if (tok2->type == tok_double)
+                                return tok1->doubleValue == tok2->doubleValue;
                         else
                                 return 0;
                 case tok_identifier:
-                        if (tok2.type == tok_identifier)
-                                return strcmp(tok1.identifierValue, tok2.identifierValue) == 0;
+                        if (tok2->type == tok_identifier)
+                                return strcmp(tok1->identifierValue, tok2->identifierValue) == 0;
                         else
                                 return 0;
         }
 }
 
-typed_token copy_token(typed_token tok){
+typed_token *copy_token(typed_token tok){
         if (tok.type == tok_identifier){
                 return identifier_token(tok.identifierValue);
-        } else
-                return tok;
+        } else {
+                typed_token *copy = (typed_token *)malloc(sizeof(typed_token));
+                memcpy(copy, &tok, sizeof(typed_token));
+                return copy;
+        }
 }
 
 
-int token_lists_equal(token_list *l1, token_list *l2){
+int token_lists_equal(List *l1, List *l2){
         while(l1 != NULL || l2 != NULL){
                 if (l1 == NULL || l2 == NULL){
                         return 0;
@@ -105,47 +109,17 @@ int token_lists_equal(token_list *l1, token_list *l2){
         }
         return 1;
 }
-                
 
-
-token_list *cons_token(typed_token elt, token_list *list){
-        token_list *consed_list = (token_list *)malloc(sizeof(token_list));
-        consed_list->car = copy_token(elt);
-        consed_list->cdr = list;
-        return consed_list;
-}
-
-token_list *reverse_token_list(token_list *list){
-        token_list *reverse = NULL;
-        while (list != NULL){
-                reverse = cons_token(copy_token(list->car), reverse);
-                list = list->cdr;
-        }
-        return reverse;
-}
-
-void free_token(typed_token tok){
-        if (tok.type == tok_identifier)
-                free(tok.identifierValue);
-}
-void free_token_list(token_list *list){
-        while (list != NULL){
-                free_token(list->car);
-                token_list *cdr = list->cdr;
-                free(list);
-                list = cdr;
-        }
-}
-token_list *make_token_list(int size, ...){
+List *make_token_list(int size, ...){
         va_list(ap);
         va_start(ap, size);
-        token_list *list = NULL;
+        List *list = NULL;
         int i;
         for (i = 0; i < size; ++i){
-                typed_token elt = va_arg(ap, typed_token);
-                list = cons_token(elt, list);
+                typed_token *elt = va_arg(ap, typed_token*);
+                list = cons(elt, list);
         }
-        token_list *result = reverse_token_list(list);
-        free_token_list(list);
+        List *result = reverse_list(list);
+        free_list(list);
         return result;
 }

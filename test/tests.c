@@ -9,8 +9,8 @@
 
 START_TEST(test_make_token_list)
 {
-        token_list *list = make_token_list(2, LEFT_PAREN, RIGHT_PAREN);
-        fail_unless(tokens_equal(LEFT_PAREN, list->car));
+        List *list = make_token_list(2, &LEFT_PAREN, &RIGHT_PAREN);
+        fail_unless(tokens_equal(&LEFT_PAREN, list->car));
 }
 END_TEST
 
@@ -26,20 +26,20 @@ static char *codes[] = {
                 (\
                 ",
 };
-token_list *expected_lists(int i){
+List *expected_lists(int i){
         switch (i){
                 case 0:
-                        return make_token_list(1, LEFT_PAREN);
+                        return make_token_list(1, &LEFT_PAREN);
                 case 1:
                 case 2:
-                        return make_token_list(2, LEFT_PAREN, integer_token(45));
+                        return make_token_list(2, &LEFT_PAREN, integer_token(45));
                 case 3:
-                        return make_token_list(2, double_token(34.6), RIGHT_PAREN);
+                        return make_token_list(2, double_token(34.6), &RIGHT_PAREN);
                 case 4:
-                        return make_token_list(3, LEFT_PAREN, identifier_token("fred"), RIGHT_PAREN);
+                        return make_token_list(3, &LEFT_PAREN, identifier_token("fred"), &RIGHT_PAREN);
                 case 5:
                 case 6:
-                        return make_token_list(3, LEFT_PAREN, identifier_token("x"), LEFT_PAREN);
+                        return make_token_list(3, &LEFT_PAREN, identifier_token("x"), &LEFT_PAREN);
         }
 }
 
@@ -48,8 +48,8 @@ START_TEST(test_lexer)
         char *code = codes[_i];
         FILE *stream;
         stream = fmemopen(code, strlen(code), "r");
-        token_list *tokens = getTokens(stream);
-        token_list *expected_list = expected_lists(_i);
+        List *tokens = getTokens(stream);
+        List *expected_list = expected_lists(_i);
         fail_unless(token_lists_equal(expected_list, tokens));
 }
 END_TEST
@@ -83,6 +83,10 @@ test_suite (void)
 
 int main (void)
 {
+        char *code = codes[0];
+        FILE *stream;
+        stream = fmemopen(code, strlen(code), "r");
+        List *tokens = getTokens(stream);
         int number_failed;
         Suite *s = test_suite ();
         SRunner *sr = srunner_create (s);
