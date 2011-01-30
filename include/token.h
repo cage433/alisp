@@ -14,9 +14,9 @@ typedef enum {
 typedef struct {
         token_type type;
         union {
-                int intValue;
-                double doubleValue;
-                char* identifierValue;
+                int int_value;
+                double double_value;
+                char* identifier_value;
         };
 } typed_token;
 
@@ -29,6 +29,7 @@ static typed_token RIGHT_PAREN = {tok_right_paren, 0};
 
 int tokens_equal(typed_token *tok1, typed_token *tok2);
 List *make_token_list(int size, ...);
+void free_tokens(List *tokens);
 
 #endif
 

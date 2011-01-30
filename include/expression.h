@@ -27,7 +27,7 @@ typedef struct {
 } call_expression;
 
 typedef struct expression {
-    expression_type exp_type;
+    expression_type type;
     union {
         int int_value;
         double double_value;

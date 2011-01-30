@@ -11,7 +11,7 @@ typed_token *token_car(List *tokens){
 
 expression *consume_integer_exp(List **tokens){
         typed_token *tok = token_car(*tokens);
-        int num = tok->intValue;
+        int num = tok->int_value;
         *tokens = (*tokens)->cdr;
         expression *exp = make_integer_expression(num);
         return exp;
@@ -19,7 +19,7 @@ expression *consume_integer_exp(List **tokens){
         
 expression *consume_double_exp(List **tokens){
         typed_token *tok = token_car(*tokens);
-        double num = tok->doubleValue;
+        double num = tok->double_value;
         *tokens = (*tokens)->cdr;
         expression *exp = make_double_expression(num);
         return exp;

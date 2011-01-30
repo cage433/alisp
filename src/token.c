@@ -9,22 +9,22 @@
 typed_token *integer_token(int num){
         typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
         tok->type = tok_integer;
-        tok->intValue = num;
+        tok->int_value = num;
         return tok;
 }
 
 typed_token *double_token(double num){
         typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
         tok->type = tok_double;
-        tok->doubleValue = num;
+        tok->double_value = num;
         return tok;
 }
 
 typed_token *identifier_token(char *identifier){
         typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
         tok->type = tok_identifier;
-        tok->identifierValue = calloc(1 + strlen(identifier), sizeof(char));
-        strcpy(tok->identifierValue, identifier);
+        tok->identifier_value = calloc(1 + strlen(identifier), sizeof(char));
+        strcpy(tok->identifier_value, identifier);
         return tok;
 }
 
@@ -37,13 +37,13 @@ void printtoken(typed_token *tok){
                         printf("RIGHT PAREN\n");
                         break;
                 case tok_integer:
-                        printf("INTEGER %d\n", tok->intValue);
+                        printf("INTEGER %d\n", tok->int_value);
                         break;
                 case tok_double:
-                        printf("DOUBLE %G\n", tok->doubleValue);
+                        printf("DOUBLE %G\n", tok->double_value);
                         break;
                 case tok_identifier:
-                        printf("IDENTIFIER %s\n", tok->identifierValue);
+                        printf("IDENTIFIER %s\n", tok->identifier_value);
                         break;
                 default:
                         printf("Unexpected token\n");
@@ -68,17 +68,17 @@ int tokens_equal(typed_token *tok1, typed_token *tok2){
                         return tok2->type == tok_right_paren;
                 case tok_integer:
                         if (tok2->type == tok_integer)
-                                return tok1->intValue == tok2->intValue;
+                                return tok1->int_value == tok2->int_value;
                         else
                                 return 0;
                 case tok_double:
                         if (tok2->type == tok_double)
-                                return tok1->doubleValue == tok2->doubleValue;
+                                return tok1->double_value == tok2->double_value;
                         else
                                 return 0;
                 case tok_identifier:
                         if (tok2->type == tok_identifier)
-                                return strcmp(tok1->identifierValue, tok2->identifierValue) == 0;
+                                return strcmp(tok1->identifier_value, tok2->identifier_value) == 0;
                         else
                                 return 0;
         }
@@ -86,7 +86,7 @@ int tokens_equal(typed_token *tok1, typed_token *tok2){
 
 typed_token *copy_token(typed_token tok){
         if (tok.type == tok_identifier){
-                return identifier_token(tok.identifierValue);
+                return identifier_token(tok.identifier_value);
         } else {
                 typed_token *copy = (typed_token *)malloc(sizeof(typed_token));
                 memcpy(copy, &tok, sizeof(typed_token));
