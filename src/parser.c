@@ -5,13 +5,26 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+typed_token *token_car(List *tokens){
+        return (typed_token *)(tokens->car);
+}
+
 expression *consume_integer_exp(List **tokens){
-        int num = ((typed_token *)((**tokens).car))->intValue;
+        typed_token *tok = token_car(*tokens);
+        int num = tok->intValue;
         *tokens = (*tokens)->cdr;
         expression *exp = make_integer_expression(num);
         return exp;
 }
         
+expression *consume_double_exp(List **tokens){
+        typed_token *tok = token_car(*tokens);
+        double num = tok->doubleValue;
+        *tokens = (*tokens)->cdr;
+        expression *exp = make_double_expression(num);
+        return exp;
+}
+
 List *parse_expressions(FILE *stream){
         
         List *tokens = getTokens(stream);
@@ -21,6 +34,8 @@ List *parse_expressions(FILE *stream){
                 typed_token *tok = (typed_token *)tokens2->car;
                 if (tok->type == tok_integer)
                         expressions = cons(consume_integer_exp(&tokens2), expressions);
+                else if (tok->type == tok_double)
+                        expressions = cons(consume_double_exp(&tokens2), expressions);
                 else {
                         printf("parser.c unimplemented\n");
                         exit(-1);
