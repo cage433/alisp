@@ -6,6 +6,7 @@
 #include "expression.h"
 #include "lexer.h"
 #include "list.h"
+#include "test_suites.h"
 
 START_TEST(test_make_token_list)
 {
@@ -54,25 +55,13 @@ START_TEST(test_lexer)
 }
 END_TEST
 
-START_TEST(test_list_length)
-{
-        List *l = NULL;
-        fail_unless(listlen(l) == 0);
-        l = cons("foo", l);
-        fail_unless(listlen(l) == 1);
-        l = cons("bar", l);
-        fail_unless(listlen(l) == 2);
-}
-END_TEST
 
-Suite *
-test_suite (void)
+Suite *test_token_suite (void)
 {
         Suite *s = suite_create ("alisp");
 
         /* Core test case */
         TCase *tc_core = tcase_create ("Core");
-        tcase_add_test (tc_core, test_list_length);
         tcase_add_test (tc_core, test_make_token_list);
         tcase_add_loop_test (tc_core, test_lexer, 0, 7);
         suite_add_tcase (s, tc_core);
@@ -83,14 +72,11 @@ test_suite (void)
 
 int main (void)
 {
-        char *code = codes[0];
-        FILE *stream;
-        stream = fmemopen(code, strlen(code), "r");
-        List *tokens = getTokens(stream);
         int number_failed;
-        Suite *s = test_suite ();
+        Suite *s = test_token_suite ();
         SRunner *sr = srunner_create (s);
         srunner_run_all (sr, CK_NORMAL);
+        srunner_add_suite (sr, test_list_suite ());
         number_failed = srunner_ntests_failed (sr);
         srunner_free (sr);
         return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;

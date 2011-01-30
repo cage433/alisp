@@ -12,8 +12,11 @@ file "tests.o" => ["test/tests.c"] + include_files do
   sh "gcc -ggdb -I include/ -c test/tests.c"
 end
 
-file "tests" => ["tests.o"] + obj_files do
-  sh "gcc -ggdb -I include/ -lcheck token.o lexer.o expression.o list.o tests.o -o tests"
+file "list_tests.o" => ["test/list_tests.c"] + include_files do
+  sh "gcc -ggdb -I include/ -c test/list_tests.c"
+end
+file "tests" => ["tests.o", "list_tests.o"] + obj_files do
+  sh "gcc -ggdb -I include/ -lcheck token.o lexer.o expression.o list.o tests.o list_tests.o -o tests"
 end
 
 task :run_tests => ["tests"] do
