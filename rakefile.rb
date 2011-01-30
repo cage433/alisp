@@ -2,21 +2,22 @@ task :default => [:run_tests]
 
 include_files = FileList['include/*.h']
 src_files = FileList['src/*.c']
-obj_files = src_files.collect{|f| File.basename(f).sub(/\.c$/, ".o")}
-
-rule(/\.o/ => [proc{|task_name| "src/" + task_name.sub(/\.o/, '.c')}] + include_files) do |t| 
-  sh "gcc -ggdb -I include/ -c #{t.source}"
+test_files = FileList['test/*.c']
+def obj_file(src_file)
+    "obj/" + File.basename(src_file).sub(/\.c/, ".o")
+end
+(src_files + test_files).each do |file|
+    file obj_file(file) => [file] + include_files do
+        sh "gcc -ggdb -I include/ -c #{file}"
+    end
 end
 
-file "tests.o" => ["test/tests.c"] + include_files do
-  sh "gcc -ggdb -I include/ -c test/tests.c"
-end
+obj_files = (src_files + test_files).collect{|f| obj_file(f)}
 
-file "list_tests.o" => ["test/list_tests.c"] + include_files do
-  sh "gcc -ggdb -I include/ -c test/list_tests.c"
-end
-file "tests" => ["tests.o", "list_tests.o"] + obj_files do
-  sh "gcc -ggdb -I include/ -lcheck token.o lexer.o expression.o list.o tests.o list_tests.o -o tests"
+
+file "tests" => obj_files do
+    obj = obj_files.join(" ")
+  sh "gcc -ggdb -I include/ -lcheck #{obj} o tests"
 end
 
 task :run_tests => ["tests"] do
