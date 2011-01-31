@@ -95,21 +95,6 @@ typed_token *copy_token(typed_token tok){
 }
 
 
-int token_lists_equal(List *l1, List *l2){
-        while(l1 != NULL || l2 != NULL){
-                if (l1 == NULL || l2 == NULL){
-                        return 0;
-                }
-                else if (tokens_equal(l1->car, l2->car)){
-                        l1 = l1->cdr;
-                        l2 = l2->cdr;
-                } else {
-                        return 0;
-                }
-        }
-        return 1;
-}
-
 void free_tokens(List *tokens){
         while(tokens != NULL){
                 free((typed_token *)(tokens->car));

@@ -49,7 +49,7 @@ START_TEST(test_lexer)
         stream = fmemopen(code, strlen(code), "r");
         List *tokens = getTokens(stream);
         List *expected_list = expected_lists(_i);
-        fail_unless(token_lists_equal(expected_list, tokens));
+        fail_unless(lists_equal(expected_list, tokens, tokens_equal));
 }
 END_TEST
 
