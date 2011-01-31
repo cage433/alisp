@@ -5,11 +5,13 @@
 #include "stdlib.h"
 #include "expression.h"
 
+static int num_tests = 5;
 static char* codes[] = {
         "10", 
         "10 12",
         "10.5",
-        "10.5 19"
+        "10.5 19",
+        "fred"
 };
 
 List *expected_list(int i){
@@ -21,6 +23,8 @@ List *expected_list(int i){
                 return make_list(1, make_double_expression(10.5));
         else if (i == 3)
                 return make_list(2, make_double_expression(10.5), make_integer_expression(19));
+        else if (i == 4)
+                return make_list(1, make_identifier_expression("fred"));
         else {
                 printf("File %s, line %d\n", __FILE__, __LINE__); 
                 exit(-1);
@@ -45,7 +49,7 @@ Suite *test_parser_suite()
 
         /* Core test case */
         TCase *tc_core = tcase_create ("Core");
-        tcase_add_loop_test (tc_core, test_parser, 0, 4);
+        tcase_add_loop_test (tc_core, test_parser, 0, num_tests);
         suite_add_tcase (s, tc_core);
 
         return s;

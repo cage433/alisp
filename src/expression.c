@@ -18,11 +18,11 @@ expression *make_double_expression(double num){
         return exp;
 }
 
-expression make_identifier_expression(char *identifier){
-        expression exp;
-        exp.type = exp_identifier;
-        exp.identifier_value = calloc(1 + strlen(identifier), sizeof(char));
-        strcpy(exp.identifier_value, identifier);
+expression *make_identifier_expression(char *identifier){
+        expression *exp = (expression *)malloc(sizeof(expression));
+        exp->type = exp_identifier;
+        exp->identifier_value = calloc(1 + strlen(identifier), sizeof(char));
+        strcpy(exp->identifier_value, identifier);
         return exp;
 }
 
@@ -35,9 +35,11 @@ int expressions_equal(void *e1, void *e2){
                 return exp1->int_value == exp2->int_value;
         else if (exp1->type == exp_double)
                 return exp1->double_value == exp2->double_value;
+        else if (exp1->type == exp_identifier)
+                return strcmp(exp1->identifier_value, exp2->identifier_value) == 0;
         else {
                 printf("File %s, line %d\n", __FILE__, __LINE__); 
-                printf("Unimplemented\n");
+                printf("Unimplemented expressions_equal\n");
                 exit(-1);
         }
 }
