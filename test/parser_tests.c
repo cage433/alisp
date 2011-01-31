@@ -5,13 +5,14 @@
 #include "stdlib.h"
 #include "expression.h"
 
-static int num_tests = 5;
+static int num_tests = 6;
 static char* codes[] = {
         "10", 
         "10 12",
         "10.5",
         "10.5 19",
-        "fred"
+        "fred",
+        "mike 13 12.2"
 };
 
 List *expected_list(int i){
@@ -25,6 +26,8 @@ List *expected_list(int i){
                 return make_list(2, make_double_expression(10.5), make_integer_expression(19));
         else if (i == 4)
                 return make_list(1, make_identifier_expression("fred"));
+        else if (i == 5)
+                return make_list(3, make_identifier_expression("mike"), make_integer_expression(13), make_double_expression(12.2));
         else {
                 printf("File %s, line %d\n", __FILE__, __LINE__); 
                 exit(-1);
