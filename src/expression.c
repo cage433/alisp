@@ -26,7 +26,9 @@ expression make_identifier_expression(char *identifier){
         return exp;
 }
 
-int expressions_equal(expression *exp1, expression *exp2){
+int expressions_equal(void *e1, void *e2){
+        expression *exp1 = (expression *)e1;
+        expression *exp2 = (expression *)e2;
         if (exp1->type != exp2->type)
                 return 0;
         else if (exp1->type == exp_integer)

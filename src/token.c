@@ -2,7 +2,6 @@
 #include "stdlib.h"
 #include "ctype.h"
 #include "string.h"
-
 #include "token.h"
 
 typed_token *integer_token(int num){
@@ -59,7 +58,9 @@ void print_token_list(List *toks){
         }
 }
 
-int tokens_equal(typed_token *tok1, typed_token *tok2){
+int tokens_equal(void *t1, void *t2){
+        typed_token *tok1 = (typed_token *)t1;
+        typed_token *tok2 = (typed_token *)t2;
         switch(tok1->type){
                 case tok_left_paren:
                         return tok2->type == tok_left_paren;

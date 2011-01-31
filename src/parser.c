@@ -37,7 +37,7 @@ List *parse_expressions(FILE *stream){
                 else if (tok->type == tok_double)
                         expressions = cons(consume_double_exp(&tokens2), expressions);
                 else {
-                        printf("parser.c unimplemented\n");
+                        printf("parser.c unimplemented for type %d\n", tok->type);
                         exit(-1);
                 }
         }

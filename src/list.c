@@ -52,3 +52,17 @@ List *make_list(int size, ...){
         return result;
 }
 
+int lists_equal(List *l1, List *l2, int(*isEq)(void*, void*)){
+        while(l1 != NULL || l2 != NULL){
+                if (l1 == NULL || l2 == NULL){
+                        return 0;
+                }
+                else if ((*isEq)(l1->car, l2->car)){
+                        l1 = l1->cdr;
+                        l2 = l2->cdr;
+                } else {
+                        return 0;
+                }
+        }
+        return 1;
+}

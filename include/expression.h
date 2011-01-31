@@ -39,6 +39,6 @@ typedef struct expression {
 
 expression *make_integer_expression(int num);
 expression *make_double_expression(double num);
-int expressions_equal(expression *exp1, expression *exp2);
+int expressions_equal(void *exp1, void *exp2);
 void print_expression(expression *exp);
 #endif
