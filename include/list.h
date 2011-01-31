@@ -2,8 +2,8 @@
 #define ALISP_LIST
 
 typedef struct List{
-        void *car;
-        struct List *cdr;
+    void *car;
+    struct List *cdr;
 } List;
 
 

@@ -4,20 +4,20 @@
 #include "list.h"
 
 typedef enum {
-        tok_left_paren,
-        tok_identifier,
-        tok_integer,
-        tok_double,
-        tok_right_paren
+    tok_left_paren,
+    tok_identifier,
+    tok_integer,
+    tok_double,
+    tok_right_paren
 } token_type;
 
 typedef struct {
-        token_type type;
-        union {
-                int int_value;
-                double double_value;
-                char* identifier_value;
-        };
+    token_type type;
+    union {
+        int int_value;
+        double double_value;
+        char* identifier_value;
+    };
 } typed_token;
 
 typed_token *integer_token(int num);
