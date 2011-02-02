@@ -19,41 +19,36 @@ static char* codes[] = {
     "(foo 1 (bar mike))",
     "(def foo (x) x)"
 };
+static List **expected = NULL;
 
-List *expected_list(int i){
-    if (i == 0)
-        return make_list(1, make_integer_expression(10));
-    else if (i == 1)
-        return make_list(2, make_integer_expression(10), make_integer_expression(12));
-    else if (i == 2)
-        return make_list(1, make_double_expression(10.5));
-    else if (i == 3)
-        return make_list(2, make_double_expression(10.5), make_integer_expression(19));
-    else if (i == 4)
-        return make_list(1, make_identifier_expression("fred"));
-    else if (i == 5)
-        return make_list(3, make_identifier_expression("mike"), make_integer_expression(13), make_double_expression(12.2));
-    else if (i == 6)
-        return make_list(1, make_call_expression("foo", make_list(0)));
-    else if (i == 7)
-        return make_list(1, make_call_expression("foo", make_list(1, make_integer_expression(1))));
-    else if (i == 8)
-        return make_list(1, make_call_expression("foo", make_list(2, make_integer_expression(1), make_double_expression(9.5))));
-    else if (i == 9)
-        return make_list(1, 
+void initialise_expected(){
+    if (expected != NULL)
+        return;
+    expected = (List **)malloc(num_tests * sizeof(List *));
+    expected[0] = make_list(1, make_integer_expression(10));
+    expected[0] = make_list(1, make_integer_expression(10));
+    expected[1] = make_list(2, make_integer_expression(10), make_integer_expression(12));
+    expected[2] = make_list(1, make_double_expression(10.5));
+    expected[3] = make_list(2, make_double_expression(10.5), make_integer_expression(19));
+    expected[4] = make_list(1, make_identifier_expression("fred"));
+    expected[5] = make_list(3, make_identifier_expression("mike"), make_integer_expression(13), make_double_expression(12.2));
+    expected[6] = make_list(1, make_call_expression("foo", make_list(0)));
+    expected[7] = make_list(1, make_call_expression("foo", make_list(1, make_integer_expression(1))));
+    expected[8] = make_list(1, make_call_expression("foo", make_list(2, make_integer_expression(1), make_double_expression(9.5))));
+    expected[9] = make_list(1, 
                 make_call_expression("foo", 
                     make_list(2, 
                         make_integer_expression(1), 
                         make_call_expression("bar", 
                             make_list(1, 
                                 make_identifier_expression("mike"))))));
-    else if (i == 10)
-        return make_list(1, make_definition_expression("foo", make_list(1, make_identifier_expression("x")), make_identifier_expression("x")));
-    else {
-        printf("File %s, line %d\n", __FILE__, __LINE__); 
-        printf("Unexpected list %d - exiting\n", i);
-        exit(-1);
-    }
+    expected[10] = make_list(1, make_definition_expression("foo", make_list(1, make_identifier_expression("x")), make_identifier_expression("x")));
+}
+
+List *expected_list(int i){
+    initialise_expected();
+    die_unless(i < num_tests, "Expected not written");
+    return expected[i];
 }
 
 
