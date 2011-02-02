@@ -97,7 +97,10 @@ typed_token *copy_token(typed_token tok){
 
 void free_tokens(List *tokens){
     while(tokens != NULL){
-        free((typed_token *)(tokens->car));
+        typed_token *tok = (typed_token *)(tokens->car);
+        if (tok->type != tok_left_paren && tok->type != tok_right_paren){
+            free(tok);
+        }
         tokens = tokens->cdr;
     }
 }

@@ -38,17 +38,21 @@ int expressions_equal(void *e1, void *e2){
     expression *exp1 = (expression *)e1;
     expression *exp2 = (expression *)e2;
     if (exp1->type != exp2->type)
-    return 0;
+        return 0;
     else if (exp1->type == exp_integer)
-    return exp1->int_value == exp2->int_value;
+        return exp1->int_value == exp2->int_value;
     else if (exp1->type == exp_double)
-    return exp1->double_value == exp2->double_value;
+        return exp1->double_value == exp2->double_value;
     else if (exp1->type == exp_identifier)
-    return strcmp(exp1->identifier_value, exp2->identifier_value) == 0;
-    else {
-    printf("File %s, line %d\n", __FILE__, __LINE__); 
-    printf("Unimplemented expressions_equal\n");
-    exit(-1);
+        return strcmp(exp1->identifier_value, exp2->identifier_value) == 0;
+    else if (exp1->type == exp_call){
+        int name_same = (strcmp(exp1->call_value.name, exp2->call_value.name) == 0);
+        int exps_same = lists_equal(exp1->call_value.exps, exp2->call_value.exps, expressions_equal);
+        return name_same && exps_same;
+    } else {
+        printf("File %s, line %d\n", __FILE__, __LINE__); 
+        printf("Unimplemented expressions_equal\n");
+        exit(-1);
     }
 }
 
