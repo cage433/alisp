@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "stdarg.h"
 
 #include "list.h"
-#include "stdarg.h"
+#include "utils.h"
      
 List *cons(void *car, List *list){
     List *consed_list = (List *)malloc(sizeof(List));
@@ -66,3 +67,14 @@ int lists_equal(List *l1, List *l2, int(*isEq)(void*, void*)){
     }
     return 1;
 }
+
+void *nthelt(List *l, int n){
+    die_unless(n >= 0, "nthelt called with negative argument");
+    while (n >0 && l != NULL){
+        --n;
+        l = l->cdr;
+    }
+    die_if(l == NULL, "List too short");
+    return l->car;
+}
+

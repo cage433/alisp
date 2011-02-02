@@ -5,7 +5,7 @@
 #include "stdlib.h"
 #include "expression.h"
 
-static int num_tests = 7;
+static int num_tests = 6;
 static char* codes[] = {
     "10", 
     "10 12",
