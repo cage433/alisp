@@ -43,10 +43,17 @@ void eat_right_paren(List **tokens){
     die_unless(token_car(*tokens)->type == tok_right_paren, "Expected ')'");
     *tokens = (*tokens)->cdr;
 }
+
+void eat_identifier(List **tokens, char *name){
+    typed_token *car = token_car(*tokens);
+    die_unless(car->type == tok_identifier && strcmp(car->identifier_value, name) == 0, "Expected identifier");
+    *tokens = (*tokens)->cdr;
+}
+
 expression *consume_expression(List **tokens);
-expression *consume_call_exp(List **tokens){
+
+List *consume_expression_list(List **tokens){
     eat_left_paren(tokens);
-    char *name = consume_identifier_exp(tokens)->identifier_value;
     List *exps = NULL;
     while ((*tokens) != NULL && token_car(*tokens)->type != tok_right_paren){
         exps = cons(consume_expression(tokens), exps);
@@ -56,11 +63,27 @@ expression *consume_call_exp(List **tokens){
 
     List *exps_in_order = reverse_list(exps);
     free_list(exps);
-    return make_call_expression(name, exps_in_order);
+    return exps_in_order;
+}
+
+expression *consume_call_exp(List **tokens){
+    List *exps = consume_expression_list(tokens);
+    die_unless(listlen(exps) >= 1, "Require at least name");
+    expression *first = (expression *)(exps->car);
+
+    die_unless(first->type == exp_identifier, "First expression must be identifier");
+    char *name = first->identifier_value;
+    return make_call_expression(name, exps->cdr);
 }
 
 expression *consume_definition_exp(List **tokens){
-    die("Not implemented\n");
+    eat_left_paren(tokens);
+    eat_identifier(tokens, "def");
+    char *name = consume_identifier_exp(tokens)->identifier_value;
+    List *args = consume_expression_list(tokens);
+    expression *body = consume_expression(tokens);
+    eat_right_paren(tokens);
+    return make_definition_expression(name, args, body);
 }
 
 expression *consume_expression(List **tokens){
