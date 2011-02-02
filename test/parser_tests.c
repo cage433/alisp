@@ -5,7 +5,7 @@
 #include "stdlib.h"
 #include "expression.h"
 
-static int num_tests = 7;
+static int num_tests = 8;
 static char* codes[] = {
     "10", 
     "10 12",
@@ -13,7 +13,8 @@ static char* codes[] = {
     "10.5 19",
     "fred",
     "mike 13 12.2",
-    "(foo)"
+    "(foo)",
+    "(foo 1)"
 };
 
 List *expected_list(int i){
@@ -31,6 +32,8 @@ List *expected_list(int i){
         return make_list(3, make_identifier_expression("mike"), make_integer_expression(13), make_double_expression(12.2));
     else if (i == 6)
         return make_list(1, make_call_expression("foo", make_list(0)));
+    else if (i == 7)
+        return make_list(1, make_call_expression("foo", make_list(1, make_integer_expression(1))));
     else {
         printf("File %s, line %d\n", __FILE__, __LINE__); 
         exit(-1);
