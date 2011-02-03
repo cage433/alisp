@@ -1,6 +1,7 @@
 #ifndef ALISP_HASH
 #define ALISP_HASH
 
+#include "string.h"
 #include "list.h"
 
 typedef struct {
@@ -12,9 +13,17 @@ typedef struct {
     int array_length;
     int num_elements;
     List **array;
-    int(*hashfn)(void *key);
-    int(*keyeq_fn)(void *key1, void *key2);
+    long(*hashfn)(const void *key);
+    int(*keyeq_fn)(const void *key1, const void *key2);
 } Hash;
 
-Hash *create_hash(int(*hashfn)(void *key), int(*keyeq_fn)(void *key1, void *key2));
+
+void hash_add(Hash *hash, void *key, void *value);
+void hash_remove(Hash *hash, void *key);
+int hash_contains(Hash *hash, void *key);
+void *hash_value(Hash *hash, void *key);
+int hash_strcmp(const void *v1, const void * v2);
+long string_hash_fn(const void *key);
+
+Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2));
 #endif

@@ -2,7 +2,7 @@
 
 #include "stdlib.h"
 
-Hash *create_hash(int(*hashfn)(void *key), int(*keyeq_fn)(void *key1, void *key2)){
+Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2)){
     Hash *hash = (Hash *)malloc(sizeof(Hash));
     hash->array_length = 16;
     hash->num_elements = 0;
@@ -10,4 +10,12 @@ Hash *create_hash(int(*hashfn)(void *key), int(*keyeq_fn)(void *key1, void *key2
     hash->hashfn = hashfn;
     hash->keyeq_fn = keyeq_fn;
     return hash;
+}
+
+
+int hash_strcmp(const void *v1, const void * v2){
+    return strcmp((char *)v1, (char *)v2);
+}
+long string_hash_fn(const void *key){
+    return 0;
 }

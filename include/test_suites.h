@@ -8,5 +8,6 @@ Suite *test_token_suite ();
 Suite *test_list_suite ();
 Suite *test_parser_suite();
 Suite *test_boxed_value_suite();
+Suite *test_hash_suite();
 
 #endif
