@@ -1,4 +1,5 @@
 #include "boxed_value.h"
+#include "utils.h"
 #include "stdlib.h"
 #include "stdio.h"
 
@@ -39,4 +40,16 @@ boxed_value *make_boxed_string(char *str){
     box->type = boxed_string;
     box->string_value = str;
     return box;
+}
+void free_boxed_value(boxed_value *b){
+    switch (b->type){
+        case boxed_int:
+        case boxed_double:
+            break;
+        case boxed_string:
+            free(b->string_value);
+            break;
+ //       default:
+//            die("Unexpected box type");
+    }
 }

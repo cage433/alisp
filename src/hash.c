@@ -58,7 +58,8 @@ KeyValuePair *hash_key_value_pair(Hash *hash, void *key){
 KeyValuePair* hash_remove(Hash *hash, void *key){
     long i = hash_index(hash, key);
     List *l = hash->array[i];
-    die_if(l == NULL, "Key not found");
+    if (l == NULL)
+        return NULL;
     KeyValuePair *kv = l->car;
     if (hash->keyeq_fn(key, kv->key)){
         hash->array[i] = l->cdr;
@@ -80,7 +81,7 @@ KeyValuePair* hash_remove(Hash *hash, void *key){
             }
         }
     }
-    die("key not found");
+    return NULL;
 }
 
 int hash_contains(Hash *hash, void *key){
@@ -119,4 +120,32 @@ void hash_add(Hash *hash, void *key, void *value){
     kv->value = value;
     hash->array[i] = cons(kv, hash->array[i]);
     hash->num_elements += 1;
+}
+
+List *hash_keys(Hash *hash){
+    int i;
+    List *keys = NULL;
+    for (i = 0; i < hash->array_length; ++i){
+        List *l = hash->array[i];
+        while (l != NULL){
+            keys = cons(l->car, keys);
+            l = l->cdr;
+        }
+    }
+    return keys;
+}
+
+void *hash_value(Hash *hash, void *key){
+    KeyValuePair *kv = hash_key_value_pair(hash, key);
+    die_unless(kv != NULL, "Key not found");
+    return kv->value;
+}
+
+void free_hash(Hash *hash){
+    int i;
+    for (i = 0; i < hash->array_length; ++i){
+        free_list(hash->array[i]);
+        free(hash->array[i]);
+    }
+    free(hash->array);
 }

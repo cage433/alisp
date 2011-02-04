@@ -26,4 +26,5 @@ int hash_string_equality(const void *v1, const void * v2);
 long string_hash_fn(const void *key);
 
 Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2));
+List *hash_keys(Hash *hash);
 #endif

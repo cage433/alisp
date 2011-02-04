@@ -18,7 +18,7 @@ obj_files = (src_files + test_files).collect{|f| obj_file(f)}
 
 file "tests" => obj_files do
     obj = obj_files.join(" ")
-  sh "gcc -ggdb3 -I include/ -lcheck #{obj} -o tests"
+  sh "gcc -ggdb3 -lcheck #{obj} -o tests"
 end
 
 task :run_tests => ["tests"] do

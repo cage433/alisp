@@ -20,5 +20,6 @@ int boxed_values_equal(void *box1, void *box2);
 boxed_value *make_boxed_int(int num);
 boxed_value *make_boxed_double(double num);
 boxed_value *make_boxed_string(char *str);
+void free_boxed_value(boxed_value *b);
 
 #endif
