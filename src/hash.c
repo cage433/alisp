@@ -87,9 +87,32 @@ int hash_contains(Hash *hash, void *key){
     return hash_key_value_pair(hash, key) != NULL;
 }
 
+void hash_resize(Hash *hash){
+    int old_array_length = hash->array_length;
+    hash->array_length *= 2;
+    List **old_array = hash->array;
+
+    hash->array = calloc(hash->array_length, sizeof(List *));
+    hash->num_elements = 0;
+    int i;
+    for (i = 0; i < old_array_length; ++i){
+        List *l = old_array[i];
+        while(l != NULL){
+            KeyValuePair *kv = l->car;
+            hash_add(hash, kv->key, kv->value);
+            free(kv);
+            l = l->cdr;
+        }
+        free_list(old_array[i]);
+    }
+}
+
+
 void hash_add(Hash *hash, void *key, void *value){
     if (hash_contains(hash, key))
         hash_remove(hash, key);
+    if (hash->num_elements * 2 > hash->array_length)
+        hash_resize(hash);
     long i = hash_index(hash, key);
     KeyValuePair *kv = malloc(sizeof(KeyValuePair));
     kv->key = key;
