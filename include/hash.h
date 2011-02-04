@@ -19,10 +19,10 @@ typedef struct {
 
 
 void hash_add(Hash *hash, void *key, void *value);
-void hash_remove(Hash *hash, void *key);
+KeyValuePair *hash_remove(Hash *hash, void *key);
 int hash_contains(Hash *hash, void *key);
 void *hash_value(Hash *hash, void *key);
-int hash_strcmp(const void *v1, const void * v2);
+int hash_string_equality(const void *v1, const void * v2);
 long string_hash_fn(const void *key);
 
 Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2));
