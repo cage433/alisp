@@ -14,7 +14,7 @@ START_TEST(test_list_length)
 }
 END_TEST
 
-void *list_test_inc(const void *v){
+static void *list_test_inc(const void *v){
     boxed_value *bv = (boxed_value *)v;
     return make_boxed_int(bv->int_value + 1);
 }
@@ -28,6 +28,19 @@ START_TEST(test_map)
 }
 END_TEST
 
+static int test_for_each_cnt = 0;
+static void inc_test_for_each_cnt(void *v){
+    boxed_value *bv = v;
+    test_for_each_cnt += bv->int_value;
+}
+START_TEST(test_for_each){
+    test_for_each_cnt = 0;
+    List *l = make_list(3, make_boxed_int(3), make_boxed_int(4), make_boxed_int(5));
+    list_for_each(l, inc_test_for_each_cnt);
+    fail_unless(test_for_each_cnt == 12);
+}
+END_TEST
+
 
 Suite *test_list_suite ()
 {
@@ -37,6 +50,7 @@ Suite *test_list_suite ()
     TCase *tc_core = tcase_create ("Core");
     tcase_add_test (tc_core, test_list_length);
     tcase_add_test (tc_core, test_map);
+    tcase_add_test (tc_core, test_for_each);
     suite_add_tcase (s, tc_core);
 
     return s;

@@ -88,3 +88,19 @@ List *list_map(List *l, void *(*fn)(const void *)){
     free_list(rev);
     return result;
 }
+
+void list_for_each(List *l, void(*fn)(const void *)){
+    while (l != NULL){
+        fn(l->car);
+        l = l->cdr;
+    }
+}
+
+void *list_fold(List *l, void *init, void *(*fn)(const void *, const void *)){
+    void *value = init;
+    while (l != NULL){
+        value = fn(value, l->car);
+        l = l->cdr;
+    }
+    return value;
+}
