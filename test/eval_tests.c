@@ -42,6 +42,18 @@ START_TEST(test_eval_def)
 }
 END_TEST
 
+START_TEST(test_eval_def2)
+{
+    Env *env = create_env();
+    expression *exp = parse_expression_from_string("(def foo (x) (+ x 1))");
+    eval(env, exp);
+    exp = parse_expression_from_string("(def bar (x y) (+ x (foo y)))");
+    eval(env, exp);
+    exp = parse_expression_from_string("(bar 10 20)");
+    boxed_value *v = eval(env, exp);
+    fail_unless(boxed_values_equal(v, make_boxed_int(31)));
+}
+END_TEST
 
 Suite *test_eval_suite ()
 {
@@ -49,9 +61,10 @@ Suite *test_eval_suite ()
 
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
-//    tcase_add_test (tc_core, test_eval_int);
-//    tcase_add_test (tc_core, test_eval_plus);
+    tcase_add_test (tc_core, test_eval_int);
+    tcase_add_test (tc_core, test_eval_plus);
     tcase_add_test (tc_core, test_eval_def);
+    tcase_add_test (tc_core, test_eval_def2);
     suite_add_tcase (s, tc_core);
 
     return s;
