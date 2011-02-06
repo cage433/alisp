@@ -96,7 +96,7 @@ void list_for_each(List *l, void(*fn)(const void *)){
     }
 }
 
-void *list_fold(List *l, void *init, void *(*fn)(const void *, const void *)){
+void *list_fold(List *l, void *init, void *(*fn)(void *, const void *)){
     void *value = init;
     while (l != NULL){
         value = fn(value, l->car);
