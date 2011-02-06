@@ -42,7 +42,7 @@ START_TEST(test_for_each){
 }
 END_TEST
 
-static void* fold_test_times(void *v1, const void *v2){
+static void* fold_test_times(void *v1, void *v2){
     const boxed_value *bv1 = v1;
     const boxed_value *bv2 = v2;
     boxed_value *result = make_boxed_int(bv1->int_value * bv2->int_value);

@@ -7,6 +7,7 @@
 #include "token.h"
 #include "lexer.h"
 #include "list.h"
+#include "utils.h"
 
 
 int isparen(char ch){
@@ -120,7 +121,7 @@ List *getTokens(FILE *stream){
     }
     }
     List *result = reverse_list(x);
-    free_list(x);
+    free_list(x, nop_free_fn);
     return result;
 }
 

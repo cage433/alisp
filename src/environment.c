@@ -15,18 +15,16 @@ Env *create_env(){
 void env_add_frame(Env *env, Hash *frame){
     env->frames = cons(frame, env->frames);
 }
+static void free_binding(void *binding){
+    KeyValuePair *kv = binding;
+    free(kv->key);
+    free_boxed_value((boxed_value *)kv->value);
+    free(kv);
+}
+
 void env_drop_frame(Env *env){
     Hash *frame = env->frames->car;
-    List *keys = hash_keys(frame);
-    List *keys2 = keys;
-    while (keys2 != NULL){
-        char *key = keys2->car;
-        boxed_value *value = hash_value(frame, key);
-        free_boxed_value(value);
-        keys2 = keys2->cdr;
-    }
-    free(keys);
-    free_hash(frame);
+    free_hash(frame, free_binding);
     env->frames = env->frames->cdr;
     free(frame);
 }

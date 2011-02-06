@@ -6,6 +6,7 @@
 #include "stdlib.h"
 #include "assert.h"
 #include "string.h"
+#include "utils.h"
 
 typed_token *token_car(List *tokens){
     return (typed_token *)(tokens->car);
@@ -63,7 +64,7 @@ List *consume_expression_list(List **tokens){
     eat_right_paren(tokens);
 
     List *exps_in_order = reverse_list(exps);
-    free_list(exps);
+    free_list(exps, nop_free_fn);
     return exps_in_order;
 }
 
@@ -132,9 +133,8 @@ List *parse_expressions(FILE *stream){
         expressions = cons(consume_expression(&tokens2), expressions);
     }
     List *result = reverse_list(expressions);
-    free_list(expressions);
-    free_tokens(tokens);
-    free_list(tokens);
+    free_list(expressions, nop_free_fn);
+    free_list(tokens, free_token);
     return result;
 }
 

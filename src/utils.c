@@ -22,3 +22,6 @@ void die_unless(int predicate, char* message){
 int strings_equal(const void *v1, const void * v2){
     return strcmp((char *)v1, (char *)v2) == 0;
 }
+
+void nop_free_fn(void *item){
+}

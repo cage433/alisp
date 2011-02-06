@@ -24,7 +24,10 @@ int hash_contains(Hash *hash, void *key);
 void *hash_value(Hash *hash, void *key);
 long string_hash_fn(const void *key);
 
-Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2));
+Hash *hash_create(
+        long(*hashfn)(const void *key), 
+        int(*keyeq_fn)(const void *key1, const void *key2)
+);
 List *hash_keys(Hash *hash);
-void free_hash(Hash *hash);
+void free_hash(Hash *hash, void(*key_value_free_fn)(void *));
 #endif

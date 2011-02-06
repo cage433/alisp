@@ -2,6 +2,7 @@
 
 #include "stdlib.h"
 #include "stdio.h"
+#include "utils.h"
 
 Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2)){
     Hash *hash = (Hash *)malloc(sizeof(Hash));
@@ -100,7 +101,7 @@ void hash_resize(Hash *hash){
             free(kv);
             l = l->cdr;
         }
-        free_list(old_array[i]);
+        free_list(old_array[i], nop_free_fn);
     }
 }
 
@@ -138,15 +139,9 @@ void *hash_value(Hash *hash, void *key){
     return kv->value;
 }
 
-void free_hash(Hash *hash){
+void free_hash(Hash *hash, void(*key_value_free_fn)(void *)){
     int i;
-    for (i = 0; i < hash->array_length; ++i){
-        List *l = hash->array[i];
-        while(l != NULL){
-            free(l->car);
-            l = l->cdr;
-        }
-        free_list(hash->array[i]);
-    }
+    for (i = 0; i < hash->array_length; ++i)
+        free_list(hash->array[i], key_value_free_fn);
     free(hash->array);
 }

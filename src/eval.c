@@ -28,7 +28,7 @@ boxed_value *eval(Env *env, expression *exp){
                 l = l->cdr;
             }
             List *args = reverse_list(reverse_args);
-            free_list(reverse_args);
+            free_list(reverse_args, nop_free_fn);
             return apply(env, call.name, args);
         default:
             die("Unexpected expression type");

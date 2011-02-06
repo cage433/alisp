@@ -94,14 +94,32 @@ typed_token *copy_token(typed_token tok){
     }
 }
 
-
-void free_tokens(List *tokens){
-    while(tokens != NULL){
-        typed_token *tok = (typed_token *)(tokens->car);
-        if (tok->type != tok_left_paren && tok->type != tok_right_paren){
+void free_token(void *token){
+    typed_token *tok = token;
+    switch (tok->type){
+        case tok_left_paren:
+        case tok_right_paren:
+            break;
+        case tok_identifier:
+            free(tok->identifier_value);
             free(tok);
-        }
-        tokens = tokens->cdr;
+            break;
+        case tok_double:
+        case tok_integer:
+            free(tok);
+            break;
+        default:
+            die("Unrecognised token");
     }
 }
+
+//void free_tokens(List *tokens){
+//    while(tokens != NULL){
+//        typed_token *tok = (typed_token *)(tokens->car);
+//        if (tok->type != tok_left_paren && tok->type != tok_right_paren){
+//            free(tok);
+//        }
+//        tokens = tokens->cdr;
+//    }
+//}
     
