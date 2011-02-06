@@ -30,7 +30,7 @@ START_TEST(test_map)
 END_TEST
 
 static int test_for_each_cnt = 0;
-static void inc_test_for_each_cnt(const void *v){
+static void inc_test_for_each_cnt(void *v){
     const boxed_value *bv = v;
     test_for_each_cnt += bv->int_value;
 }
