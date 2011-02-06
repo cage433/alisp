@@ -39,6 +39,12 @@ boxed_value *eval(Env *env, expression *exp){
 boxed_value *apply(Env *env, char *op_name, List *args){
     if (strcmp(op_name, "+") == 0)
         return apply_plus(args);
+    else if (strcmp(op_name, "*") == 0)
+        return apply_times(args);
+    else if (strcmp(op_name, "-") == 0)
+        return apply_minus(args);
+    else if (strcmp(op_name, "/") == 0)
+        return apply_divide(args);
     else {
         boxed_value *boxed_def = env_lookup(env, op_name);
         die_unless(boxed_def->type == boxed_definition, "Can only apply functions\n");

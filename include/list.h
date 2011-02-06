@@ -16,5 +16,7 @@ int lists_equal(List *l1, List *l2, int (*isEq)(const void*, const void*));
 void *nthelt(List *l, int n);
 List *list_map(List *l, void *(*fn)(const void *));
 void list_for_each(List *l, void(*fn)(void *));
-void *list_fold(List *l, void *init, void *(*fn)(void *, void *));
+typedef void *(*fold_fn_ptr)(void *, void *);
+//void *list_fold(List *l, void *init, void *(*fn)(void *, void *));
+void *list_fold(List *l, void *init, fold_fn_ptr fn);
 #endif

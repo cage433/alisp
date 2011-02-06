@@ -2,6 +2,7 @@
 
 #include "primitives.h"
 #include "boxed_value.h"
+#include "list.h"
 
 double as_double_value(boxed_value *value){
     if (value->type == boxed_int)
@@ -12,22 +13,68 @@ double as_double_value(boxed_value *value){
         die("Boxed value not int or double");
 }
 
-
 boxed_value *apply_plus(List *values){
-    boxed_value *acc = make_boxed_int(0);
-    while (values != NULL){
-        boxed_value *next = values->car;
-        if (acc->type == boxed_int && next->type == boxed_int){
-            acc->int_value += next->int_value;
-        } else {
-            double acc_double_value = as_double_value(acc);
-            double next_double_value = as_double_value(next);
-            acc->type = boxed_double;
-            acc->double_value = acc_double_value + next_double_value;
-        }
-        values = values->cdr;
+    void *add_values(boxed_value *bv1, boxed_value *bv2){
+        boxed_value *result;
+        if (bv1->type == boxed_int && bv2->type == boxed_int)
+            result = make_boxed_int(bv1->int_value + bv2->int_value);
+        else
+            result = make_boxed_double(as_double_value(bv1) + as_double_value(bv2));
+        free(bv1);
+        return result;
     }
-    return acc;
+
+    return list_fold(values, make_boxed_int(0), (fold_fn_ptr)add_values);
 }
 
+boxed_value *apply_times(List *values){
+    void *mult_values(boxed_value *bv1, boxed_value *bv2){
+        boxed_value *result;
+        if (bv1->type == boxed_int && bv2->type == boxed_int)
+            result = make_boxed_int(bv1->int_value * bv2->int_value);
+        else
+            result = make_boxed_double(as_double_value(bv1) * as_double_value(bv2));
+        free(bv1);
+        return result;
+    }
 
+    return list_fold(values, make_boxed_int(1), (fold_fn_ptr)mult_values);
+}
+
+boxed_value *apply_minus(List *values){
+    void *minus_values(boxed_value *bv1, boxed_value *bv2){
+        boxed_value *result;
+        if (bv1->type == boxed_int && bv2->type == boxed_int)
+            result = make_boxed_int(bv1->int_value - bv2->int_value);
+        else
+            result = make_boxed_double(as_double_value(bv1) - as_double_value(bv2));
+        free(bv1);
+        return result;
+    }
+    if (values == NULL)
+        return make_boxed_int(0);
+    else
+        return list_fold(values->cdr, values->car, (fold_fn_ptr)minus_values);
+}
+
+boxed_value *apply_divide(List *values){
+    void *divide_values(boxed_value *bv1, boxed_value *bv2){
+        boxed_value *result;
+        if (bv1->type == boxed_int && bv2->type == boxed_int){
+            int n1 = bv1->int_value;
+            int n2 = bv2->int_value;
+            div_t d = div(n1, n2);
+            if (d.rem == 0)
+                result = make_boxed_int(d.quot);
+            else
+                result = make_boxed_double(as_double_value(bv1) / as_double_value(bv2));
+        } else
+            result = make_boxed_double(as_double_value(bv1) / as_double_value(bv2));
+        free(bv1);
+        return result;
+    }
+    if (values == NULL)
+        return make_boxed_int(1);
+    else
+        return list_fold(values->cdr, values->car, (fold_fn_ptr)divide_values);
+}
