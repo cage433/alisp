@@ -89,7 +89,7 @@ List *list_map(List *l, void *(*fn)(const void *)){
     return result;
 }
 
-void list_for_each(List *l, void(*fn)(const void *)){
+void list_for_each(List *l, void(*fn)(void *)){
     while (l != NULL){
         fn(l->car);
         l = l->cdr;
