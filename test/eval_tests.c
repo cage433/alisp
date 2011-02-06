@@ -3,6 +3,7 @@
 #include "environment.h"
 #include "boxed_value.h"
 #include "expression.h"
+#include "parser.h"
 
 START_TEST(test_eval_int)
 {
@@ -15,10 +16,18 @@ END_TEST
 
 START_TEST(test_eval_plus)
 {
-    Env *env = create_env();
-    expression *exp = parse_expression_from_string("(+ 4 5)");
-    boxed_value *v = eval(env, exp);
-    fail_unless(boxed_values_equal(v, make_boxed_int(9)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), parse_expression_from_string("(+ )")), 
+        make_boxed_int(0)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), parse_expression_from_string("(+ 4 5)")), 
+        make_boxed_int(9)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), parse_expression_from_string("(+ 4.0 5)")), 
+        make_boxed_double(9.0)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), parse_expression_from_string("(+ 10 4.0 5)")),
+        make_boxed_double(19.0)));
 } 
 END_TEST
 

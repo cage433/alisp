@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "stdlib.h"
 #include "stdio.h"
+#include "math.h"
 
 int boxed_values_equal(void *b1, void *b2){
     boxed_value *box1 = (boxed_value *)b1;
@@ -11,7 +12,7 @@ int boxed_values_equal(void *b1, void *b2){
     if (box1->type == boxed_int)
         return box1->int_value == box2->int_value;
     else if (box1->type == boxed_double)
-        return box1->double_value == box2->double_value;
+        return fabs(box1->double_value - box2->double_value) < 1e-9;
     else if (box1->type == boxed_string)
         return strcmp(box1->string_value, box2->string_value) == 0;
     else {
@@ -59,3 +60,25 @@ boxed_value *make_boxed_definition(definition_expression def){
     box->definition_value = def;
     return box;
 }
+
+void print_boxed_value(boxed_value *v){
+    switch (v->type){
+        case boxed_int:
+            printf("Boxed int %d\n", v->int_value);
+            break;
+        case boxed_double:
+            printf("Boxed double %.6f\n", v->double_value);
+            break;
+        case boxed_string:
+            printf("Boxed string %s\n", v->string_value);
+            break;
+        case boxed_definition:
+            printf("Boxed definition %s\n", v->definition_value.name);
+            break;
+        default:
+            printf("File %s, line %d\n", __FILE__, __LINE__); 
+            die("Unexpected box type");
+    }
+}
+
+
