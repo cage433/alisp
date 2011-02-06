@@ -53,3 +53,9 @@ void free_boxed_value(boxed_value *b){
 //            die("Unexpected box type");
     }
 }
+boxed_value *make_boxed_definition(definition_expression def){
+    boxed_value *box = malloc(sizeof(boxed_value));
+    box->type = boxed_definition;
+    box->definition_value = def;
+    return box;
+}

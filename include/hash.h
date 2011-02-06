@@ -27,4 +27,5 @@ long string_hash_fn(const void *key);
 
 Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2));
 List *hash_keys(Hash *hash);
+void free_hash(Hash *hash);
 #endif

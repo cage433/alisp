@@ -4,16 +4,18 @@
 #include "hash.h"
 #include "boxed_value.h"
 #include "stdlib.h"
-List *create_env(){
-    return NULL;
+
+Env *create_env(){
+    Env *env = malloc(sizeof(Env));
+    env->base = hash_create(string_hash_fn, hash_string_equality);
+    env->frames = cons(env->base, NULL);
+    return env;
 }
-List *add_frame(List *env, Hash *frame){
-    List *new_env = malloc(sizeof(List));
-    new_env->car = frame;
-    new_env->cdr = env;
+void env_add_frame(Env *env, Hash *frame){
+    env->frames = cons(frame, env->frames);
 }
-List *drop_frame(List *env){
-    Hash *frame = env->car;
+void env_drop_frame(Env *env){
+    Hash *frame = env->frames->car;
     List *keys = hash_keys(frame);
     List *keys2 = keys;
     while (keys2 != NULL){
@@ -24,8 +26,29 @@ List *drop_frame(List *env){
         free(value);
         keys2 = keys2->cdr;
     }
+    free(keys);
     free_hash(frame);
-    List *remaining_env = env->cdr;
+    env->frames = env->frames->cdr;
     free(frame);
-    return remaining_env;
+}
+
+boxed_value *env_lookup(Env *env, char *name){
+    List *l = env->frames;
+    while (l != NULL){
+        if (hash_contains(l->car, name))
+            return hash_value(l->car, name);
+        l = l->cdr;
+    }
+    die("Value not found in environment");
+}
+
+Hash *frame_create(List *args, List *values){
+    Hash *frame = hash_create(string_hash_fn, hash_string_equality);
+    while (args != NULL && values != NULL){
+        hash_add(frame, args->car, values->car);
+        args = args->cdr;
+        values = values->cdr;
+    }
+    die_unless(args == NULL && values == NULL, "Arg names and values have different lengths");
+    return frame;
 }

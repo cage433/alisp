@@ -3,9 +3,16 @@
 
 #include "list.h"
 #include "hash.h"
+#include "boxed_value.h"
 
-List *create_env();
-List *add_frame(List *env, Hash *frame);
-List *drop_frame(List *env);
+typedef struct {
+    Hash *base;
+    List *frames;
+} Env;
+Env *create_env();
+void env_add_frame(Env *env, Hash *frame);
+void env_drop_frame(Env *env);
+boxed_value *env_lookup(Env *env, char *name);
+Hash *frame_create(List *args, List *values);
 
 #endif
