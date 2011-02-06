@@ -123,3 +123,17 @@ List *parse_expressions(FILE *stream){
     free_list(tokens);
     return result;
 }
+
+List *parse_expressions_from_string(char *text){
+    FILE *s = fmemopen(text, strlen(text), "r");
+    List *l = parse_expressions(s);
+    return l;
+}
+
+expression *parse_expression_from_string(char *text){
+    List *l = parse_expressions_from_string(text);
+    die_unless(l != NULL && l->cdr == NULL, "List should have a single element");
+    expression *exp = l->car;
+    free(l);
+    return exp;
+}

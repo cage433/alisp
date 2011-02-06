@@ -72,10 +72,19 @@ int expressions_equal(void *e1, void *e2){
 
 void print_expression(expression *exp){
     if (exp->type == exp_integer)
-    printf("Integer Expression %d\n", exp->int_value);
-    else {
-    printf("expression.c unimplemented\n");
-    exit(-1);
+        printf("Integer Expression %d\n", exp->int_value);
+    else if (exp->type == exp_double)
+        printf("Double expression %.2f\n", exp->double_value);
+    else if (exp->type == exp_call){
+        printf("Call expression %s\n", exp->call_value.name);
+        List *exps = exp->call_value.exps;
+        while (exps != NULL){
+            print_expression(exps->car);
+            exps = exps->cdr;
+        }
+    } else {
+        printf("expression.c unimplemented\n");
+        exit(-1);
     }
 }
 

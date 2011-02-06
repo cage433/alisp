@@ -23,7 +23,8 @@ boxed_value *apply_plus(List *values){
             acc->type = boxed_double;
             acc->double_value = as_double_value(acc) + as_double_value(next);
         }
-        return acc;
+        values = values->cdr;
     }
+    return acc;
 }
 
