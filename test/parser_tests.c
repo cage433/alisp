@@ -43,10 +43,10 @@ void initialise_expected(){
                         make_call_expression("bar", 
                             make_list(1, 
                                 make_identifier_expression("mike"))))));
-    expected[10] = make_list(1, make_definition_expression("foo", make_list(1, make_identifier_expression("x")), make_identifier_expression("x")));
+    expected[10] = make_list(1, make_definition_expression("foo", make_list(1, "x"), make_identifier_expression("x")));
     expected[11] = make_list(1, make_definition_expression(
                                     "foo", 
-                                    make_list(2, make_identifier_expression("x"), make_identifier_expression("y")), 
+                                    make_list(2, "x", "y"), 
                                     make_call_expression("+", make_list(2, make_identifier_expression("x"), make_identifier_expression("y")))
                                     ));
 }

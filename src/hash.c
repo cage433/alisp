@@ -1,6 +1,7 @@
 #include "hash.h"
 
 #include "stdlib.h"
+#include "stdio.h"
 
 Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2)){
     Hash *hash = (Hash *)malloc(sizeof(Hash));
@@ -10,11 +11,6 @@ Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key
     hash->hashfn = hashfn;
     hash->keyeq_fn = keyeq_fn;
     return hash;
-}
-
-
-int hash_string_equality(const void *v1, const void * v2){
-    return strcmp((char *)v1, (char *)v2) == 0;
 }
 
 long string_hash_fn(const void *key){
@@ -38,7 +34,7 @@ long string_hash_fn(const void *key){
 }
 
 long hash_index(Hash *hash, void *key){
-    long i = ldiv(hash->hashfn(key), hash->array_length).rem;
+    long i = abs(ldiv(hash->hashfn(key), hash->array_length).rem);
     die_unless(i >= 0 && i < hash->array_length, "Invalid quotient");
     return i;
 }
@@ -128,7 +124,8 @@ List *hash_keys(Hash *hash){
     for (i = 0; i < hash->array_length; ++i){
         List *l = hash->array[i];
         while (l != NULL){
-            keys = cons(l->car, keys);
+            KeyValuePair *kv = l->car;
+            keys = cons(kv->key, keys);
             l = l->cdr;
         }
     }
@@ -144,8 +141,12 @@ void *hash_value(Hash *hash, void *key){
 void free_hash(Hash *hash){
     int i;
     for (i = 0; i < hash->array_length; ++i){
+        List *l = hash->array[i];
+        while(l != NULL){
+            free(l->car);
+            l = l->cdr;
+        }
         free_list(hash->array[i]);
-        free(hash->array[i]);
     }
     free(hash->array);
 }

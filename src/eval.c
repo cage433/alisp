@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "environment.h"
 #include "expression.h"
+#include "primitives.h"
 
 boxed_value *eval(Env *env, expression *exp){
     definition_expression def;

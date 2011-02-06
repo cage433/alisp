@@ -1,11 +1,12 @@
 #include "check.h"
 #include "hash.h"
+#include "utils.h"
 #include "stdlib.h"
 #include "stdio.h"
 
 START_TEST(test_hash_add_remove)
 {
-    Hash *hash = hash_create(string_hash_fn, hash_string_equality);
+    Hash *hash = hash_create(string_hash_fn, strings_equal);
     fail_unless(hash->num_elements == 0);
     fail_if(hash_contains(hash, "fred"));
     hash_add(hash, "fred", "mike");
@@ -18,7 +19,7 @@ START_TEST(test_hash_add_remove)
 END_TEST
 
 START_TEST(test_hash_add_lots_of_keys){
-    Hash *hash = hash_create(string_hash_fn, hash_string_equality);
+    Hash *hash = hash_create(string_hash_fn, strings_equal);
     int n = 100;
     char *keys[n];
     int i;

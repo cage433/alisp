@@ -17,7 +17,7 @@ struct expression_list;
 
 typedef struct {
     char *name;
-    List *args;
+    List *args;                 // List of char*
     struct expression *body;
 } definition_expression;
 
@@ -43,6 +43,6 @@ expression *make_identifier_expression(char *identifier);
 expression *make_call_expression(char *name, List *exps);
 expression *make_definition_expression(char *name, List *args, expression *body);
 
-int expressions_equal(void *exp1, void *exp2);
+int expressions_equal(const void *exp1, const void *exp2);
 void print_expression(expression *exp);
 #endif

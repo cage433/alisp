@@ -53,7 +53,7 @@ List *make_list(int size, ...){
     return result;
 }
 
-int lists_equal(List *l1, List *l2, int(*isEq)(void*, void*)){
+int lists_equal(List *l1, List *l2, int(*isEq)(const void*, const void*)){
     while(l1 != NULL || l2 != NULL){
         if (l1 == NULL || l2 == NULL){
             return 0;

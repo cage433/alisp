@@ -5,6 +5,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "assert.h"
+#include "string.h"
 
 typed_token *token_car(List *tokens){
     return (typed_token *)(tokens->car);
@@ -80,7 +81,20 @@ expression *consume_definition_exp(List **tokens){
     eat_left_paren(tokens);
     eat_identifier(tokens, "def");
     char *name = consume_identifier_exp(tokens)->identifier_value;
-    List *args = consume_expression_list(tokens);
+    List *arg_exps = consume_expression_list(tokens);
+    List *arg_exps2 = arg_exps;
+    List *reverse_args = NULL;
+    while (arg_exps2 != NULL){
+        expression *exp = arg_exps2->car;
+        die_unless(exp->type == exp_identifier, "Expected identifier expression");
+        char *identifier_name = malloc(strlen(exp->identifier_value) * sizeof(char));
+        strcpy(identifier_name, exp->identifier_value);
+        reverse_args = cons(identifier_name, reverse_args);
+        arg_exps2 = arg_exps2->cdr;
+    }
+    List *args = reverse_list(reverse_args);
+    free(arg_exps);
+    free(reverse_args);
     expression *body = consume_expression(tokens);
     eat_right_paren(tokens);
     return make_definition_expression(name, args, body);

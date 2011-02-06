@@ -58,7 +58,7 @@ void print_token_list(List *toks){
     }
 }
 
-int tokens_equal(void *t1, void *t2){
+int tokens_equal(const void *t1, const void *t2){
     typed_token *tok1 = (typed_token *)t1;
     typed_token *tok2 = (typed_token *)t2;
     switch(tok1->type){

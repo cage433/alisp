@@ -2,6 +2,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdio.h"
+#include "utils.h"
 
 
 expression *make_integer_expression(int num){
@@ -43,7 +44,7 @@ expression *make_definition_expression(char *name, List *args, expression *body)
     return exp;
 }
 
-int expressions_equal(void *e1, void *e2){
+int expressions_equal(const void *e1, const void *e2){
     expression *exp1 = (expression *)e1;
     expression *exp2 = (expression *)e2;
     if (exp1->type != exp2->type)
@@ -60,7 +61,7 @@ int expressions_equal(void *e1, void *e2){
         return name_same && exps_same;
     } else if (exp1->type == exp_definition){
         int name_same = (strcmp(exp1->definition_value.name, exp2->definition_value.name) == 0);
-        int args_same = lists_equal(exp1->definition_value.args, exp2->definition_value.args, expressions_equal);
+        int args_same = lists_equal(exp1->definition_value.args, exp2->definition_value.args, strings_equal);
         int body_same = expressions_equal(exp1->definition_value.body, exp2->definition_value.body);
         return name_same && args_same && body_same;
     } else {
