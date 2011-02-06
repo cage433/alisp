@@ -56,7 +56,7 @@ END_TEST
 
 Suite *test_token_suite (void)
 {
-    Suite *s = suite_create ("alisp");
+    Suite *s = suite_create ("token");
 
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");

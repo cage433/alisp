@@ -57,7 +57,7 @@ END_TEST
 
 Suite *test_eval_suite ()
 {
-    Suite *s = suite_create ("Eval tests");
+    Suite *s = suite_create ("eval");
 
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");

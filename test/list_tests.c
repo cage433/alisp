@@ -15,7 +15,7 @@ END_TEST
 
 Suite *test_list_suite ()
 {
-    Suite *s = suite_create ("List tests");
+    Suite *s = suite_create ("list");
 
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
