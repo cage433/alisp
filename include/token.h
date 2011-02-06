@@ -29,7 +29,6 @@ static typed_token RIGHT_PAREN = {tok_right_paren, 0};
 
 int tokens_equal(const void *tok1, const void *tok2);
 void free_token(void *typed_token);
-//void free_tokens(List *tokens);
 
 #endif
 

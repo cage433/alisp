@@ -26,7 +26,6 @@ void env_drop_frame(Env *env){
     Hash *frame = env->frames->car;
     free_hash(frame, free_binding);
     env->frames = env->frames->cdr;
-    free(frame);
 }
 
 boxed_value *env_lookup(Env *env, char *name){

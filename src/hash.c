@@ -144,4 +144,5 @@ void free_hash(Hash *hash, void(*key_value_free_fn)(void *)){
     for (i = 0; i < hash->array_length; ++i)
         free_list(hash->array[i], key_value_free_fn);
     free(hash->array);
+    free(hash);
 }
