@@ -4,7 +4,7 @@
 #include "stdio.h"
 #include "math.h"
 
-int boxed_values_equal(void *b1, void *b2){
+int boxed_values_equal(const void *b1, const void *b2){
     boxed_value *box1 = (boxed_value *)b1;
     boxed_value *box2 = (boxed_value *)b2;
     if(box1->type != box2->type)

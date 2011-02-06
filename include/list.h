@@ -14,4 +14,7 @@ void free_list(List *l);
 List *make_list(int size, ...);
 int lists_equal(List *l1, List *l2, int (*isEq)(const void*, const void*));
 void *nthelt(List *l, int n);
+List *list_map(List *l, void *(*fn)(const void *));
+void list_for_each(List *l, void(*fn)(const void *));
+void *list_fold(List *l, void *init, void *(*fn)(const void *, const void *));
 #endif

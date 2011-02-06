@@ -78,3 +78,13 @@ void *nthelt(List *l, int n){
     return l->car;
 }
 
+List *list_map(List *l, void *(*fn)(const void *)){
+    List *rev = NULL;
+    while (l != NULL){
+        rev = cons(fn(l->car), rev);
+        l = l->cdr;
+    }
+    List *result = reverse_list(rev);
+    free_list(rev);
+    return result;
+}

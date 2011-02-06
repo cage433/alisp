@@ -20,7 +20,7 @@ typedef struct {
     };
 } boxed_value;
 
-int boxed_values_equal(void *box1, void *box2);
+int boxed_values_equal(const void *box1, const void *box2);
 boxed_value *make_boxed_int(int num);
 boxed_value *make_boxed_double(double num);
 boxed_value *make_boxed_string(char *str);
