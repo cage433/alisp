@@ -1,6 +1,6 @@
 #ifndef ALISP_BOXED_VALUE
 #define ALISP_BOXED_VALUE
-
+#include "stdlib.h"
 #include "expression.h"
 
 typedef enum {
@@ -28,6 +28,8 @@ boxed_value *make_boxed_double(double num);
 boxed_value *make_boxed_string(char *str);
 boxed_value *make_boxed_definition(definition_expression def);
 boxed_value *make_boxed_list(List *list);
+static boxed_value NIL_VALUE = {boxed_list, 0};
+static boxed_value *NIL = &NIL_VALUE;
 void free_boxed_value(boxed_value *b);
 void print_boxed_value(boxed_value *v);
 

@@ -21,7 +21,14 @@ START_TEST(test_boxed_value_equality)
     fail_if(boxed_values_equal(
         make_boxed_list(make_list(2, make_boxed_string("a"), make_boxed_string("b"))),
         make_boxed_list(make_list(2, make_boxed_string("a"), make_boxed_string("c")))));
+}
+END_TEST
 
+START_TEST(test_null_list)
+{
+    fail_unless(boxed_values_equal(
+        NIL,
+        make_boxed_list(make_list(0))));
 }
 END_TEST
 
@@ -32,6 +39,7 @@ Suite *test_boxed_value_suite()
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
     tcase_add_test (tc_core, test_boxed_value_equality);
+    tcase_add_test (tc_core, test_null_list);
     suite_add_tcase (s, tc_core);
 
     return s;
