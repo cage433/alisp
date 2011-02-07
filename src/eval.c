@@ -7,6 +7,9 @@
 boxed_value *eval(Env *env, expression *exp){
     definition_expression def;
     call_expression call;
+    boxed_value *eval_exp(expression *arg){
+        return eval(env, arg);
+    }
     switch(exp->type){
         case exp_integer:
             return make_boxed_int(exp->int_value);
@@ -21,15 +24,8 @@ boxed_value *eval(Env *env, expression *exp){
             return boxed_def;
         case exp_call:
             call = exp->call_value;
-            List *reverse_args = NULL;
-            List *l = call.exps;
-            while (l != NULL){
-                reverse_args = cons(eval(env, l->car), reverse_args);
-                l = l->cdr;
-            }
-            List *args = reverse_list(reverse_args);
-            free_list(reverse_args, nop_free_fn);
-            return apply(env, call.name, args);
+            List *arg_values = list_map(call.exps, (map_fn_ptr)eval_exp);
+            return apply(env, call.name, arg_values);
         default:
             die("Unexpected expression type");
     }
