@@ -9,6 +9,8 @@
 Env *create_env(){
     Env *env = malloc(sizeof(Env));
     env->base = hash_create(string_hash_fn, strings_equal);
+    hash_add(env->base, "NIL", NIL);
+    hash_add(env->base, "TRUE", TRUE);
     env->frames = cons(env->base, NULL);
     return env;
 }

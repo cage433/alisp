@@ -39,6 +39,8 @@ boxed_value *apply(Env *env, char *op_name, List *arg_exps){
     if (strings_equal(op_name, "if")){
         die_unless(listlen(arg_exps) == 3, "If requires three arguments exactly");
         value =  apply_if(env, nthelt(arg_exps, 0), nthelt(arg_exps, 1), nthelt(arg_exps, 2));
+    } else if (strings_equal(op_name, "and")){
+        value = apply_and(env, arg_exps);
     } else {
         boxed_value *eval_exp(expression *exp){
             return eval(env, exp);

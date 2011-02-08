@@ -110,3 +110,14 @@ boxed_value *apply_eq(boxed_value *v1, boxed_value *v2){
         return NIL;
     }
 }
+
+boxed_value *apply_and(Env *env, List *exps){
+    while (exps != NULL){
+        boxed_value *v = eval(env, exps->car);
+        if (boxed_values_equal(v, NIL))
+            return NIL;
+        exps = exps->cdr;
+    }
+    return TRUE;
+}
+

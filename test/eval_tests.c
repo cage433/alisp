@@ -129,9 +129,29 @@ START_TEST(test_factorial)
     eval(env, exp);
     exp = parse_expression_from_string("(factorial 5)");
     boxed_value *v = eval(env, exp);
-    printf("Factorial 5 = ");
-    print_boxed_value(v);
     fail_unless(boxed_values_equal(v, make_boxed_int(120)));
+}
+END_TEST
+
+START_TEST(test_and)
+{
+    Env *env = create_env();
+    expression *exp;
+    exp = parse_expression_from_string("(and 3 4)");
+    fail_unless(boxed_values_equal(TRUE, eval(env, exp)));
+
+    exp = parse_expression_from_string("(and NIL TRUE)");
+    fail_unless(boxed_values_equal(NIL, eval(env, exp)));
+
+    exp = parse_expression_from_string("(and TRUE NIL TRUE)");
+    fail_unless(boxed_values_equal(NIL, eval(env, exp)));
+
+    exp = parse_expression_from_string("(and)");
+    fail_unless(boxed_values_equal(TRUE, eval(env, exp)));
+
+    // UNASSIGNED_VARIABLE never evaluated
+    exp = parse_expression_from_string("(and TRUE NIL UNASSIGNED_VARIABLE)");
+    fail_unless(boxed_values_equal(NIL, eval(env, exp)));
 }
 END_TEST
 
@@ -150,6 +170,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_eval_def2);
     tcase_add_test (tc_core, test_factorial);
     tcase_add_test (tc_core, test_if_and_equals);
+    tcase_add_test (tc_core, test_and);
     suite_add_tcase (s, tc_core);
 
     return s;

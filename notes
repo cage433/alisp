@@ -1,1 +1,21 @@
 To debug set env variable CK_FORK to no
+
+TODO
+    Tail recursion
+    lexical scope
+    define for dynamic variables
+    primitives
+       and
+       or
+       cons
+       car
+       cdr
+       quote
+       atom?
+       cons?
+    function compilation
+    external functions
+    macros
+    lambda
+    let - implement as macro?
+    improve debugging of eval
