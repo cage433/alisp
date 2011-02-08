@@ -88,8 +88,7 @@ expression *consume_definition_exp(List **tokens){
     while (arg_exps2 != NULL){
         expression *exp = arg_exps2->car;
         die_unless(exp->type == exp_identifier, "Expected identifier expression");
-        char *identifier_name = malloc((1 + strlen(exp->identifier_value)) * sizeof(char));
-        strcpy(identifier_name, exp->identifier_value);
+        char *identifier_name = strdup(exp->identifier_value);
         reverse_args = cons(identifier_name, reverse_args);
         arg_exps2 = arg_exps2->cdr;
     }

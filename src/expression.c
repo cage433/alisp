@@ -22,8 +22,7 @@ expression *make_double_expression(double num){
 expression *make_identifier_expression(char *identifier){
     expression *exp = (expression *)malloc(sizeof(expression));
     exp->type = exp_identifier;
-    exp->identifier_value = calloc(1 + strlen(identifier), sizeof(char));
-    strcpy(exp->identifier_value, identifier);
+    exp->identifier_value = strdup(identifier);
     return exp;
 }
 
