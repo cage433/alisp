@@ -6,6 +6,8 @@
 #include "list.h"
 
 int first_ptr = 0;
+boxed_value *NIL = &(boxed_value){4, 0};
+boxed_value *TRUE = &(boxed_value){0, 1};
 
 int boxed_values_equal(const void *b1, const void *b2){
     boxed_value *box1 = (boxed_value *)b1;
@@ -29,9 +31,6 @@ int boxed_values_equal(const void *b1, const void *b2){
 
 boxed_value *make_boxed_int(int num){
     boxed_value *box = malloc(sizeof(boxed_value));
-    if (first_ptr == 0){
-        first_ptr = box;
-    }
     box->type = boxed_int;
     box->int_value = num;
     return box;
@@ -88,10 +87,7 @@ void print_boxed_value(boxed_value *v){
     else
         switch (v->type){
             case boxed_int:
-                if (v->int_value == 77)
-                    printf("Boxed TRUE\n");
-                else 
-                    printf("Boxed int %d\n", v->int_value);
+                printf("Boxed int %d\n", v->int_value);
                 break;
             case boxed_double:
                 printf("Boxed double %.6f\n", v->double_value);
@@ -103,12 +99,8 @@ void print_boxed_value(boxed_value *v){
                 printf("Boxed definition %s\n", v->definition_value.name);
                 break;
             case boxed_list:
-                if (listlen(v->list_value) == 0)
-                    printf("Boxed NIL\n");
-                else {
-                    printf("Boxed list with %d elements\n", listlen(v->list_value));
-                    list_for_each(v->list_value, (for_each_fn_ptr)print_boxed_value);
-                }
+                printf("Boxed list with %d elements\n", listlen(v->list_value));
+                list_for_each(v->list_value, (for_each_fn_ptr)print_boxed_value);
                 break;
             default:
                 printf("File %s, line %d\n", __FILE__, __LINE__); 

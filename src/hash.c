@@ -15,18 +15,6 @@ Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key
     return hash;
 }
 
-void create_dummy_hash(char *msg){
-    Hash *hash = (Hash *)malloc(sizeof(Hash));
-    if (hash == first_ptr){
-        printf("OVERRIDE at %s\n", msg);
-        exit(-1);
-    } else {
-        printf("OK at %s\n", msg);
-    }
-    free(hash);
-}
-
-
 long string_hash_fn(const void *key){
     const char *k = key;
     size_t len = strlen(key);
