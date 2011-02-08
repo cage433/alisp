@@ -27,16 +27,14 @@ void print_env(Env *env){
 void env_add_frame(Env *env, Hash *frame){
     env->frames = cons(frame, env->frames);
 }
-static void free_binding(void *binding){
-    KeyValuePair *kv = binding;
+static void free_binding(KeyValuePair *kv){
     free(kv->key);
     free_boxed_value((boxed_value *)kv->value);
     free(kv);
 }
 
 void env_drop_frame(Env *env){
-    Hash *frame = env->frames->car;
-    free_hash(frame, free_binding);
+    free_hash(env->frames->car, free_binding);
     env->frames = env->frames->cdr;
 }
 

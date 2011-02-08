@@ -131,10 +131,10 @@ void *hash_value(Hash *hash, void *key){
     return kv->value;
 }
 
-void free_hash(Hash *hash, void(*key_value_free_fn)(void *)){
+void free_hash(Hash *hash, void(*key_value_free_fn)(KeyValuePair *)){
     int i;
     for (i = 0; i < hash->array_length; ++i)
-        free_list(hash->array[i], key_value_free_fn);
+        free_list(hash->array[i], (free_fn_ptr)key_value_free_fn);
     free(hash->array);
     free(hash);
 }
