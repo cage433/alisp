@@ -119,3 +119,12 @@ int list_all(List *l, predicate_fn_ptr predicate){
     }
     return 1;
 }
+
+void *list_find(List *l, predicate_fn_ptr predicate){
+    while (l != NULL){
+        if (predicate(l->car))
+            return l->car;
+        l = l->cdr;
+    }
+    return NULL;
+}

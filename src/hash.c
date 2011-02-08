@@ -43,14 +43,10 @@ long hash_index(Hash *hash, void *key){
 
 KeyValuePair *hash_key_value_pair(Hash *hash, void *key){
     long i = hash_index(hash, key);
-    List *l = hash->array[i];
-    while (l != NULL){
-        KeyValuePair *kv = l->car;
-        if (hash->keyeq_fn(key, kv->key))
-            return kv;
-        l = l->cdr;
+    int key_matches(KeyValuePair *kv){
+        return hash->keyeq_fn(key, kv->key);
     }
-    return NULL;
+    return list_find(hash->array[i], (predicate_fn_ptr)key_matches);
 }
 
 KeyValuePair* hash_remove(Hash *hash, void *key){

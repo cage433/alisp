@@ -28,4 +28,5 @@ void *list_fold(List *l, void *init, fold_fn_ptr fn);
 typedef int(*predicate_fn_ptr)(void *);
 int list_some(List *l, predicate_fn_ptr predicate);
 int list_all(List *l, predicate_fn_ptr predicate);
+void *list_find(List *l, predicate_fn_ptr predicate);
 #endif
