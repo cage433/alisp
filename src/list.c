@@ -29,8 +29,8 @@ List *reverse_list(List *l){
 void free_list(List *l, void (*free_fn)(void *)){
     while (l != NULL){
         List *l1 = l->cdr;
-        //free_fn(l->car);
-        //free(l);
+        free_fn(l->car);
+        free(l);
         l = l1;
     }
 }

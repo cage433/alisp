@@ -94,8 +94,9 @@ expression *consume_definition_exp(List **tokens){
         arg_exps2 = arg_exps2->cdr;
     }
     List *args = reverse_list(reverse_args);
-    //free(arg_exps);
-    //free(reverse_args);
+    free(arg_exps);
+    free(reverse_args);
+    //TODO - replace above with map
     expression *body = consume_expression(tokens);
     eat_right_paren(tokens);
     return make_definition_expression(name, args, body);
@@ -148,6 +149,6 @@ expression *parse_expression_from_string(char *text){
     List *l = parse_expressions_from_string(text);
     die_unless(l != NULL && l->cdr == NULL, "List should have a single element");
     expression *exp = l->car;
-    //free(l);
+    free(l);
     return exp;
 }

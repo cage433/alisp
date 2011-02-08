@@ -113,13 +113,4 @@ void free_token(void *token){
     }
 }
 
-//void free_tokens(List *tokens){
-//    while(tokens != NULL){
-//        typed_token *tok = (typed_token *)(tokens->car);
-//        if (tok->type != tok_left_paren && tok->type != tok_right_paren){
-//            free(tok);
-//        }
-//        tokens = tokens->cdr;
-//    }
-//}
     

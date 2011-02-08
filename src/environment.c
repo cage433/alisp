@@ -31,14 +31,14 @@ void env_add_frame(Env *env, Hash *frame){
 }
 static void free_binding(void *binding){
     KeyValuePair *kv = binding;
-    //free(kv->key);
-    //free_boxed_value((boxed_value *)kv->value);
-    //free(kv);
+    free(kv->key);
+    free_boxed_value((boxed_value *)kv->value);
+    free(kv);
 }
 
 void env_drop_frame(Env *env){
     Hash *frame = env->frames->car;
-    //free_hash(frame, free_binding);
+    free_hash(frame, free_binding);
     env->frames = env->frames->cdr;
 }
 
@@ -58,7 +58,7 @@ boxed_value *env_lookup(Env *env, char *name){
 Hash *frame_create(List *args, List *values){
     Hash *frame = hash_create(string_hash_fn, strings_equal);
     while (args != NULL && values != NULL){
-        hash_add(frame, args->car, values->car);
+        hash_add(frame, strdup(args->car), values->car);
         args = args->cdr;
         values = values->cdr;
     }

@@ -73,7 +73,7 @@ KeyValuePair* hash_remove(Hash *hash, void *key){
     KeyValuePair *kv = l->car;
     if (hash->keyeq_fn(key, kv->key)){
         hash->array[i] = l->cdr;
-        //free(l);
+        free(l);
         hash->num_elements -= 1;
         return kv;
     } else {
@@ -82,7 +82,7 @@ KeyValuePair* hash_remove(Hash *hash, void *key){
             kv = l2->car;
             if (hash->keyeq_fn(key, kv->key)){
                 l->cdr = l2->cdr;
-                //free(l2);
+                free(l2);
                 hash->num_elements -= 1;
                 return kv;
             } else {
@@ -111,10 +111,11 @@ void hash_resize(Hash *hash){
         while(l != NULL){
             KeyValuePair *kv = l->car;
             hash_add(hash, kv->key, kv->value);
-            //free(kv);
+            free(kv);
             l = l->cdr;
         }
-        //free_list(old_array[i], nop_free_fn);
+        free_list(old_array[i], nop_free_fn);
+        //TODO - use free itself above
     }
 }
 
@@ -154,8 +155,8 @@ void *hash_value(Hash *hash, void *key){
 
 void free_hash(Hash *hash, void(*key_value_free_fn)(void *)){
     int i;
-    //for (i = 0; i < hash->array_length; ++i)
-        //free_list(hash->array[i], key_value_free_fn);
-    //free(hash->array);
-    //free(hash);
+    for (i = 0; i < hash->array_length; ++i)
+        free_list(hash->array[i], key_value_free_fn);
+    free(hash->array);
+    free(hash);
 }

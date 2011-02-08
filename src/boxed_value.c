@@ -66,19 +66,18 @@ boxed_value *make_boxed_list(List *list){
 }
 
 void free_boxed_value(boxed_value *b){
-    print_boxed_value(b);
     switch (b->type){
         case boxed_int:
         case boxed_double:
             break;
         case boxed_string:
-//            free(b->string_value);
+            free(b->string_value);
             break;
         case boxed_list:
- //           free_list(b->list_value, (free_fn_ptr)free_boxed_value);
+            free_list(b->list_value, (free_fn_ptr)free_boxed_value);
             break;
- //       default:
-//            die("Unexpected box type");
+        default:
+            die("Unexpected box type");
     }
 }
 void print_boxed_value(boxed_value *v){
