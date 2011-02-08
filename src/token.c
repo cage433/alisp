@@ -48,15 +48,6 @@ void printtoken(typed_token *tok){
     }
 }
 
-void print_token_list(List *toks){
-    int i = 0;
-    while (toks != NULL){
-        printf("Token %d\n", i++);
-        printtoken(toks->car);
-        toks = toks->cdr;
-    }
-}
-
 int tokens_equal(const void *t1, const void *t2){
     typed_token *tok1 = (typed_token *)t1;
     typed_token *tok2 = (typed_token *)t2;

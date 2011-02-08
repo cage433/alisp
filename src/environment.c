@@ -16,13 +16,11 @@ void print_env(Env *env){
     List *frames = env->frames;
     while (frames != NULL){
         printf("Frame no %d\n", listlen(frames));
-        List *keys = hash_keys(frames->car);
-        while (keys != NULL){
-            printf("Key %s, value ", (char *)keys->car);
-            print_boxed_value((boxed_value *)hash_value(frames->car, keys->car));
-            keys = keys->cdr;
+        void print_key_and_value(char *key){
+            printf("Key %s, value ", key);
+            print_boxed_value((boxed_value *)hash_value(frames->car, key));
         }
-        frames = frames->cdr;
+        list_for_each(hash_keys(frames->car), (for_each_fn_ptr)print_key_and_value);
     }
 }
 
@@ -43,16 +41,16 @@ void env_drop_frame(Env *env){
 }
 
 boxed_value *env_lookup(Env *env, char *name){
-    List *l = env->frames;
-    while (l != NULL){
-        if (hash_contains(l->car, name)){
-            boxed_value *value = hash_value(l->car, name);
-            return value;
-        }
-        l = l->cdr;
+    int hash_contains_name(Hash *hash){
+        return hash_contains(hash, name);
     }
-    printf("Looking for %s\n", name);
-    die("Value not found in environment");
+    Hash *frame = list_find(env->frames, (predicate_fn_ptr)hash_contains_name);
+    if (frame == NULL){
+        printf("Looking for %s\n", name);
+        die("Value not found in environment");
+    } else {
+        return hash_value(frame, name);
+    }
 }
 
 Hash *frame_create(List *args, List *values){

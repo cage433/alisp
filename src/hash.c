@@ -121,12 +121,6 @@ List *hash_keys(Hash *hash){
     }
     for (i = 0; i < hash->array_length; ++i){
         list_for_each(hash->array[i], (for_each_fn_ptr)add_key);
-//        List *l = hash->array[i];
-//        while (l != NULL){
-//            KeyValuePair *kv = l->car;
-//            keys = cons(kv->key, keys);
-//            l = l->cdr;
-//        }
     }
     return keys;
 }

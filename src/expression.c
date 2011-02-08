@@ -77,11 +77,7 @@ void print_expression(expression *exp){
         printf("Double expression %.2f\n", exp->double_value);
     else if (exp->type == exp_call){
         printf("Call expression %s\n", exp->call_value.name);
-        List *exps = exp->call_value.exps;
-        while (exps != NULL){
-            print_expression(exps->car);
-            exps = exps->cdr;
-        }
+        list_for_each(exp->call_value.exps, (for_each_fn_ptr)print_expression);
     } else if (exp->type == exp_identifier){
         printf("Identifier expression %s\n", exp->identifier_value);
     } else if (exp->type == exp_definition){

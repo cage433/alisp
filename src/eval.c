@@ -33,17 +33,6 @@ boxed_value *eval(Env *env, expression *exp){
     }
     return value;
 }
-List *eval_expressions(Env *env, List *expressions){
-    List *l = NULL;
-    while (expressions != NULL){
-        l = cons(eval(env, expressions->car), l);
-        expressions = expressions->cdr;
-    }
-    List *result = reverse_list(l);
-    free_list(l, nop_free_fn);
-    return result;
-}
-
 
 boxed_value *apply(Env *env, char *op_name, List *arg_exps){
     boxed_value *value;
@@ -51,7 +40,10 @@ boxed_value *apply(Env *env, char *op_name, List *arg_exps){
         die_unless(listlen(arg_exps) == 3, "If requires three arguments exactly");
         value =  apply_if(env, nthelt(arg_exps, 0), nthelt(arg_exps, 1), nthelt(arg_exps, 2));
     } else {
-        List *arg_values = eval_expressions(env, arg_exps);
+        boxed_value *eval_exp(expression *exp){
+            return eval(env, exp);
+        }
+        List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
         if (strings_equal(op_name, "eq")){
             die_unless(listlen(arg_values) == 2, "Eq requires two arguments exactly");
             value = apply_eq(nthelt(arg_values, 0), nthelt(arg_values, 1));
