@@ -83,19 +83,11 @@ expression *consume_definition_exp(List **tokens){
     eat_identifier(tokens, "def");
     char *name = consume_identifier_exp(tokens)->identifier_value;
     List *arg_exps = consume_expression_list(tokens);
-    List *arg_exps2 = arg_exps;
-    List *reverse_args = NULL;
-    while (arg_exps2 != NULL){
-        expression *exp = arg_exps2->car;
+    char *identifier_name(expression *exp){
         die_unless(exp->type == exp_identifier, "Expected identifier expression");
-        char *identifier_name = strdup(exp->identifier_value);
-        reverse_args = cons(identifier_name, reverse_args);
-        arg_exps2 = arg_exps2->cdr;
+        return strdup(exp->identifier_value);
     }
-    List *args = reverse_list(reverse_args);
-    free(arg_exps);
-    free(reverse_args);
-    //TODO - replace above with map
+    List *args = list_map(arg_exps, (map_fn_ptr)identifier_name);
     expression *body = consume_expression(tokens);
     eat_right_paren(tokens);
     return make_definition_expression(name, args, body);

@@ -32,6 +32,5 @@ extern boxed_value *NIL;
 extern boxed_value *TRUE;
 void free_boxed_value(boxed_value *b);
 void print_boxed_value(boxed_value *v);
-extern int first_ptr;
 
 #endif

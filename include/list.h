@@ -15,10 +15,17 @@ void free_list(List *l, free_fn_ptr fn);
 List *make_list(int size, ...);
 int lists_equal(List *l1, List *l2, int (*isEq)(const void*, const void*));
 void *nthelt(List *l, int n);
+
 typedef void *(*map_fn_ptr)(const void *);
 List *list_map(List *l, map_fn_ptr fn);
+
 typedef void(*for_each_fn_ptr)(void *);
 void list_for_each(List *l, for_each_fn_ptr fn);
+
 typedef void *(*fold_fn_ptr)(void *, void *);
 void *list_fold(List *l, void *init, fold_fn_ptr fn);
+
+typedef int(*predicate_fn_ptr)(void *);
+int list_some(List *l, predicate_fn_ptr predicate);
+int list_all(List *l, predicate_fn_ptr predicate);
 #endif

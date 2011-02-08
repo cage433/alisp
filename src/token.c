@@ -22,8 +22,6 @@ typed_token *identifier_token(char *identifier){
     typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
     tok->type = tok_identifier;
     tok->identifier_value = strdup(identifier);
-//    tok->identifier_value = calloc(1 + strlen(identifier), sizeof(char));
-//    strcpy(tok->identifier_value, identifier);
     return tok;
 }
 

@@ -31,6 +31,15 @@ START_TEST(test_hash_add_lots_of_keys){
         fail_unless(hash_contains(hash, keys[i]));
         fail_unless(hash->num_elements == i + 1);
     }
+    int j = 0;
+    int equals_key_j(char *v){
+        return strcmp(v, keys[j]) == 0;
+    }
+    List *hks = hash_keys(hash);
+    fail_unless(listlen(hks) == n);
+    for (j = 0; j < n; ++j){
+        fail_unless(list_some(hks, (predicate_fn_ptr)equals_key_j));
+    }
     for (i = 0; i < n; ++i){
         hash_remove(hash, keys[i]);
         fail_if(hash_contains(hash, keys[i]));

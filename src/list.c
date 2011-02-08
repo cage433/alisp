@@ -100,3 +100,22 @@ void *list_fold(List *l, void *init, void *(*fn)(void *, void *)){
     }
     return value;
 }
+
+
+int list_some(List *l, predicate_fn_ptr predicate){
+    while (l != NULL){
+        if (predicate(l->car))
+            return 1;
+        l = l->cdr;
+    }
+    return 0;
+}
+
+int list_all(List *l, predicate_fn_ptr predicate){
+    while (l != NULL){
+        if (!predicate(l->car))
+            return 0;
+        l = l->cdr;
+    }
+    return 1;
+}

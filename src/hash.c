@@ -93,17 +93,13 @@ void hash_resize(Hash *hash){
 
     hash->array = calloc(hash->array_length, sizeof(List *));
     hash->num_elements = 0;
+    void add_to_hash(KeyValuePair *kv){
+        hash_add(hash, kv->key, kv->value);
+    }
     int i;
     for (i = 0; i < old_array_length; ++i){
-        List *l = old_array[i];
-        while(l != NULL){
-            KeyValuePair *kv = l->car;
-            hash_add(hash, kv->key, kv->value);
-            free(kv);
-            l = l->cdr;
-        }
-        free_list(old_array[i], nop_free_fn);
-        //TODO - use free itself above
+        list_for_each(old_array[i], (for_each_fn_ptr)add_to_hash);
+        free_list(old_array[i], free);
     }
 }
 
@@ -124,13 +120,17 @@ void hash_add(Hash *hash, void *key, void *value){
 List *hash_keys(Hash *hash){
     int i;
     List *keys = NULL;
+    void add_key(KeyValuePair *kv){
+        keys = cons(kv->key, keys);
+    }
     for (i = 0; i < hash->array_length; ++i){
-        List *l = hash->array[i];
-        while (l != NULL){
-            KeyValuePair *kv = l->car;
-            keys = cons(kv->key, keys);
-            l = l->cdr;
-        }
+        list_for_each(hash->array[i], (for_each_fn_ptr)add_key);
+//        List *l = hash->array[i];
+//        while (l != NULL){
+//            KeyValuePair *kv = l->car;
+//            keys = cons(kv->key, keys);
+//            l = l->cdr;
+//        }
     }
     return keys;
 }
