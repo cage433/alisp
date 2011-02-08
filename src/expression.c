@@ -83,6 +83,10 @@ void print_expression(expression *exp){
             print_expression(exps->car);
             exps = exps->cdr;
         }
+    } else if (exp->type == exp_identifier){
+        printf("Identifier expression %s\n", exp->identifier_value);
+    } else if (exp->type == exp_definition){
+        printf("Definition expression%s\n", exp->definition_value.name);
     } else {
         printf("expression.c unimplemented\n");
         exit(-1);

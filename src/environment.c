@@ -12,27 +12,43 @@ Env *create_env(){
     env->frames = cons(env->base, NULL);
     return env;
 }
+void print_env(Env *env){
+    List *frames = env->frames;
+    while (frames != NULL){
+        printf("Frame no %d\n", listlen(frames));
+        List *keys = hash_keys(frames->car);
+        while (keys != NULL){
+            printf("Key %s, value ", (char *)keys->car);
+            print_boxed_value((boxed_value *)hash_value(frames->car, keys->car));
+            keys = keys->cdr;
+        }
+        frames = frames->cdr;
+    }
+}
+
 void env_add_frame(Env *env, Hash *frame){
     env->frames = cons(frame, env->frames);
 }
 static void free_binding(void *binding){
     KeyValuePair *kv = binding;
-    free(kv->key);
-    free_boxed_value((boxed_value *)kv->value);
-    free(kv);
+    //free(kv->key);
+    //free_boxed_value((boxed_value *)kv->value);
+    //free(kv);
 }
 
 void env_drop_frame(Env *env){
     Hash *frame = env->frames->car;
-    free_hash(frame, free_binding);
+    //free_hash(frame, free_binding);
     env->frames = env->frames->cdr;
 }
 
 boxed_value *env_lookup(Env *env, char *name){
     List *l = env->frames;
     while (l != NULL){
-        if (hash_contains(l->car, name))
-            return hash_value(l->car, name);
+        if (hash_contains(l->car, name)){
+            boxed_value *value = hash_value(l->car, name);
+            return value;
+        }
         l = l->cdr;
     }
     printf("Looking for %s\n", name);

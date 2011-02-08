@@ -88,14 +88,14 @@ expression *consume_definition_exp(List **tokens){
     while (arg_exps2 != NULL){
         expression *exp = arg_exps2->car;
         die_unless(exp->type == exp_identifier, "Expected identifier expression");
-        char *identifier_name = malloc(strlen(exp->identifier_value) * sizeof(char));
+        char *identifier_name = malloc((1 + strlen(exp->identifier_value)) * sizeof(char));
         strcpy(identifier_name, exp->identifier_value);
         reverse_args = cons(identifier_name, reverse_args);
         arg_exps2 = arg_exps2->cdr;
     }
     List *args = reverse_list(reverse_args);
-    free(arg_exps);
-    free(reverse_args);
+    //free(arg_exps);
+    //free(reverse_args);
     expression *body = consume_expression(tokens);
     eat_right_paren(tokens);
     return make_definition_expression(name, args, body);
@@ -148,6 +148,6 @@ expression *parse_expression_from_string(char *text){
     List *l = parse_expressions_from_string(text);
     die_unless(l != NULL && l->cdr == NULL, "List should have a single element");
     expression *exp = l->car;
-    free(l);
+    //free(l);
     return exp;
 }

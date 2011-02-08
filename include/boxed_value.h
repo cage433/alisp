@@ -30,7 +30,10 @@ boxed_value *make_boxed_definition(definition_expression def);
 boxed_value *make_boxed_list(List *list);
 static boxed_value NIL_VALUE = {boxed_list, 0};
 static boxed_value *NIL = &NIL_VALUE;
+static boxed_value TRUE_VALUE = {boxed_int, 77};
+static boxed_value *TRUE = &TRUE_VALUE;
 void free_boxed_value(boxed_value *b);
 void print_boxed_value(boxed_value *v);
+extern int first_ptr;
 
 #endif

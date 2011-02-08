@@ -14,5 +14,5 @@ void env_add_frame(Env *env, Hash *frame);
 void env_drop_frame(Env *env);
 boxed_value *env_lookup(Env *env, char *name);
 Hash *frame_create(List *args, List *values);
-
+void print_env(Env *env);
 #endif

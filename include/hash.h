@@ -30,4 +30,5 @@ Hash *hash_create(
 );
 List *hash_keys(Hash *hash);
 void free_hash(Hash *hash, void(*key_value_free_fn)(void *));
+void create_dummy_hash();
 #endif

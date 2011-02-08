@@ -106,6 +106,35 @@ START_TEST(test_eval_def2)
 }
 END_TEST
 
+START_TEST(test_if_and_equals)
+{
+    Env *env = create_env();
+    expression *exp = parse_expression_from_string("(def foo (n) (if (eq n 1) 10 20))");
+    eval(env, exp);
+    exp = parse_expression_from_string("(foo 5)");
+    boxed_value *v = eval(env, exp);
+    fail_unless(boxed_values_equal(v, make_boxed_int(20)));
+
+    exp = parse_expression_from_string("(foo 1)");
+    v = eval(env, exp);
+    fail_unless(boxed_values_equal(v, make_boxed_int(10)));
+}
+END_TEST
+
+
+START_TEST(test_factorial)
+{
+    Env *env = create_env();
+    expression *exp = parse_expression_from_string("(def factorial (n) (if (eq n 1) 1 (* (factorial (- n 1)) n)))");
+    eval(env, exp);
+    exp = parse_expression_from_string("(factorial 5)");
+    boxed_value *v = eval(env, exp);
+    printf("Factorial 5 = ");
+    print_boxed_value(v);
+    fail_unless(boxed_values_equal(v, make_boxed_int(120)));
+}
+END_TEST
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -119,6 +148,8 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_eval_divide);
     tcase_add_test (tc_core, test_eval_def);
     tcase_add_test (tc_core, test_eval_def2);
+    tcase_add_test (tc_core, test_factorial);
+    tcase_add_test (tc_core, test_if_and_equals);
     suite_add_tcase (s, tc_core);
 
     return s;

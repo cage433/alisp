@@ -3,14 +3,29 @@
 #include "primitives.h"
 #include "boxed_value.h"
 #include "list.h"
+#include "hash.h"
+#include "eval.h"
+#include "stdio.h"
 
 double as_double_value(boxed_value *value){
     if (value->type == boxed_int)
         return (double)(value->int_value);
     else if (value->type == boxed_double)
         return value->double_value;
-    else
+    else {
+        printf("Unexpected value ");
+        print_boxed_value(value);
         die("Boxed value not int or double");
+    }
+}
+
+boxed_value *copy_boxed_number(boxed_value *v){
+    if (v->type == boxed_int)
+        return make_boxed_int(v->int_value);
+    else if (v->type == boxed_double)
+        return make_boxed_double(v->double_value);
+    else
+        die("Only do subtracton on ints and doubles");
 }
 
 boxed_value *apply_plus(List *values){
@@ -53,8 +68,9 @@ boxed_value *apply_minus(List *values){
     }
     if (values == NULL)
         return make_boxed_int(0);
-    else
-        return list_fold(values->cdr, values->car, (fold_fn_ptr)minus_values);
+    else {
+        return list_fold(values->cdr, copy_boxed_number(values->car), (fold_fn_ptr)minus_values);
+    }
 }
 
 boxed_value *apply_divide(List *values){
@@ -76,5 +92,21 @@ boxed_value *apply_divide(List *values){
     if (values == NULL)
         return make_boxed_int(1);
     else
-        return list_fold(values->cdr, values->car, (fold_fn_ptr)divide_values);
+        return list_fold(values->cdr, copy_boxed_number(values->car), (fold_fn_ptr)divide_values);
+}
+
+boxed_value *apply_if(Env *env, expression *predicate, expression *consequent, expression *alternative){
+    boxed_value *predicate_value = eval(env, predicate);
+    if (boxed_values_equal(predicate_value, NIL))
+        return eval(env, alternative);
+    else
+        return eval(env, consequent);
+}
+
+boxed_value *apply_eq(boxed_value *v1, boxed_value *v2){
+    if (boxed_values_equal(v1, v2))
+        return TRUE;
+    else {
+        return NIL;
+    }
 }
