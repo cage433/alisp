@@ -138,7 +138,7 @@ START_TEST(test_and)
     Env *env = create_env();
     expression *exp;
     exp = parse_expression_from_string("(and 3 4)");
-    fail_unless(boxed_values_equal(TRUE, eval(env, exp)));
+    fail_unless(boxed_values_equal(make_boxed_int(4), eval(env, exp)));
 
     exp = parse_expression_from_string("(and NIL TRUE)");
     fail_unless(boxed_values_equal(NIL, eval(env, exp)));
@@ -152,6 +152,28 @@ START_TEST(test_and)
     // UNASSIGNED_VARIABLE never evaluated
     exp = parse_expression_from_string("(and TRUE NIL UNASSIGNED_VARIABLE)");
     fail_unless(boxed_values_equal(NIL, eval(env, exp)));
+}
+END_TEST
+
+START_TEST(test_or)
+{
+    Env *env = create_env();
+    expression *exp;
+    exp = parse_expression_from_string("(or 3 4)");
+    fail_unless(boxed_values_equal(make_boxed_int(3), eval(env, exp)));
+
+    exp = parse_expression_from_string("(or NIL TRUE)");
+    fail_unless(boxed_values_equal(TRUE, eval(env, exp)));
+
+    exp = parse_expression_from_string("(or)");
+    fail_unless(boxed_values_equal(NIL, eval(env, exp)));
+
+    exp = parse_expression_from_string("(or NIL NIL)");
+    fail_unless(boxed_values_equal(NIL, eval(env, exp)));
+
+    // UNASSIGNED_VARIABLE never evaluated
+    exp = parse_expression_from_string("(or TRUE NIL UNASSIGNED_VARIABLE)");
+    fail_unless(boxed_values_equal(TRUE, eval(env, exp)));
 }
 END_TEST
 
@@ -171,6 +193,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_factorial);
     tcase_add_test (tc_core, test_if_and_equals);
     tcase_add_test (tc_core, test_and);
+    tcase_add_test (tc_core, test_or);
     suite_add_tcase (s, tc_core);
 
     return s;

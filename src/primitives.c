@@ -111,13 +111,27 @@ boxed_value *apply_eq(boxed_value *v1, boxed_value *v2){
     }
 }
 
+// TODO - Deal with the memory leak 
 boxed_value *apply_and(Env *env, List *exps){
+    boxed_value *result = TRUE;
     while (exps != NULL){
         boxed_value *v = eval(env, exps->car);
-        if (boxed_values_equal(v, NIL))
+        if (boxed_values_equal(v, NIL)){
             return NIL;
+        }
         exps = exps->cdr;
+        if (exps == NULL)
+            result = v;
     }
-    return TRUE;
+    return result;
 }
 
+boxed_value *apply_or(Env *env, List *exps){
+    while (exps != NULL){
+        boxed_value *v = eval(env, exps->car);
+        if (!boxed_values_equal(v, NIL))
+            return v;
+        exps = exps->cdr;
+    }
+    return NIL;
+}

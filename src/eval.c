@@ -41,6 +41,8 @@ boxed_value *apply(Env *env, char *op_name, List *arg_exps){
         value =  apply_if(env, nthelt(arg_exps, 0), nthelt(arg_exps, 1), nthelt(arg_exps, 2));
     } else if (strings_equal(op_name, "and")){
         value = apply_and(env, arg_exps);
+    } else if (strings_equal(op_name, "or")){
+        value = apply_or(env, arg_exps);
     } else {
         boxed_value *eval_exp(expression *exp){
             return eval(env, exp);
