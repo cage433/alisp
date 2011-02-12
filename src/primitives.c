@@ -126,6 +126,7 @@ boxed_value *apply_and(Env *env, List *exps){
     return result;
 }
 
+// TODO - Deal with the memory leak 
 boxed_value *apply_or(Env *env, List *exps){
     while (exps != NULL){
         boxed_value *v = eval(env, exps->car);

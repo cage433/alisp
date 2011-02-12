@@ -6,7 +6,7 @@
 #include "list.h"
 
 int first_ptr = 0;
-boxed_value *NIL = &(boxed_value){4, 0};
+boxed_value *NIL = &(boxed_value){5, 0};
 boxed_value *TRUE = &(boxed_value){0, 1};
 
 int boxed_values_equal(const void *b1, const void *b2){
@@ -20,8 +20,11 @@ int boxed_values_equal(const void *b1, const void *b2){
         return fabs(box1->double_value - box2->double_value) < 1e-9;
     else if (box1->type == boxed_string)
         return strcmp(box1->string_value, box2->string_value) == 0;
-    else if (box1->type == boxed_list)
-        return lists_equal(box1->list_value, box2->list_value, boxed_values_equal);
+    else if (box1->type == boxed_cons)
+        return boxed_values_equal(box1->cons_value.car, box2->cons_value.car) &&
+                boxed_values_equal(box1->cons_value.cdr, box2->cons_value.cdr); 
+    else if (box1->type == boxed_nil)
+        return 1;
     else {
         printf("File %s, line %d\n", __FILE__, __LINE__); 
         printf("Unexpected box type %d\n", box1->type);
@@ -57,10 +60,10 @@ boxed_value *make_boxed_definition(definition_expression def){
     return box;
 }
 
-boxed_value *make_boxed_list(List *list){
+boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr){
     boxed_value *box = malloc(sizeof(boxed_value));
-    box->type = boxed_list;
-    box->list_value = list;
+    box->type = boxed_cons;
+    box->cons_value = (struct boxed_cons){car, cdr};
     return box;
 }
 
@@ -72,8 +75,9 @@ void free_boxed_value(boxed_value *b){
         case boxed_string:
             free(b->string_value);
             break;
-        case boxed_list:
-            free_list(b->list_value, (free_fn_ptr)free_boxed_value);
+        case boxed_cons:
+            free(b->cons_value.car);
+            free(b->cons_value.cdr);
             break;
         default:
             die("Unexpected box type");
@@ -98,9 +102,10 @@ void print_boxed_value(boxed_value *v){
             case boxed_definition:
                 printf("Boxed definition %s\n", v->definition_value.name);
                 break;
-            case boxed_list:
-                printf("Boxed list with %d elements\n", listlen(v->list_value));
-                list_for_each(v->list_value, (for_each_fn_ptr)print_boxed_value);
+            case boxed_cons:
+                printf("Boxed cons");
+                print_boxed_value(v->cons_value.car);
+                print_boxed_value(v->cons_value.cdr);
                 break;
             default:
                 printf("File %s, line %d\n", __FILE__, __LINE__); 

@@ -15,12 +15,12 @@ START_TEST(test_boxed_value_equality)
     fail_if(boxed_values_equal(make_boxed_string("mike"), make_boxed_string("fred")));
 
     fail_unless(boxed_values_equal(
-        make_boxed_list(make_list(2, make_boxed_string("a"), make_boxed_string("b"))),
-        make_boxed_list(make_list(2, make_boxed_string("a"), make_boxed_string("b")))));
+        make_boxed_cons(make_boxed_string("a"), make_boxed_string("b")),
+        make_boxed_cons(make_boxed_string("a"), make_boxed_string("b"))));
 
     fail_if(boxed_values_equal(
-        make_boxed_list(make_list(2, make_boxed_string("a"), make_boxed_string("b"))),
-        make_boxed_list(make_list(2, make_boxed_string("a"), make_boxed_string("c")))));
+        make_boxed_cons(make_boxed_string("a"), make_boxed_string("b")),
+        make_boxed_cons(make_boxed_string("a"), make_boxed_string("c"))));
 }
 END_TEST
 
@@ -28,7 +28,8 @@ START_TEST(test_null_list)
 {
     fail_unless(boxed_values_equal(
         NIL,
-        make_boxed_list(make_list(0))));
+        NIL
+        ));
 }
 END_TEST
 
