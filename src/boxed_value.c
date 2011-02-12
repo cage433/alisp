@@ -63,7 +63,8 @@ boxed_value *make_boxed_definition(definition_expression def){
 boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr){
     boxed_value *box = malloc(sizeof(boxed_value));
     box->type = boxed_cons;
-    box->cons_value = (struct boxed_cons){car, cdr};
+    box->cons_value.car = car;
+    box->cons_value.cdr = cdr;
     return box;
 }
 

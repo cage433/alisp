@@ -12,4 +12,7 @@ boxed_value *apply_divide(List *values);
 boxed_value *apply_if(Env *env, expression *predicate, expression *consequent, expression *alternative);
 boxed_value *apply_eq(boxed_value *v1, boxed_value *v2);
 boxed_value *apply_and(Env *env, List *exps);
+boxed_value *apply_cons(boxed_value *v1, boxed_value *v2);
+boxed_value *apply_car(boxed_value *v1);
+boxed_value *apply_cdr(boxed_value *v1);
 #endif

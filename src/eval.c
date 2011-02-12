@@ -55,11 +55,21 @@ boxed_value *apply(Env *env, char *op_name, List *arg_exps){
             value = apply_plus(arg_values);
         else if (strcmp(op_name, "*") == 0)
             value = apply_times(arg_values);
-        else if (strcmp(op_name, "-") == 0){
+        else if (strcmp(op_name, "-") == 0)
             value = apply_minus(arg_values);
-        }else if (strcmp(op_name, "/") == 0)
+        else if (strcmp(op_name, "/") == 0)
             value = apply_divide(arg_values);
-        else {
+        else if (strcmp(op_name, "cons") == 0){
+            die_unless(listlen(arg_values) == 2, "Cons requires two values");
+            value = apply_cons(nthelt(arg_values, 0), nthelt(arg_values, 1));
+        }
+        else if (strcmp(op_name, "car") == 0){
+            die_unless(listlen(arg_values) == 1, "car requires one value");
+            value = apply_car(nthelt(arg_values, 0));
+        } else if (strcmp(op_name, "cdr") == 0) {
+            die_unless(listlen(arg_values) == 1, "cdr requires one value");
+            value = apply_cdr(nthelt(arg_values, 0));
+        } else {
             boxed_value *boxed_def = env_lookup(env, op_name);
             die_unless(boxed_def->type == boxed_definition, "Can only apply functions\n");
             definition_expression def = boxed_def->definition_value;

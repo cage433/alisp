@@ -136,3 +136,17 @@ boxed_value *apply_or(Env *env, List *exps){
     }
     return NIL;
 }
+
+boxed_value *apply_cons(boxed_value *v1, boxed_value *v2){
+    return make_boxed_cons(v1, v2);
+}
+
+boxed_value *apply_car(boxed_value *v1){
+    die_unless(v1->type == boxed_cons, "can only get car of a cons");
+    return v1->cons_value.car;
+}
+
+boxed_value *apply_cdr(boxed_value *v1){
+    die_unless(v1->type == boxed_cons, "can only get cdr of a cons");
+    return v1->cons_value.cdr;
+}

@@ -177,6 +177,17 @@ START_TEST(test_or)
 }
 END_TEST
 
+START_TEST(test_cons)
+{
+    Env *env = create_env();
+    expression *exp;
+    exp = parse_expression_from_string("(car (cons 3 4))");
+    fail_unless(boxed_values_equal(make_boxed_int(3), eval(env, exp)));
+    exp = parse_expression_from_string("(cdr (cons 3 4))");
+    fail_unless(boxed_values_equal(make_boxed_int(4), eval(env, exp)));
+}
+END_TEST
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -194,6 +205,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_if_and_equals);
     tcase_add_test (tc_core, test_and);
     tcase_add_test (tc_core, test_or);
+    tcase_add_test (tc_core, test_cons);
     suite_add_tcase (s, tc_core);
 
     return s;
