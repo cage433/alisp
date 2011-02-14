@@ -35,7 +35,7 @@ boxed_value *apply_plus(List *values){
             result = make_boxed_int(bv1->int_value + bv2->int_value);
         else
             result = make_boxed_double(as_double_value(bv1) + as_double_value(bv2));
-        free(bv1);
+        my_free(bv1);
         return result;
     }
 
@@ -49,7 +49,7 @@ boxed_value *apply_times(List *values){
             result = make_boxed_int(bv1->int_value * bv2->int_value);
         else
             result = make_boxed_double(as_double_value(bv1) * as_double_value(bv2));
-        free(bv1);
+        my_free(bv1);
         return result;
     }
 
@@ -63,7 +63,7 @@ boxed_value *apply_minus(List *values){
             result = make_boxed_int(bv1->int_value - bv2->int_value);
         else
             result = make_boxed_double(as_double_value(bv1) - as_double_value(bv2));
-        free(bv1);
+        my_free(bv1);
         return result;
     }
     if (values == NULL)
@@ -86,7 +86,7 @@ boxed_value *apply_divide(List *values){
                 result = make_boxed_double(as_double_value(bv1) / as_double_value(bv2));
         } else
             result = make_boxed_double(as_double_value(bv1) / as_double_value(bv2));
-        free(bv1);
+        my_free(bv1);
         return result;
     }
     if (values == NULL)

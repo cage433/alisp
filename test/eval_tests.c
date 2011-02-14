@@ -201,6 +201,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_eval_divide);
     tcase_add_test (tc_core, test_eval_def);
     tcase_add_test (tc_core, test_eval_def2);
+    tcase_add_test (tc_core, test_eval_int);
     tcase_add_test (tc_core, test_factorial);
     tcase_add_test (tc_core, test_if_and_equals);
     tcase_add_test (tc_core, test_and);

@@ -5,21 +5,21 @@
 #include "token.h"
 
 typed_token *integer_token(int num){
-    typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
+    typed_token *tok = my_malloc(sizeof(typed_token));
     tok->type = tok_integer;
     tok->int_value = num;
     return tok;
 }
 
 typed_token *double_token(double num){
-    typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
+    typed_token *tok = my_malloc(sizeof(typed_token));
     tok->type = tok_double;
     tok->double_value = num;
     return tok;
 }
 
 typed_token *identifier_token(char *identifier){
-    typed_token *tok = (typed_token *)malloc(sizeof(typed_token));
+    typed_token *tok = my_malloc(sizeof(typed_token));
     tok->type = tok_identifier;
     tok->identifier_value = strdup(identifier);
     return tok;
@@ -78,7 +78,7 @@ typed_token *copy_token(typed_token tok){
     if (tok.type == tok_identifier){
         return identifier_token(tok.identifier_value);
     } else {
-        typed_token *copy = (typed_token *)malloc(sizeof(typed_token));
+        typed_token *copy = my_malloc(sizeof(typed_token));
         memcpy(copy, &tok, sizeof(typed_token));
         return copy;
     }
@@ -91,12 +91,12 @@ void free_token(void *token){
         case tok_right_paren:
             break;
         case tok_identifier:
-            free(tok->identifier_value);
-            free(tok);
+            my_free(tok->identifier_value);
+            my_free(tok);
             break;
         case tok_double:
         case tok_integer:
-            free(tok);
+            my_free(tok);
             break;
         default:
             die("Unrecognised token");

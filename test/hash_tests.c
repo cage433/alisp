@@ -24,7 +24,7 @@ START_TEST(test_hash_add_lots_of_keys){
     char *keys[n];
     int i;
     for (i = 0; i < n; ++i){
-        keys[i] = malloc(sizeof(char) * 10);
+        keys[i] = my_malloc(sizeof(char) * 10);
         sprintf(keys[i], "%d", i);
         fail_if(hash_contains(hash, keys[i]));
         hash_add(hash, keys[i], keys[i]);

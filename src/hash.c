@@ -6,7 +6,7 @@
 #include "boxed_value.h"
 
 Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2)){
-    Hash *hash = (Hash *)malloc(sizeof(Hash));
+    Hash *hash = my_malloc(sizeof(Hash));
     hash->array_length = 16;
     hash->num_elements = 0;
     hash->array = (List **)calloc(hash->array_length, sizeof(List *));
@@ -57,7 +57,7 @@ KeyValuePair* hash_remove(Hash *hash, void *key){
     KeyValuePair *kv = l->car;
     if (hash->keyeq_fn(key, kv->key)){
         hash->array[i] = l->cdr;
-        free(l);
+        my_free(l);
         hash->num_elements -= 1;
         return kv;
     } else {
@@ -66,7 +66,7 @@ KeyValuePair* hash_remove(Hash *hash, void *key){
             kv = l2->car;
             if (hash->keyeq_fn(key, kv->key)){
                 l->cdr = l2->cdr;
-                free(l2);
+                my_free(l2);
                 hash->num_elements -= 1;
                 return kv;
             } else {
@@ -95,7 +95,7 @@ void hash_resize(Hash *hash){
     int i;
     for (i = 0; i < old_array_length; ++i){
         list_for_each(old_array[i], (for_each_fn_ptr)add_to_hash);
-        free_list(old_array[i], free);
+        free_list(old_array[i], my_free);
     }
 }
 
@@ -106,7 +106,7 @@ void hash_add(Hash *hash, void *key, void *value){
     if (hash->num_elements * 2 > hash->array_length)
         hash_resize(hash);
     long i = hash_index(hash, key);
-    KeyValuePair *kv = malloc(sizeof(KeyValuePair));
+    KeyValuePair *kv = my_malloc(sizeof(KeyValuePair));
     kv->key = key;
     kv->value = value;
     hash->array[i] = cons(kv, hash->array[i]);
@@ -135,6 +135,6 @@ void free_hash(Hash *hash, void(*key_value_free_fn)(KeyValuePair *)){
     int i;
     for (i = 0; i < hash->array_length; ++i)
         free_list(hash->array[i], (free_fn_ptr)key_value_free_fn);
-    free(hash->array);
-    free(hash);
+    my_free(hash->array);
+    my_free(hash);
 }

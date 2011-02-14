@@ -102,7 +102,7 @@ typed_token *consume_token(FILE *stream){
 
     }
     fclose(buf);
-    free(p);
+    my_free(p);
     }
     return tok;
 }

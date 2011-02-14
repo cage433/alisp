@@ -20,6 +20,7 @@ struct boxed_cons{
 
 typedef struct boxed_value{
     boxed_value_type type;
+    int ref_count;
     union {
         int int_value;
         double double_value;
@@ -37,7 +38,8 @@ boxed_value *make_boxed_definition(definition_expression def);
 boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr);
 extern boxed_value *NIL;
 extern boxed_value *TRUE;
-void free_boxed_value(boxed_value *b);
 void print_boxed_value(boxed_value *v);
+void inc_ref_count(boxed_value *v);
+void dec_ref_count(boxed_value *v);
 
 #endif

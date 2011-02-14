@@ -6,28 +6,28 @@
 
 
 expression *make_integer_expression(int num){
-    expression *exp = (expression *)malloc(sizeof(expression));
+    expression *exp = my_malloc(sizeof(expression));
     exp->type = exp_integer;
     exp->int_value = num;
     return exp;
 }
 
 expression *make_double_expression(double num){
-    expression *exp = (expression *)malloc(sizeof(expression));
+    expression *exp = my_malloc(sizeof(expression));
     exp->type = exp_double;
     exp->double_value = num;
     return exp;
 }
 
 expression *make_identifier_expression(char *identifier){
-    expression *exp = (expression *)malloc(sizeof(expression));
+    expression *exp = my_malloc(sizeof(expression));
     exp->type = exp_identifier;
     exp->identifier_value = strdup(identifier);
     return exp;
 }
 
 expression *make_call_expression(char *name, List *exps){
-    expression *exp = (expression *)malloc(sizeof(expression));
+    expression *exp = my_malloc(sizeof(expression));
     exp->type = exp_call;
     exp->call_value.name = name;
     exp->call_value.exps = exps;
@@ -35,7 +35,7 @@ expression *make_call_expression(char *name, List *exps){
 }
 
 expression *make_definition_expression(char *name, List *args, expression *body){
-    expression *exp = (expression *)malloc(sizeof(expression));
+    expression *exp = my_malloc(sizeof(expression));
     exp->type = exp_definition;
     exp->definition_value.name = name;
     exp->definition_value.args = args;

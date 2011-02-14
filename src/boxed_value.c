@@ -33,39 +33,56 @@ int boxed_values_equal(const void *b1, const void *b2){
 }
 
 boxed_value *make_boxed_int(int num){
-    boxed_value *box = malloc(sizeof(boxed_value));
+    boxed_value *box = my_malloc(sizeof(boxed_value));
     box->type = boxed_int;
+    box->ref_count = 1;
     box->int_value = num;
     return box;
 }
 
 boxed_value *make_boxed_double(double num){
-    boxed_value *box = malloc(sizeof(boxed_value));
+    boxed_value *box = my_malloc(sizeof(boxed_value));
     box->type = boxed_double;
+    box->ref_count = 1;
     box->double_value = num;
     return box;
 }
 
 boxed_value *make_boxed_string(char *str){
-    boxed_value *box = malloc(sizeof(boxed_value));
+    boxed_value *box = my_malloc(sizeof(boxed_value));
     box->type = boxed_string;
+    box->ref_count = 1;
     box->string_value = str;
     return box;
 }
 
 boxed_value *make_boxed_definition(definition_expression def){
-    boxed_value *box = malloc(sizeof(boxed_value));
+    boxed_value *box = my_malloc(sizeof(boxed_value));
     box->type = boxed_definition;
+    box->ref_count = 1;
     box->definition_value = def;
     return box;
 }
 
 boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr){
-    boxed_value *box = malloc(sizeof(boxed_value));
+    boxed_value *box = my_malloc(sizeof(boxed_value));
     box->type = boxed_cons;
+    box->ref_count = 1;
     box->cons_value.car = car;
     box->cons_value.cdr = cdr;
+    inc_ref_count(car);
+    inc_ref_count(cdr);
     return box;
+}
+void free_boxed_value(boxed_value *b);
+
+void inc_ref_count(boxed_value *v){
+    v->ref_count += 1;
+}
+void dec_ref_count(boxed_value *v){
+    v->ref_count -= 1;
+    if (v->ref_count == 0)
+        free_boxed_value(v);
 }
 
 void free_boxed_value(boxed_value *b){
@@ -74,15 +91,17 @@ void free_boxed_value(boxed_value *b){
         case boxed_double:
             break;
         case boxed_string:
-            free(b->string_value);
+            my_free(b->string_value);
             break;
         case boxed_cons:
-            free(b->cons_value.car);
-            free(b->cons_value.cdr);
+            dec_ref_count(b->cons_value.car);
+            dec_ref_count(b->cons_value.cdr);
             break;
         default:
+            printf("Box type %d\n", b->type);
             die("Unexpected box type");
     }
+    my_free(b);
 }
 void print_boxed_value(boxed_value *v){
     if (v == NIL)

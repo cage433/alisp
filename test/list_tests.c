@@ -46,7 +46,7 @@ static void* fold_test_times(void *v1, void *v2){
     const boxed_value *bv1 = v1;
     const boxed_value *bv2 = v2;
     boxed_value *result = make_boxed_int(bv1->int_value * bv2->int_value);
-    free(v1);
+    my_free(v1);
     return result;
 }
 

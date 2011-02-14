@@ -7,7 +7,7 @@
 #include "stdio.h"
 
 Env *create_env(){
-    Env *env = malloc(sizeof(Env));
+    Env *env = my_malloc(sizeof(Env));
     env->base = hash_create(string_hash_fn, strings_equal);
     hash_add(env->base, "NIL", NIL);
     hash_add(env->base, "TRUE", TRUE);
@@ -23,6 +23,7 @@ void print_env(Env *env){
             print_boxed_value((boxed_value *)hash_value(frames->car, key));
         }
         list_for_each(hash_keys(frames->car), (for_each_fn_ptr)print_key_and_value);
+        frames = frames->cdr;
     }
 }
 
@@ -30,9 +31,9 @@ void env_add_frame(Env *env, Hash *frame){
     env->frames = cons(frame, env->frames);
 }
 static void free_binding(KeyValuePair *kv){
-    free(kv->key);
-    free_boxed_value((boxed_value *)kv->value);
-    free(kv);
+    my_free(kv->key);
+    dec_ref_count((boxed_value *)kv->value);
+    my_free(kv);
 }
 
 void env_drop_frame(Env *env){
@@ -57,6 +58,7 @@ Hash *frame_create(List *args, List *values){
     Hash *frame = hash_create(string_hash_fn, strings_equal);
     while (args != NULL && values != NULL){
         hash_add(frame, strdup(args->car), values->car);
+        inc_ref_count((boxed_value *)values->car);
         args = args->cdr;
         values = values->cdr;
     }

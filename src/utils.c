@@ -25,3 +25,10 @@ int strings_equal(const void *v1, const void * v2){
 
 void nop_free_fn(void *item){
 }
+void *my_malloc(size_t size){
+    void *ptr = malloc(size);
+    return ptr;
+}
+void *my_free(void *ptr){
+    free(ptr);
+}

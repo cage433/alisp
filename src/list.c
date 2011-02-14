@@ -6,7 +6,7 @@
 #include "utils.h"
      
 List *cons(void *car, List *list){
-    List *consed_list = malloc(sizeof(List));
+    List *consed_list = my_malloc(sizeof(List));
     consed_list->car = car;
     consed_list->cdr = list;
     return consed_list;
@@ -30,7 +30,7 @@ void free_list(List *l, void (*free_fn)(void *)){
     while (l != NULL){
         List *l1 = l->cdr;
         free_fn(l->car);
-        free(l);
+        my_free(l);
         l = l1;
     }
 }

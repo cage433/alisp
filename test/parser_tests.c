@@ -25,7 +25,7 @@ static List **expected = NULL;
 void initialise_expected(){
     if (expected != NULL)
         return;
-    expected = (List **)malloc(num_tests * sizeof(List *));
+    expected = my_malloc(num_tests * sizeof(List *));
     expected[0] = make_list(1, make_integer_expression(10));
     expected[0] = make_list(1, make_integer_expression(10));
     expected[1] = make_list(2, make_integer_expression(10), make_integer_expression(12));

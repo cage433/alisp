@@ -140,6 +140,6 @@ expression *parse_expression_from_string(char *text){
     List *l = parse_expressions_from_string(text);
     die_unless(l != NULL && l->cdr == NULL, "List should have a single element");
     expression *exp = l->car;
-    free(l);
+    //my_free(l);
     return exp;
 }
