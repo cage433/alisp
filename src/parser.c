@@ -73,9 +73,8 @@ expression *consume_call_exp(List **tokens){
     die_unless(listlen(exps) >= 1, "Require at least name");
     expression *first = (expression *)(exps->car);
 
-    die_unless(first->type == exp_identifier, "First expression must be identifier");
-    char *name = first->identifier_value;
-    return make_call_expression(name, exps->cdr);
+    die_unless(first->type == exp_identifier || first->type == exp_function, "First expression must be identifier or lambda");
+    return make_call_expression(first, exps->cdr);
 }
 
 expression *consume_definition_exp(List **tokens){
@@ -93,6 +92,19 @@ expression *consume_definition_exp(List **tokens){
     return make_definition_expression(name, args, body);
 }
 
+expression *consume_lambda_expression(List **tokens){
+    eat_left_paren(tokens);
+    eat_identifier(tokens, "lambda");
+    List *arg_exps = consume_expression_list(tokens);
+    char *identifier_name(expression *exp){
+        die_unless(exp->type == exp_identifier, "Expected identifier expression");
+        return strdup(exp->identifier_value);
+    }
+    List *args = list_map(arg_exps, (map_fn_ptr)identifier_name);
+    expression *body = consume_expression(tokens);
+    eat_right_paren(tokens);
+    return make_function_expression(args, body);
+}
 expression *consume_expression(List **tokens){
     typed_token *tok = token_car(*tokens);
     if (tok->type == tok_integer)
@@ -103,11 +115,22 @@ expression *consume_expression(List **tokens){
         return consume_identifier_exp(tokens);
     else if (tok->type == tok_left_paren){
         typed_token *nexttok = (typed_token *)nthelt(*tokens, 1);
-        die_if((nexttok == NULL) || (nexttok->type != tok_identifier), "Expected idnetifier token after '('");
-        if (strcmp(nexttok->identifier_value, "def") == 0)
-            return consume_definition_exp(tokens);
-        else
+        if (nexttok == NULL)
+            die("Expected more tokens");
+        else if (nexttok->type == tok_identifier) {
+            if (strings_equal(nexttok->identifier_value, "def"))
+                return consume_definition_exp(tokens);
+            else if (strings_equal(nexttok->identifier_value, "lambda"))
+                return consume_lambda_expression(tokens);
+            else
+                return consume_call_exp(tokens);
+        } else if (nexttok->type == tok_left_paren){
             return consume_call_exp(tokens);
+        } else {
+            printf("File %s, line %d\n", __FILE__, __LINE__); 
+            printf("parser.c unimplemented for token type %d\n", tok->type);
+            exit(-1);
+        }
     } else {
         printf("File %s, line %d\n", __FILE__, __LINE__); 
         printf("parser.c unimplemented for token type %d\n", tok->type);

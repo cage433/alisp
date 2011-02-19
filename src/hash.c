@@ -95,7 +95,7 @@ void hash_resize(Hash *hash){
     int i;
     for (i = 0; i < old_array_length; ++i){
         list_for_each(old_array[i], (for_each_fn_ptr)add_to_hash);
-        free_list(old_array[i], my_free);
+        free_list(old_array[i], (free_fn_ptr)my_free);
     }
 }
 

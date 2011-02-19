@@ -1,6 +1,7 @@
 #include "check.h"
 #include "parser.h"
 #include "list.h"
+#include "utils.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "expression.h"
@@ -33,21 +34,21 @@ void initialise_expected(){
     expected[3] = make_list(2, make_double_expression(10.5), make_integer_expression(19));
     expected[4] = make_list(1, make_identifier_expression("fred"));
     expected[5] = make_list(3, make_identifier_expression("mike"), make_integer_expression(13), make_double_expression(12.2));
-    expected[6] = make_list(1, make_call_expression("foo", make_list(0)));
-    expected[7] = make_list(1, make_call_expression("foo", make_list(1, make_integer_expression(1))));
-    expected[8] = make_list(1, make_call_expression("foo", make_list(2, make_integer_expression(1), make_double_expression(9.5))));
+    expected[6] = make_list(1, make_call_expression(make_identifier_expression("foo"), make_list(0)));
+    expected[7] = make_list(1, make_call_expression(make_identifier_expression("foo"), make_list(1, make_integer_expression(1))));
+    expected[8] = make_list(1, make_call_expression(make_identifier_expression("foo"), make_list(2, make_integer_expression(1), make_double_expression(9.5))));
     expected[9] = make_list(1, 
-                make_call_expression("foo", 
+                make_call_expression(make_identifier_expression("foo"), 
                     make_list(2, 
                         make_integer_expression(1), 
-                        make_call_expression("bar", 
+                        make_call_expression(make_identifier_expression("bar"), 
                             make_list(1, 
                                 make_identifier_expression("mike"))))));
     expected[10] = make_list(1, make_definition_expression("foo", make_list(1, "x"), make_identifier_expression("x")));
     expected[11] = make_list(1, make_definition_expression(
                                     "foo", 
                                     make_list(2, "x", "y"), 
-                                    make_call_expression("+", make_list(2, make_identifier_expression("x"), make_identifier_expression("y")))
+                                    make_call_expression(make_identifier_expression("+"), make_list(2, make_identifier_expression("x"), make_identifier_expression("y")))
                                     ));
 }
 

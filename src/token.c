@@ -3,23 +3,24 @@
 #include "ctype.h"
 #include "string.h"
 #include "token.h"
+#include "utils.h"
 
 typed_token *integer_token(int num){
-    typed_token *tok = my_malloc(sizeof(typed_token));
+    typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
     tok->type = tok_integer;
     tok->int_value = num;
     return tok;
 }
 
 typed_token *double_token(double num){
-    typed_token *tok = my_malloc(sizeof(typed_token));
+    typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
     tok->type = tok_double;
     tok->double_value = num;
     return tok;
 }
 
 typed_token *identifier_token(char *identifier){
-    typed_token *tok = my_malloc(sizeof(typed_token));
+    typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
     tok->type = tok_identifier;
     tok->identifier_value = strdup(identifier);
     return tok;

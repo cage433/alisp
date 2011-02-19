@@ -188,6 +188,15 @@ START_TEST(test_cons)
 }
 END_TEST
 
+START_TEST(test_lambda)
+{
+    Env *env = create_env();
+    expression *exp;
+    exp = parse_expression_from_string("((lambda (x) (+ x 5)) 6)");
+    fail_unless(boxed_values_equal(make_boxed_int(11), eval(env, exp)));
+}
+END_TEST
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -207,6 +216,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_and);
     tcase_add_test (tc_core, test_or);
     tcase_add_test (tc_core, test_cons);
+    tcase_add_test (tc_core, test_lambda);
     suite_add_tcase (s, tc_core);
 
     return s;

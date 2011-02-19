@@ -56,11 +56,11 @@ boxed_value *make_boxed_string(char *str){
     return box;
 }
 
-boxed_value *make_boxed_definition(definition_expression def){
+boxed_value *make_boxed_function(function_expression func){
     boxed_value *box = my_malloc(sizeof(boxed_value));
-    box->type = boxed_definition;
+    box->type = boxed_function;
     box->ref_count = 1;
-    box->definition_value = def;
+    box->function_value = func;
     return box;
 }
 
@@ -119,8 +119,8 @@ void print_boxed_value(boxed_value *v){
             case boxed_string:
                 printf("Boxed string %s\n", v->string_value);
                 break;
-            case boxed_definition:
-                printf("Boxed definition %s\n", v->definition_value.name);
+            case boxed_function:
+                printf("Boxed function\n");
                 break;
             case boxed_cons:
                 printf("Boxed cons");

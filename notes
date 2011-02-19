@@ -1,15 +1,17 @@
 To debug set env variable CK_FORK to no
 
 TODO
+#   reference count GC 
+    mark and sweep GC
     Tail recursion
     lexical scope
     define for dynamic variables
     primitives
-       and
-       or
-       cons
-       car
-       cdr
+#       and
+#       or
+#       cons
+#       car
+#       cdr
        quote
        atom?
        cons?
@@ -19,3 +21,4 @@ TODO
     lambda
     let - implement as macro?
     improve debugging of eval
+    improve debugging of malloc/free

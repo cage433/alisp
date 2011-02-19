@@ -20,13 +20,13 @@ boxed_value *eval(Env *env, expression *exp){
             break;
         case exp_definition:
             def = exp->definition_value;
-            boxed_value *boxed_def = make_boxed_definition(def);
-            hash_add(env->base, def.name, boxed_def);
-            value = boxed_def;
+            boxed_value *boxed_fun = make_boxed_function(def.function);
+            hash_add(env->base, def.name, boxed_fun);
+            value = boxed_fun;
             break;
         case exp_call:
             call = exp->call_value;
-            value = apply(env, call.name, call.exps);
+            value = apply(env, call.func, call.exps);
             break;
         default:
             die("Unexpected expression type");
@@ -34,7 +34,16 @@ boxed_value *eval(Env *env, expression *exp){
     return value;
 }
 
-boxed_value *apply(Env *env, char *op_name, List *arg_exps){
+
+boxed_value *apply_function(Env *env, function_expression func, List *arg_values){
+    Hash *frame = frame_create(func.args, arg_values);
+    env_add_frame(env, frame);
+    boxed_value *value = eval(env, func.body);
+    env_drop_frame(env);
+    return value;
+}
+
+boxed_value *apply_named_function(Env *env, char *op_name, List *arg_exps){
     boxed_value *value;
     if (strings_equal(op_name, "if")){
         die_unless(listlen(arg_exps) == 3, "If requires three arguments exactly");
@@ -56,7 +65,7 @@ boxed_value *apply(Env *env, char *op_name, List *arg_exps){
         else if (strcmp(op_name, "*") == 0)
             value = apply_times(arg_values);
         else if (strcmp(op_name, "-") == 0)
-            value = apply_minus(arg_values);
+           value = apply_minus(arg_values);
         else if (strcmp(op_name, "/") == 0)
             value = apply_divide(arg_values);
         else if (strcmp(op_name, "cons") == 0){
@@ -70,15 +79,28 @@ boxed_value *apply(Env *env, char *op_name, List *arg_exps){
             die_unless(listlen(arg_values) == 1, "cdr requires one value");
             value = apply_cdr(nthelt(arg_values, 0));
         } else {
-            boxed_value *boxed_def = env_lookup(env, op_name);
-            die_unless(boxed_def->type == boxed_definition, "Can only apply functions\n");
-            definition_expression def = boxed_def->definition_value;
-            Hash *frame = frame_create(def.args, arg_values);
-
-            env_add_frame(env, frame);
-            value = eval(env, def.body);
-            env_drop_frame(env);
+            boxed_value *boxed_fun = env_lookup(env, op_name);
+            die_unless(boxed_fun->type == boxed_function, "Can only apply functions\n");
+            function_expression func = boxed_fun->function_value;
+            value = apply_function(env, func, arg_values);
+//            Hash *frame = frame_create(def.function.args, arg_values);
+//
+//            env_add_frame(env, frame);
+//            value = eval(env, def.function.body);
+//            env_drop_frame(env);
         }
     }
     return value;
+}
+
+boxed_value *apply(Env *env, expression *func, List *arg_exps){
+    if (func->type == exp_identifier)
+        return apply_named_function(env, func->identifier_value, arg_exps);
+    else {
+        boxed_value *eval_exp(expression *exp){
+            return eval(env, exp);
+        }
+        List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
+        return apply_function(env, func->function_value, arg_values);
+    }
 }

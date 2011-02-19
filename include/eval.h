@@ -6,6 +6,6 @@
 #include "environment.h"
 
 boxed_value *eval(Env *env, expression *exp);
-boxed_value *apply(Env *env, char *op_name, List *args);
+boxed_value *apply(Env *env, expression *func, List *args);
 
 #endif

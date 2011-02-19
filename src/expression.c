@@ -26,10 +26,10 @@ expression *make_identifier_expression(char *identifier){
     return exp;
 }
 
-expression *make_call_expression(char *name, List *exps){
+expression *make_call_expression(expression *func, List *exps){
     expression *exp = my_malloc(sizeof(expression));
     exp->type = exp_call;
-    exp->call_value.name = name;
+    exp->call_value.func = func;
     exp->call_value.exps = exps;
     return exp;
 }
@@ -38,8 +38,16 @@ expression *make_definition_expression(char *name, List *args, expression *body)
     expression *exp = my_malloc(sizeof(expression));
     exp->type = exp_definition;
     exp->definition_value.name = name;
-    exp->definition_value.args = args;
-    exp->definition_value.body = body;
+    exp->definition_value.function.args = args;
+    exp->definition_value.function.body = body;
+    return exp;
+}
+
+expression *make_function_expression(List *args, expression *body){
+    expression *exp = my_malloc(sizeof(expression));
+    exp->type = exp_function;
+    exp->function_value.args = args;
+    exp->function_value.body = body;
     return exp;
 }
 
@@ -55,13 +63,12 @@ int expressions_equal(const void *e1, const void *e2){
     else if (exp1->type == exp_identifier)
         return strcmp(exp1->identifier_value, exp2->identifier_value) == 0;
     else if (exp1->type == exp_call){
-        int name_same = (strcmp(exp1->call_value.name, exp2->call_value.name) == 0);
         int exps_same = lists_equal(exp1->call_value.exps, exp2->call_value.exps, expressions_equal);
-        return name_same && exps_same;
+        return exps_same;
     } else if (exp1->type == exp_definition){
         int name_same = (strcmp(exp1->definition_value.name, exp2->definition_value.name) == 0);
-        int args_same = lists_equal(exp1->definition_value.args, exp2->definition_value.args, strings_equal);
-        int body_same = expressions_equal(exp1->definition_value.body, exp2->definition_value.body);
+        int args_same = lists_equal(exp1->definition_value.function.args, exp2->definition_value.function.args, strings_equal);
+        int body_same = expressions_equal(exp1->definition_value.function.body, exp2->definition_value.function.body);
         return name_same && args_same && body_same;
     } else {
         printf("File %s, line %d\n", __FILE__, __LINE__); 
@@ -76,7 +83,7 @@ void print_expression(expression *exp){
     else if (exp->type == exp_double)
         printf("Double expression %.2f\n", exp->double_value);
     else if (exp->type == exp_call){
-        printf("Call expression %s\n", exp->call_value.name);
+        printf("Call expression\n");
         list_for_each(exp->call_value.exps, (for_each_fn_ptr)print_expression);
     } else if (exp->type == exp_identifier){
         printf("Identifier expression %s\n", exp->identifier_value);
