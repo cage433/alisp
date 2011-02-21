@@ -46,65 +46,6 @@ boxed_value *eval(Env *env, expression *exp){
     return value;
 }
 
-
-boxed_value *apply_function(Env *env, function_expression func, List *arg_values){
-    Hash *frame = frame_create(func.args, arg_values);
-    env_add_frame(env, frame);
-    boxed_value *value = eval(env, func.body);
-    env_drop_frame(env);
-    return value;
-}
-
-boxed_value *apply_named_function(Env *env, char *op_name, List *arg_exps){
-    boxed_value *value;
-    if (strings_equal(op_name, "if")){
-        die_unless(listlen(arg_exps) == 3, "If requires three arguments exactly");
-        value =  apply_if(env, nthelt(arg_exps, 0), nthelt(arg_exps, 1), nthelt(arg_exps, 2));
-    } else if (strings_equal(op_name, "and")){
-        value = apply_and(env, arg_exps);
-    } else if (strings_equal(op_name, "or")){
-        value = apply_or(env, arg_exps);
-    } else {
-        boxed_value *eval_exp(expression *exp){
-            return eval(env, exp);
-        }
-        List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
-        if (strings_equal(op_name, "eq")){
-            die_unless(listlen(arg_values) == 2, "Eq requires two arguments exactly");
-            value = apply_eq(nthelt(arg_values, 0), nthelt(arg_values, 1));
-        } else if (strcmp(op_name, "+") == 0)
-            value = apply_plus(arg_values);
-        else if (strcmp(op_name, "*") == 0)
-            value = apply_times(arg_values);
-        else if (strcmp(op_name, "-") == 0)
-           value = apply_minus(arg_values);
-        else if (strcmp(op_name, "/") == 0)
-            value = apply_divide(arg_values);
-        else if (strcmp(op_name, "cons") == 0){
-            die_unless(listlen(arg_values) == 2, "Cons requires two values");
-            value = apply_cons(nthelt(arg_values, 0), nthelt(arg_values, 1));
-        }
-        else if (strcmp(op_name, "car") == 0){
-            die_unless(listlen(arg_values) == 1, "car requires one value");
-            value = apply_car(nthelt(arg_values, 0));
-        } else if (strcmp(op_name, "cdr") == 0) {
-            die_unless(listlen(arg_values) == 1, "cdr requires one value");
-            value = apply_cdr(nthelt(arg_values, 0));
-        } else {
-            boxed_value *boxed_fun = env_lookup(env, op_name);
-            die_unless(boxed_fun->type == boxed_function, "Can only apply functions\n");
-            function_expression func = boxed_fun->function_value;
-            value = apply_function(env, func, arg_values);
-//            Hash *frame = frame_create(def.function.args, arg_values);
-//
-//            env_add_frame(env, frame);
-//            value = eval(env, def.function.body);
-//            env_drop_frame(env);
-        }
-    }
-    return value;
-}
-
 boxed_value *apply_primitive(Env *env, char *op_name, List *arg_exps){
     boxed_value *value;
     if (strings_equal(op_name, "if")){
@@ -155,6 +96,10 @@ boxed_value *apply(Env *env, expression *func_exp, List *arg_exps){
             return eval(env, exp);
         }
         List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
-        return apply_function(env, func->function_value, arg_values);
+        Hash *frame = frame_create(func->function_value.args, arg_values);
+        env_add_frame(env, frame);
+        boxed_value *value = eval(env, func->function_value.body);
+        env_drop_frame(env);
+        return value;
     }
 }
