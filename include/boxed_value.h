@@ -2,6 +2,7 @@
 #define ALISP_BOXED_VALUE
 #include "stdlib.h"
 #include "expression.h"
+#include "hash.h"
 
 typedef enum {
     boxed_int,

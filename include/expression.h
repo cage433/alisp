@@ -50,5 +50,5 @@ expression *make_definition_expression(char *name, List *args, expression *body)
 expression *make_function_expression(List *args, expression *body);
 
 int expressions_equal(const void *exp1, const void *exp2);
-void print_expression(expression *exp);
+void print_expression(int depth, expression *exp);
 #endif

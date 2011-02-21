@@ -73,7 +73,7 @@ expression *consume_call_exp(List **tokens){
     die_unless(listlen(exps) >= 1, "Require at least name");
     expression *first = (expression *)(exps->car);
 
-    die_unless(first->type == exp_identifier || first->type == exp_function, "First expression must be identifier or lambda");
+    //die_unless(first->type == exp_identifier || first->type == exp_function, "First expression must be identifier or lambda");
     return make_call_expression(first, exps->cdr);
 }
 
@@ -101,6 +101,9 @@ expression *consume_lambda_expression(List **tokens){
         return strdup(exp->identifier_value);
     }
     List *args = list_map(arg_exps, (map_fn_ptr)identifier_name);
+    void print_it(void *x){
+        printf("%s\n", (char *)x);
+    }
     expression *body = consume_expression(tokens);
     eat_right_paren(tokens);
     return make_function_expression(args, body);

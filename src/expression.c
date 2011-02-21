@@ -77,18 +77,34 @@ int expressions_equal(const void *e1, const void *e2){
     }
 }
 
-void print_expression(expression *exp){
+void print_expression(int depth, expression *exp){
+    print_tabs(depth);
     if (exp->type == exp_integer)
         printf("Integer Expression %d\n", exp->int_value);
     else if (exp->type == exp_double)
         printf("Double expression %.2f\n", exp->double_value);
     else if (exp->type == exp_call){
         printf("Call expression\n");
-        list_for_each(exp->call_value.exps, (for_each_fn_ptr)print_expression);
+        print_expression(depth + 1, exp->call_value.func);
+        List *l = exp->call_value.exps;
+        while (l != NULL){
+            print_expression(depth + 1, (expression *)l->car);
+            l = l->cdr;
+        }
     } else if (exp->type == exp_identifier){
         printf("Identifier expression %s\n", exp->identifier_value);
     } else if (exp->type == exp_definition){
         printf("Definition expression%s\n", exp->definition_value.name);
+    } else if (exp->type == exp_function){
+        printf("Function expression\n");
+        List *l = exp->function_value.args;
+        while (l != NULL){
+            print_tabs(depth + 1);
+            printf("Arg %s\n", (char *)(l->car));
+        }
+        print_tabs(depth + 1);
+        printf("Body\n");
+        print_expression(depth + 1, exp->function_value.body);
     } else {
         printf("expression.c unimplemented\n");
         exit(-1);

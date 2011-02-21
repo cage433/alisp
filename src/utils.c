@@ -32,3 +32,8 @@ void *my_malloc(size_t size){
 void *my_free(void *ptr){
     free(ptr);
 }
+void print_tabs(int n){
+    int i;
+    for (i = 0; i < n; ++i)
+        printf("\t");
+}
