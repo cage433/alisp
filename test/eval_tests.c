@@ -208,6 +208,18 @@ START_TEST(test_lambdas_can_be_returned_by_functions)
 }
 END_TEST
 
+START_TEST(test_closure)
+{
+    Env *env = create_env();
+    expression *exp;
+    exp = parse_expression_from_string("(def inc(n) (lambda (x) (+ x n)))");
+    eval(env, exp);
+    exp = parse_expression_from_string("((inc 5) 4)");
+    fail_unless(boxed_values_equal(make_boxed_int(9), eval(env, exp)));
+}
+END_TEST
+
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -229,6 +241,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_cons);
     tcase_add_test (tc_core, test_lambda);
     tcase_add_test (tc_core, test_lambdas_can_be_returned_by_functions);
+    tcase_add_test (tc_core, test_closure);
     suite_add_tcase (s, tc_core);
 
     return s;

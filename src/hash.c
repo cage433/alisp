@@ -138,3 +138,29 @@ void free_hash(Hash *hash, void(*key_value_free_fn)(KeyValuePair *)){
     my_free(hash->array);
     my_free(hash);
 }
+
+Hash *copy_hash(Hash *hash){
+    Hash *copy = hash_create(
+        hash->hashfn,
+        hash->keyeq_fn
+    );
+    void add_key_value(void *key){
+        void *value = hash_value(hash, key);
+        hash_add(copy, key, value);
+    }
+        
+    List *keys = hash_keys(hash);
+    list_for_each(keys, add_key_value);
+    free_list(keys, nop_free_fn);
+    return copy;
+}
+
+List *hash_values(Hash *hash){
+    List *keys = hash_keys(hash);
+    void *get_hash_value(void *key){
+        return hash_value(hash, key);
+    }
+    List *values = list_map(keys, (map_fn_ptr)get_hash_value);
+    free_list(keys, nop_free_fn);
+    return values;
+}

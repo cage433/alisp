@@ -18,7 +18,7 @@ TODO
     function compilation
     external functions
     macros
-    lambda
+#    lambda
     let - implement as macro?
     improve debugging of eval
     improve debugging of malloc/free

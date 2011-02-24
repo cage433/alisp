@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "math.h"
 #include "list.h"
+#include "environment.h"
 
 int first_ptr = 0;
 boxed_value *NIL = &(boxed_value){5, 0};
@@ -56,11 +57,12 @@ boxed_value *make_boxed_string(char *str){
     return box;
 }
 
-boxed_value *make_boxed_function(function_expression func){
+boxed_value *make_boxed_closure(Env *env, function_expression func){
     boxed_value *box = my_malloc(sizeof(boxed_value));
-    box->type = boxed_function;
+    box->type = boxed_closure;
     box->ref_count = 1;
-    box->function_value = func;
+    box->closure_value.frame = collapse_to_single_frame(env);
+    box->closure_value.function = func;
     return box;
 }
 
@@ -97,6 +99,9 @@ void free_boxed_value(boxed_value *b){
             dec_ref_count(b->cons_value.car);
             dec_ref_count(b->cons_value.cdr);
             break;
+        case boxed_closure:
+            //free_hash(b->closure_value.env);
+            break;
         default:
             printf("Box type %d\n", b->type);
             die("Unexpected box type");
@@ -119,8 +124,8 @@ void print_boxed_value(boxed_value *v){
             case boxed_string:
                 printf("Boxed string %s\n", v->string_value);
                 break;
-            case boxed_function:
-                printf("Boxed function\n");
+            case boxed_closure:
+                printf("Boxed closure\n");
                 break;
             case boxed_cons:
                 printf("Boxed cons");

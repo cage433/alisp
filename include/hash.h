@@ -29,5 +29,7 @@ Hash *hash_create(
         int(*keyeq_fn)(const void *key1, const void *key2)
 );
 List *hash_keys(Hash *hash);
+List *hash_values(Hash *hash);
 void free_hash(Hash *hash, void(*key_value_free_fn)(KeyValuePair *));
+Hash *copy_hash(Hash *hash);
 #endif

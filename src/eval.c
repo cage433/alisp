@@ -3,6 +3,7 @@
 #include "environment.h"
 #include "expression.h"
 #include "primitives.h"
+#include "boxed_value.h"
 
 char *PRIMITIVES[11] = {"+", "*", "-", "/", "cons", "car", "cdr", "eq", "if", "and", "or"};
 int is_primitive(char *identifier){
@@ -29,7 +30,7 @@ boxed_value *eval(Env *env, expression *exp){
             break;
         case exp_definition:
             def = exp->definition_value;
-            boxed_value *boxed_fun = make_boxed_function(def.function);
+            boxed_value *boxed_fun = make_boxed_closure(create_env(), def.function);
             hash_add(env->base, def.name, boxed_fun);
             value = boxed_fun;
             break;
@@ -38,7 +39,7 @@ boxed_value *eval(Env *env, expression *exp){
             value = apply(env, call.func, call.exps);
             break;
         case exp_function:
-            value = make_boxed_function(exp->function_value);
+            value = make_boxed_closure(create_env(), exp->function_value);
             break;
         default:
             die("Unexpected expression type");
@@ -95,11 +96,20 @@ boxed_value *apply(Env *env, expression *func_exp, List *arg_exps){
         boxed_value *eval_exp(expression *exp){
             return eval(env, exp);
         }
+        env_add_frame(env, func->closure_value.frame);
+        void print_key_value(char *key){
+            printf("Key = %s, value = ", key);
+            print_boxed_value((boxed_value *)(hash_value(func->closure_value.frame, key)));
+        }
+        list_for_each(hash_keys(func->closure_value.frame), (for_each_fn_ptr)print_key_value);
+        printf("\n\n");
         List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
-        Hash *frame = frame_create(func->function_value.args, arg_values);
+        env_drop_frame(env, 0);
+
+        Hash *frame = frame_create(func->closure_value.function.args, arg_values);
         env_add_frame(env, frame);
-        boxed_value *value = eval(env, func->function_value.body);
-        env_drop_frame(env);
+        boxed_value *value = eval(env, func->closure_value.function.body);
+        env_drop_frame(env, 1);
         return value;
     }
 }
