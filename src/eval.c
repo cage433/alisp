@@ -99,10 +99,10 @@ boxed_value *apply(Env *env, expression *func_exp, List *arg_exps){
         boxed_value *eval_exp(expression *exp){
             return eval(env, exp);
         }
-        env_add_frame(env, func->closure_value.frame);
         List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
 
         Hash *frame = frame_create(func->closure_value.function.args, arg_values);
+        env_add_frame(env, func->closure_value.frame);
         env_add_frame(env, frame);
         value = eval(env, func->closure_value.function.body);
         env_drop_frame(env, 1);
