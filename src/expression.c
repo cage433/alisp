@@ -111,3 +111,61 @@ void print_expression(int depth, expression *exp){
     }
 }
 
+char *expression_to_string(expression *exp){
+    char *buf = calloc(1000, sizeof(char));
+    char *buf2 = calloc(1000, sizeof(char));
+    List *l;
+    void append(char *text){
+        strcat(buf, text);
+    }
+    void append_func(function_expression func){
+        append("(lambda (");
+        l = func.args;
+        while (l != NULL){
+            append((char *)l->car);
+            if (l->cdr != NULL)
+                append(" ");
+            l = l->cdr;
+        }
+        append(") ");
+        append(expression_to_string(func.body));
+        append(")");
+    }
+
+    if (exp->type == exp_integer){
+        sprintf(buf2, "%d", exp->int_value);
+        append(buf2);
+    } else if (exp->type == exp_double){
+        sprintf(buf2, "%.2f", exp->double_value);
+        append(buf2);
+    } else if (exp->type == exp_call){
+        sprintf(buf2, "(");
+        append(buf2);
+        char *caller = expression_to_string(exp->call_value.func);
+        append(caller);
+        free(caller);
+        l = exp->call_value.exps;
+        while (l != NULL){
+            append(" ");
+            char *arg = expression_to_string((expression *)l->car);
+            append(arg);
+            free(arg);
+            l = l->cdr;
+        }
+        append(")");
+    } else if (exp->type == exp_identifier){
+        sprintf(buf2, "%s", exp->identifier_value);
+        append(buf2);
+    } else if (exp->type == exp_definition){
+        sprintf(buf2, "(def %s ", exp->definition_value.name);
+        append(buf2);
+        append_func(exp->definition_value.function);
+        append(")");
+    } else if (exp->type == exp_function){
+        append_func(exp->function_value);
+    } else {
+        printf("expression.c unimplemented\n");
+        exit(-1);
+    }
+    return strdup(buf);
+}

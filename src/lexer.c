@@ -91,13 +91,13 @@ typed_token *consume_token(FILE *stream){
     fflush(buf);
     switch (token_type){
         case tok_identifier:
-        tok = identifier_token(p);
+        tok = identifier_token(p, p);
         break;
         case tok_double:
-        tok = double_token(atof(p));
+        tok = double_token(atof(p), p);
         break;
         case tok_integer:
-        tok = integer_token(atoi(p));
+        tok = integer_token(atoi(p), p);
         break;
 
     }

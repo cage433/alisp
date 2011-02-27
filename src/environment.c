@@ -14,13 +14,15 @@ Env *create_env(){
     env->frames = cons(env->base, NULL);
     return env;
 }
-void print_env(Env *env){
+void print_env(Env *env, int indent){
     List *frames = env->frames;
     while (frames != NULL){
+        print_tabs(indent);
         printf("Frame no %d\n", listlen(frames));
         void print_key_and_value(char *key){
+            print_tabs(indent + 1);
             printf("Key %s, value ", key);
-            print_boxed_value((boxed_value *)hash_value(frames->car, key));
+            print_boxed_value((boxed_value *)hash_value(frames->car, key), 0);
         }
         list_for_each(hash_keys(frames->car), (for_each_fn_ptr)print_key_and_value);
         frames = frames->cdr;
@@ -31,7 +33,7 @@ void env_add_frame(Env *env, Hash *frame){
     env->frames = cons(frame, env->frames);
 }
 static void free_binding(KeyValuePair *kv){
-    my_free(kv->key);
+    //my_free(kv->key);
     dec_ref_count((boxed_value *)kv->value);
     my_free(kv);
 }

@@ -14,7 +14,7 @@ double as_double_value(boxed_value *value){
         return value->double_value;
     else {
         printf("Unexpected value ");
-        print_boxed_value(value);
+        print_boxed_value(value, 0);
         die("Boxed value not int or double");
     }
 }

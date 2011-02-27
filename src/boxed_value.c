@@ -5,6 +5,7 @@
 #include "math.h"
 #include "list.h"
 #include "environment.h"
+#include "hash.h"
 
 int first_ptr = 0;
 boxed_value *NIL = &(boxed_value){5, 0};
@@ -108,34 +109,43 @@ void free_boxed_value(boxed_value *b){
     }
     my_free(b);
 }
-void print_boxed_value(boxed_value *v){
-    if (v == NIL)
+void print_boxed_value(boxed_value *v, int indent){
+    if (v == NIL){
+        print_tabs(indent);
         printf("Boxed NIL\n");
-    else if (v == TRUE)
+    } else if (v == TRUE){
+        print_tabs(indent);
         printf("Boxed TRUE\n");
-    else
+    } else {
         switch (v->type){
             case boxed_int:
+                print_tabs(indent);
                 printf("Boxed int %d\n", v->int_value);
                 break;
             case boxed_double:
+                print_tabs(indent);
                 printf("Boxed double %.6f\n", v->double_value);
                 break;
             case boxed_string:
+                print_tabs(indent);
                 printf("Boxed string %s\n", v->string_value);
                 break;
             case boxed_closure:
+                print_tabs(indent);
                 printf("Boxed closure\n");
+                print_hash(v->closure_value.frame, indent);
                 break;
             case boxed_cons:
-                printf("Boxed cons");
-                print_boxed_value(v->cons_value.car);
-                print_boxed_value(v->cons_value.cdr);
+                print_tabs(indent);
+                printf("Boxed cons\n");
+                print_boxed_value(v->cons_value.car, indent + 1);
+                print_boxed_value(v->cons_value.cdr, indent + 1);
                 break;
             default:
                 printf("File %s, line %d\n", __FILE__, __LINE__); 
                 printf("box type %d\n", v->type);
                 die("Unexpected box type");
         }
+    }
 }
 

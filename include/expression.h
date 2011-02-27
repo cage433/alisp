@@ -40,6 +40,7 @@ typedef struct expression {
         call_expression call_value;
         function_expression function_value;
     };
+    char *text;
 } expression;
 
 expression *make_integer_expression(int num);
@@ -51,4 +52,5 @@ expression *make_function_expression(List *args, expression *body);
 
 int expressions_equal(const void *exp1, const void *exp2);
 void print_expression(int depth, expression *exp);
+char *expression_to_string(expression *exp);
 #endif

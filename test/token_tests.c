@@ -31,14 +31,14 @@ List *expected_lists(int i){
             return make_list(1, &LEFT_PAREN);
         case 1:
         case 2:
-            return make_list(2, &LEFT_PAREN, integer_token(45));
+            return make_list(2, &LEFT_PAREN, integer_token(45, "45"));
         case 3:
-            return make_list(2, double_token(34.6), &RIGHT_PAREN);
+            return make_list(2, double_token(34.6, "34.6"), &RIGHT_PAREN);
         case 4:
-            return make_list(3, &LEFT_PAREN, identifier_token("fred"), &RIGHT_PAREN);
+            return make_list(3, &LEFT_PAREN, identifier_token("fred", "fred"), &RIGHT_PAREN);
         case 5:
         case 6:
-            return make_list(3, &LEFT_PAREN, identifier_token("x"), &LEFT_PAREN);
+            return make_list(3, &LEFT_PAREN, identifier_token("x", "x"), &LEFT_PAREN);
     }
 }
 

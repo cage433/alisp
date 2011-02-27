@@ -164,3 +164,16 @@ List *hash_values(Hash *hash){
     free_list(keys, nop_free_fn);
     return values;
 }
+
+void print_hash(Hash *hash, int indent){
+    List *keys = hash_keys(hash);
+    void print_key_and_value(void *key){
+        print_tabs(indent);
+        printf("Key = %s, val = ", (char *)key);
+        boxed_value *val = hash_value(hash, key);
+        print_boxed_value(val, 0);
+    }
+    list_for_each(keys, (for_each_fn_ptr)print_key_and_value);
+    free_list(keys, nop_free_fn);
+}
+

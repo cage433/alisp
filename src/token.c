@@ -5,48 +5,32 @@
 #include "token.h"
 #include "utils.h"
 
-typed_token *integer_token(int num){
+typed_token *integer_token(int num, char *text){
     typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
     tok->type = tok_integer;
     tok->int_value = num;
+    tok->text = strdup(text);
     return tok;
 }
 
-typed_token *double_token(double num){
+typed_token *double_token(double num, char *text){
     typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
     tok->type = tok_double;
     tok->double_value = num;
+    tok->text = strdup(text);
     return tok;
 }
 
-typed_token *identifier_token(char *identifier){
+typed_token *identifier_token(char *identifier, char *text){
     typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
     tok->type = tok_identifier;
     tok->identifier_value = strdup(identifier);
+    tok->text = strdup(text);
     return tok;
 }
 
 void printtoken(typed_token *tok){
-    switch(tok->type){
-        case tok_left_paren:
-            printf("LEFT PAREN\n");
-            break;
-        case tok_right_paren:
-            printf("RIGHT PAREN\n");
-            break;
-        case tok_integer:
-            printf("INTEGER %d\n", tok->int_value);
-            break;
-        case tok_double:
-            printf("DOUBLE %G\n", tok->double_value);
-            break;
-        case tok_identifier:
-            printf("IDENTIFIER %s\n", tok->identifier_value);
-            break;
-        default:
-            printf("Unexpected token\n");
-            exit(1);
-    }
+    printf("Token %s\n", tok->text);
 }
 
 int tokens_equal(const void *t1, const void *t2){
@@ -72,16 +56,6 @@ int tokens_equal(const void *t1, const void *t2){
                 return strcmp(tok1->identifier_value, tok2->identifier_value) == 0;
             else
                 return 0;
-    }
-}
-
-typed_token *copy_token(typed_token tok){
-    if (tok.type == tok_identifier){
-        return identifier_token(tok.identifier_value);
-    } else {
-        typed_token *copy = my_malloc(sizeof(typed_token));
-        memcpy(copy, &tok, sizeof(typed_token));
-        return copy;
     }
 }
 

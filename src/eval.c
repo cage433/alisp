@@ -14,6 +14,7 @@ int is_primitive(char *identifier){
     return 0;
 }
     
+static int indent = 0;
 boxed_value *eval(Env *env, expression *exp){
     definition_expression def;
     call_expression call;
@@ -39,11 +40,12 @@ boxed_value *eval(Env *env, expression *exp){
             value = apply(env, call.func, call.exps);
             break;
         case exp_function:
-            value = make_boxed_closure(create_env(), exp->function_value);
+            value = make_boxed_closure(env, exp->function_value);
             break;
         default:
             die("Unexpected expression type");
     }
+    indent -=1;
     return value;
 }
 
@@ -89,27 +91,23 @@ boxed_value *apply_primitive(Env *env, char *op_name, List *arg_exps){
     return value;
 }
 boxed_value *apply(Env *env, expression *func_exp, List *arg_exps){
+    boxed_value *value;
     if (func_exp->type == exp_identifier && is_primitive(func_exp->identifier_value))
-        return apply_primitive(env, func_exp->identifier_value, arg_exps);
+        value = apply_primitive(env, func_exp->identifier_value, arg_exps);
     else {
         boxed_value *func = eval(env, func_exp);
         boxed_value *eval_exp(expression *exp){
             return eval(env, exp);
         }
         env_add_frame(env, func->closure_value.frame);
-        void print_key_value(char *key){
-            printf("Key = %s, value = ", key);
-            print_boxed_value((boxed_value *)(hash_value(func->closure_value.frame, key)));
-        }
-        list_for_each(hash_keys(func->closure_value.frame), (for_each_fn_ptr)print_key_value);
-        printf("\n\n");
         List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
-        env_drop_frame(env, 0);
 
         Hash *frame = frame_create(func->closure_value.function.args, arg_values);
         env_add_frame(env, frame);
-        boxed_value *value = eval(env, func->closure_value.function.body);
+        value = eval(env, func->closure_value.function.body);
         env_drop_frame(env, 1);
-        return value;
+        env_drop_frame(env, 0);
     }
+    indent -=1;
+    return value;
 }

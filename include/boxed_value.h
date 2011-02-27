@@ -45,7 +45,7 @@ boxed_value *make_boxed_string(char *str);
 boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr);
 extern boxed_value *NIL;
 extern boxed_value *TRUE;
-void print_boxed_value(boxed_value *v);
+void print_boxed_value(boxed_value *v, int indent);
 void inc_ref_count(boxed_value *v);
 void dec_ref_count(boxed_value *v);
 boxed_value *make_boxed_closure(Env *env, function_expression def);
