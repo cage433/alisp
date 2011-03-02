@@ -21,4 +21,5 @@ struct boxed_value *env_lookup(Env *env, char *name);
 Env *copy_env(Env *env);
 int has_binding(Env *env, char *name);
 Hash *collapse_to_single_frame(Env *env);
+void free_env(Env *env);
 #endif

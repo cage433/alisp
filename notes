@@ -4,7 +4,7 @@ TODO
 #   reference count GC 
     mark and sweep GC
     Tail recursion
-    lexical scope
+#    lexical scope
     define for dynamic variables
     primitives
 #       and
@@ -20,5 +20,5 @@ TODO
     macros
 #    lambda
     let - implement as macro?
-    improve debugging of eval
+#    improve debugging of eval
     improve debugging of malloc/free

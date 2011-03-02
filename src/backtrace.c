@@ -86,9 +86,7 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
 int sz;
 char syscom[256];
 void **bt = malloc(20 * sizeof(void *));
-printf("GOT HERE\n");
-    sz = backtrace(bt, 20);
-printf("BT SIZE %d\n", sz);
+sz = backtrace(bt, 20);
 
 for (i=0; i < sz; i++){
   if ( bt[i] < (void *)0x420000 && bt[i] > (void *)0x400000) {

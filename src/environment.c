@@ -109,4 +109,9 @@ Hash *collapse_to_single_frame(Env *env){
     return single_frame;
 }
 
+void free_env(Env *env){
+    while (env->frames != NULL)
+        env_drop_frame(env, 1);
+}
+
 
