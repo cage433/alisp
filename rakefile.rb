@@ -42,3 +42,8 @@ end
 task :run_repl => ["alisp"] do
   system('./alisp -i')
 end
+
+task :clean => [] do
+  system('rm obj/*.o *.o')
+end
+    

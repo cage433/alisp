@@ -70,7 +70,7 @@ START_TEST(test_parser)
     List *expected = expected_list(_i);
     char *code = codes[_i];
     FILE *s = fmemopen(code, strlen(code), "r");
-    List *l = parse_expressions(s);
+    List *l = parse_expressions(s, 1);
     fail_unless(listlen(l) == listlen(expected));
     fail_unless(lists_equal(expected, l, expressions_equal));
 }

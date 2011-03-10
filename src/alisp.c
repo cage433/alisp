@@ -22,7 +22,7 @@ void repl(){
             printf("   ");
         } else {
             strcat(exp_buf, buf);
-            exp = parse_expression_from_string(exp_buf);
+            exp = parse_expression_from_string(exp_buf, 1);
             boxed_value *val = eval(env, NULL, exp);
             printf("  ");
             print_boxed_value(val, 0);
@@ -37,7 +37,7 @@ int main(int ARGC, char **ARGV){
         repl();
     else {
         FILE *f = fopen(ARGV[1], "r");
-        List *exps = parse_expressions(f);
+        List *exps = parse_expressions(f, 1);
         List *env = create_env();
         while (exps != NULL){
             boxed_value *val = eval(env, NULL, exps->car);

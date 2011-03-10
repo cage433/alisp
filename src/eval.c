@@ -96,6 +96,9 @@ boxed_value *eval(List *env, List* tagbody_env_pairs, expression *exp){
                 exps = exps->cdr;
             }
             break;
+        case exp_list:
+            value = apply(env, tagbody_env_pairs, exp->list_value->car, exp->list_value->cdr);
+            break;
         default:
             die(make_msg("Unexpected expression type %d", exp->type));
     }

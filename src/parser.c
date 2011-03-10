@@ -71,7 +71,7 @@ expression *consume_expression(List **tokens){
 }
 
 
-List *parse_expressions(FILE *stream){
+List *parse_expressions(FILE *stream, int do_compilation){
     
     List *tokens = getTokens(stream);
     List *tokens2 = tokens;
@@ -79,22 +79,26 @@ List *parse_expressions(FILE *stream){
     while (tokens2 != NULL){
         expressions = cons(consume_expression(&tokens2), expressions);
     }
-    List *unprocessed_expressions = reverse_list(expressions);
-    List *processed_expressions = compile(unprocessed_expressions);
+    List *uncompiled_expressions = reverse_list(expressions);
     free_list(expressions, nop_free_fn);
     free_list(tokens, (free_fn_ptr)free_token);
-    free_list(unprocessed_expressions, nop_free_fn);
-    return processed_expressions;
+    if (do_compilation){
+        List *compiled_expressions = compile(uncompiled_expressions);
+        free_list(uncompiled_expressions, nop_free_fn);
+        return compiled_expressions;
+    } else {
+        return uncompiled_expressions;
+    }
 }
 
-List *parse_expressions_from_string(char *text){
+List *parse_expressions_from_string(char *text, int do_compilation){
     FILE *s = fmemopen(text, strlen(text), "r");
-    List *l = parse_expressions(s);
+    List *l = parse_expressions(s, do_compilation);
     return l;
 }
 
-expression *parse_expression_from_string(char *text){
-    List *l = parse_expressions_from_string(text);
+expression *parse_expression_from_string(char *text, int do_compilation){
+    List *l = parse_expressions_from_string(text, do_compilation);
     die_unless(l != NULL && l->cdr == NULL, "List should have a single element");
     expression *exp = l->car;
     my_free(l);

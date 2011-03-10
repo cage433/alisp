@@ -123,5 +123,5 @@ expression *process_expression(expression *exp){
     }
 }
 List *compile(List *expressions){
-   return list_map(expressions, process_expression); 
+   return list_map(expressions, (map_fn_ptr)process_expression); 
 }
