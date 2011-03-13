@@ -54,6 +54,7 @@ boxed_value *eval(List *env, List* tagbody_env_pairs, expression *exp){
     definition_expression def;
     call_expression call;
     boxed_value *value;
+    expression *compiled_expression;
     List *exps;
     switch(exp->type){
         case exp_tagbody:
@@ -97,7 +98,8 @@ boxed_value *eval(List *env, List* tagbody_env_pairs, expression *exp){
             }
             break;
         case exp_list:
-            value = apply(env, tagbody_env_pairs, exp->list_value->car, exp->list_value->cdr);
+            compiled_expression = compile_expression(exp);
+            value = eval(env, tagbody_env_pairs, compiled_expression);
             break;
         default:
             die(make_msg("Unexpected expression type %d", exp->type));

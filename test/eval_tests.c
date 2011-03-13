@@ -16,103 +16,91 @@ END_TEST
 
 START_TEST(test_eval_plus)
 {
-    int i;
-    for (i = 0; i <= 1; ++i){
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(+ )", i)), 
-            make_boxed_int(0)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(+ 4 5)", i)), 
-            make_boxed_int(9)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(+ 4.0 5)", i)), 
-            make_boxed_double(9.0)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(+ 10 4.0 5)", i)),
-            make_boxed_double(19.0)));
-    }
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(+ )")), 
+        make_boxed_int(0)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(+ 4 5)")), 
+        make_boxed_int(9)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(+ 4.0 5)")), 
+        make_boxed_double(9.0)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(+ 10 4.0 5)")),
+        make_boxed_double(19.0)));
 } 
 END_TEST
 
 START_TEST(test_eval_times)
 {
-    int i;
-    for (i = 0; i <= 1; ++i){
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(* )", i)), 
-            make_boxed_int(1)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(* 4 5)", i)), 
-            make_boxed_int(20)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(* 4.0 5)", i)), 
-            make_boxed_double(20.0)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(* 10 4.0 5)", i)),
-            make_boxed_double(200.0)));
-    }
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(* )")), 
+        make_boxed_int(1)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(* 4 5)")), 
+        make_boxed_int(20)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(* 4.0 5)")), 
+        make_boxed_double(20.0)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(* 10 4.0 5)")),
+        make_boxed_double(200.0)));
 } 
 END_TEST
 
 START_TEST(test_eval_minus)
 {
-    int i;
-    for (i = 0; i <= 1; ++i){
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(- )", i)), 
-            make_boxed_int(0)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(- 4 5)", i)), 
-            make_boxed_int(-1)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(- 4.0 5)", i)), 
-            make_boxed_double(-1.0)));
-        fail_unless(boxed_values_equal(
-            eval(create_env(), NULL, parse_expression_from_string("(- 10 4.0 5)", i)),
-            make_boxed_double(1.0)));
-    }
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(- )")), 
+        make_boxed_int(0)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(- 4 5)")), 
+        make_boxed_int(-1)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(- 4.0 5)")), 
+        make_boxed_double(-1.0)));
+    fail_unless(boxed_values_equal(
+        eval(create_env(), NULL, parse_expression_from_string("(- 10 4.0 5)")),
+        make_boxed_double(1.0)));
 } 
 END_TEST
 
 START_TEST(test_eval_divide)
 {
     fail_unless(boxed_values_equal(
-        eval(create_env(), NULL, parse_expression_from_string("(/ )", 1)), 
+        eval(create_env(), NULL, parse_expression_from_string("(/ )")), 
         make_boxed_int(1)));
     fail_unless(boxed_values_equal(
-        eval(create_env(), NULL, parse_expression_from_string("(/ 4 5)", 1)), 
+        eval(create_env(), NULL, parse_expression_from_string("(/ 4 5)")), 
         make_boxed_double(0.8)));
     fail_unless(boxed_values_equal(
-        eval(create_env(), NULL, parse_expression_from_string("(/ 4 2)", 1)), 
+        eval(create_env(), NULL, parse_expression_from_string("(/ 4 2)")), 
         make_boxed_int(2)));
     fail_unless(boxed_values_equal(
-        eval(create_env(), NULL, parse_expression_from_string("(/ 10 4.0 5)", 1)),
+        eval(create_env(), NULL, parse_expression_from_string("(/ 10 4.0 5)")),
         make_boxed_double(0.5)));
 } 
 END_TEST
 
 START_TEST(test_eval_def)
 {
-    int i;
-    for (i = 0; i <= 1; ++i){
-        List *env = create_env();
-        expression *exp = parse_expression_from_string("(def (foo x) (+ x 1))", i);
-        eval(env, NULL, exp);
-        exp = parse_expression_from_string("(foo 10)", i);
-        boxed_value *v = eval(env, NULL, exp);
-        fail_unless(boxed_values_equal(v, make_boxed_int(11)));
-    }
+    List *env = create_env();
+    expression *exp = parse_expression_from_string("(def (foo x) (+ x 1))");
+    eval(env, NULL, exp);
+    exp = parse_expression_from_string("(foo 10)");
+    boxed_value *v = eval(env, NULL, exp);
+    fail_unless(boxed_values_equal(v, make_boxed_int(11)));
 }
 END_TEST
 
 START_TEST(test_eval_def2)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def (foo x) (+ x 1))", 1);
+    expression *exp = parse_expression_from_string("(def (foo x) (+ x 1))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("(def (bar x y) (+ x (foo y)))", 1);
+    exp = parse_expression_from_string("(def (bar x y) (+ x (foo y)))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("(bar 10 20)", 1);
+    exp = parse_expression_from_string("(bar 10 20)");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(v, make_boxed_int(31)));
 }
@@ -121,13 +109,13 @@ END_TEST
 START_TEST(test_if_and_equals)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def (foo n) (if (eq n 1) 10 20))", 1);
+    expression *exp = parse_expression_from_string("(def (foo n) (if (eq n 1) 10 20))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("(foo 5)", 1);
+    exp = parse_expression_from_string("(foo 5)");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(v, make_boxed_int(20)));
 
-    exp = parse_expression_from_string("(foo 1)", 1);
+    exp = parse_expression_from_string("(foo 1)");
     v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(v, make_boxed_int(10)));
 }
@@ -136,13 +124,13 @@ END_TEST
 START_TEST(test_if_with_no_alternative)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def (foo n) (if (eq n 1) 10))", 1);
+    expression *exp = parse_expression_from_string("(def (foo n) (if (eq n 1) 10))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("(foo 5)", 1);
+    exp = parse_expression_from_string("(foo 5)");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(v, NIL));
 
-    exp = parse_expression_from_string("(foo 1)", 1);
+    exp = parse_expression_from_string("(foo 1)");
     v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(v, make_boxed_int(10)));
 }
@@ -151,9 +139,9 @@ END_TEST
 START_TEST(test_factorial)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def (factorial n) (if (eq n 1) 1 (* (factorial (- n 1)) n)))", 1);
+    expression *exp = parse_expression_from_string("(def (factorial n) (if (eq n 1) 1 (* (factorial (- n 1)) n)))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("(factorial 5)", 1);
+    exp = parse_expression_from_string("(factorial 5)");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(v, make_boxed_int(120)));
 }
@@ -163,20 +151,20 @@ START_TEST(test_and)
 {
     List *env = create_env();
     expression *exp;
-    exp = parse_expression_from_string("(and 3 4)", 1);
+    exp = parse_expression_from_string("(and 3 4)");
     fail_unless(boxed_values_equal(make_boxed_int(4), eval(env, NULL, exp)));
 
-    exp = parse_expression_from_string("(and NIL TRUE)", 1);
+    exp = parse_expression_from_string("(and NIL TRUE)");
     fail_unless(boxed_values_equal(NIL, eval(env, NULL, exp)));
 
-    exp = parse_expression_from_string("(and TRUE NIL TRUE)", 1);
+    exp = parse_expression_from_string("(and TRUE NIL TRUE)");
     fail_unless(boxed_values_equal(NIL, eval(env, NULL, exp)));
 
-    exp = parse_expression_from_string("(and)", 1);
+    exp = parse_expression_from_string("(and)");
     fail_unless(boxed_values_equal(TRUE, eval(env, NULL, exp)));
 
     // UNASSIGNED_VARIABLE never evaluated
-    exp = parse_expression_from_string("(and TRUE NIL UNASSIGNED_VARIABLE)", 1);
+    exp = parse_expression_from_string("(and TRUE NIL UNASSIGNED_VARIABLE)");
     fail_unless(boxed_values_equal(NIL, eval(env, NULL, exp)));
 }
 END_TEST
@@ -185,20 +173,20 @@ START_TEST(test_or)
 {
     List *env = create_env();
     expression *exp;
-    exp = parse_expression_from_string("(or 3 4)", 1);
+    exp = parse_expression_from_string("(or 3 4)");
     fail_unless(boxed_values_equal(make_boxed_int(3), eval(env, NULL, exp)));
 
-    exp = parse_expression_from_string("(or NIL TRUE)", 1);
+    exp = parse_expression_from_string("(or NIL TRUE)");
     fail_unless(boxed_values_equal(TRUE, eval(env, NULL, exp)));
 
-    exp = parse_expression_from_string("(or)", 1);
+    exp = parse_expression_from_string("(or)");
     fail_unless(boxed_values_equal(NIL, eval(env, NULL, exp)));
 
-    exp = parse_expression_from_string("(or NIL NIL)", 1);
+    exp = parse_expression_from_string("(or NIL NIL)");
     fail_unless(boxed_values_equal(NIL, eval(env, NULL, exp)));
 
     // UNASSIGNED_VARIABLE never evaluated
-    exp = parse_expression_from_string("(or TRUE NIL UNASSIGNED_VARIABLE)", 1);
+    exp = parse_expression_from_string("(or TRUE NIL UNASSIGNED_VARIABLE)");
     fail_unless(boxed_values_equal(TRUE, eval(env, NULL, exp)));
 }
 END_TEST
@@ -207,14 +195,11 @@ START_TEST(test_cons)
 {
     List *env;
     expression *exp;
-    int i;
-    for (i = 0; i <= 1; ++i){
-        env = create_env();
-        exp = parse_expression_from_string("(car (cons 3 4))", i);
-        fail_unless(boxed_values_equal(make_boxed_int(3), eval(env, NULL, exp)));
-        exp = parse_expression_from_string("(cdr (cons 3 4))", i);
-        fail_unless(boxed_values_equal(make_boxed_int(4), eval(env, NULL, exp)));
-    }
+    env = create_env();
+    exp = parse_expression_from_string("(car (cons 3 4))");
+    fail_unless(boxed_values_equal(make_boxed_int(3), eval(env, NULL, exp)));
+    exp = parse_expression_from_string("(cdr (cons 3 4))");
+    fail_unless(boxed_values_equal(make_boxed_int(4), eval(env, NULL, exp)));
 }
 END_TEST
 
@@ -222,7 +207,7 @@ START_TEST(test_lambda)
 {
     List *env = create_env();
     expression *exp;
-    exp = parse_expression_from_string("((lambda (x) (+ x 5)) 6)", 1);
+    exp = parse_expression_from_string("((lambda (x) (+ x 5)) 6)");
     fail_unless(boxed_values_equal(make_boxed_int(11), eval(env, NULL, exp)));
 }
 END_TEST
@@ -231,9 +216,9 @@ START_TEST(test_lambdas_can_be_returned_by_functions)
 {
     List *env = create_env();
     expression *exp;
-    exp = parse_expression_from_string("(def (inc) (lambda (x) (+ x 10)))", 1);
+    exp = parse_expression_from_string("(def (inc) (lambda (x) (+ x 10)))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("((inc) 4)", 1);
+    exp = parse_expression_from_string("((inc) 4)");
     fail_unless(boxed_values_equal(make_boxed_int(14), eval(env, NULL, exp)));
 }
 END_TEST
@@ -242,9 +227,9 @@ START_TEST(test_closure)
 {
     List *env = create_env();
     expression *exp;
-    exp = parse_expression_from_string("(def (inc n) (lambda (x) (+ x n)))", 1);
+    exp = parse_expression_from_string("(def (inc n) (lambda (x) (+ x n)))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("((inc 5) 4)", 1);
+    exp = parse_expression_from_string("((inc 5) 4)");
     fail_unless(boxed_values_equal(make_boxed_int(9), eval(env, NULL, exp)));
 }
 END_TEST
@@ -252,9 +237,9 @@ END_TEST
 START_TEST(test_variable_shadowed)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def (foo n) (lambda (n) n))", 1);
+    expression *exp = parse_expression_from_string("(def (foo n) (lambda (n) n))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("((foo 5) 4)", 1);
+    exp = parse_expression_from_string("((foo 5) 4)");
     fail_unless(boxed_values_equal(make_boxed_int(4), eval(env, NULL, exp)));
 }
 END_TEST
@@ -262,18 +247,18 @@ END_TEST
 START_TEST(test_set)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def x 20)", 1);
+    expression *exp = parse_expression_from_string("(def x 20)");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("(set! x 10)", 1);
+    exp = parse_expression_from_string("(set! x 10)");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("x", 1);
+    exp = parse_expression_from_string("x");
     fail_unless(boxed_values_equal(make_boxed_int(10), eval(env, NULL, exp)));
 }
 END_TEST
 
 START_TEST(test_progn){
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(progn 3 4)", 1);
+    expression *exp = parse_expression_from_string("(progn 3 4)");
     boxed_value *val = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(make_boxed_int(4), val));
 }
@@ -281,19 +266,19 @@ END_TEST
 
 START_TEST(test_def_inside_lambda){
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def (foo) (progn (def x 10) x))", 1);
+    expression *exp = parse_expression_from_string("(def (foo) (progn (def x 10) x))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("(foo)", 1);
+    exp = parse_expression_from_string("(foo)");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(make_boxed_int(10), v));
-    v = eval(env, NULL, parse_expression_from_string("x", 1));
+    v = eval(env, NULL, parse_expression_from_string("x"));
     fail_unless(boxed_values_equal(make_boxed_int(10), v));
 }
 END_TEST
 
 START_TEST(test_tagbody){
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(tagbody)", 1);
+    expression *exp = parse_expression_from_string("(tagbody)");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(NIL, v));
 }
@@ -301,7 +286,7 @@ END_TEST
 
 START_TEST(test_tagbody2){
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(tagbody foo 3)", 1);
+    expression *exp = parse_expression_from_string("(tagbody foo 3)");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(NIL, v));
 }
@@ -309,9 +294,9 @@ END_TEST
 
 START_TEST(test_tagbody3){
     List *env = create_env();
-    eval(env, NULL, parse_expression_from_string("(def x 3)", 1));
-    eval(env, NULL, parse_expression_from_string("(tagbody foo (if (eq x 10) 77 (progn (set! x (+ x 1)) (go foo))))", 1)); 
-    expression *exp = parse_expression_from_string("x", 1);
+    eval(env, NULL, parse_expression_from_string("(def x 3)"));
+    eval(env, NULL, parse_expression_from_string("(tagbody foo (if (eq x 10) 77 (progn (set! x (+ x 1)) (go foo))))")); 
+    expression *exp = parse_expression_from_string("x");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(make_boxed_int(10), v));
 }
@@ -330,7 +315,7 @@ START_TEST(test_comparators){
     for (i = 0; i < num_trues; ++i){
         fail_unless(boxed_values_equal(
             TRUE,
-            eval(env, NULL, parse_expression_from_string(true_expressions[i], 1))
+            eval(env, NULL, parse_expression_from_string(true_expressions[i]))
         ));
     }
     int num_falses = 5;
@@ -345,7 +330,7 @@ START_TEST(test_comparators){
     for (i = 0; i < num_falses; ++i){
         fail_unless(boxed_values_equal(
             NIL,
-            eval(env, NULL, parse_expression_from_string(false_expressions[i], 1))
+            eval(env, NULL, parse_expression_from_string(false_expressions[i]))
         ));
     }
 }
@@ -365,8 +350,8 @@ START_TEST(test_tagbody_factorial){
                         acc)                            \
                     1 1) )";
 
-    eval(env, NULL, parse_expression_from_string(exp, 1));
-    boxed_value *v = eval(env, NULL, parse_expression_from_string("(fact 4)", 1)); 
+    eval(env, NULL, parse_expression_from_string(exp));
+    boxed_value *v = eval(env, NULL, parse_expression_from_string("(fact 4)")); 
     fail_unless(boxed_values_equal(make_boxed_int(24), v));
 }
 END_TEST

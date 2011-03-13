@@ -5,6 +5,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "expression.h"
+#include "compiler.h"
 
 static int num_tests = 12;
 static char* codes[] = {
@@ -70,7 +71,7 @@ START_TEST(test_parser)
     List *expected = expected_list(_i);
     char *code = codes[_i];
     FILE *s = fmemopen(code, strlen(code), "r");
-    List *l = parse_expressions(s, 1);
+    List *l = compile(parse_expressions(s));
     fail_unless(listlen(l) == listlen(expected));
     fail_unless(lists_equal(expected, l, expressions_equal));
 }
