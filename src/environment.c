@@ -89,7 +89,7 @@ Hash *collapse_to_single_frame(Env *env){
         while (keys2 != NULL){
             char *key = keys2->car;
             if (! hash_contains(single_frame, key))
-                hash_add(single_frame, key, hash_value(frame, key));
+                frame_add(single_frame, key, hash_value(frame, key));
             keys2 = keys2->cdr;
         }
         free_list(keys, nop_free_fn);
@@ -108,10 +108,8 @@ void set_value_in_env(Env *env, char *key, boxed_value *value){
     while (frames != NULL){
         Hash *frame = (Hash *)frames->car;
         if (hash_contains(frame, key)){
-            boxed_value *existing_value = hash_value(frame, key);
-            dec_ref_count(existing_value);
-            hash_add(frame, key, value);
-            inc_ref_count(value);
+            frame_remove(frame, key);
+            frame_add(frame, key, value);
             return;
         } else {
             frames = frames->cdr;
