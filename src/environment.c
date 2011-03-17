@@ -2,15 +2,16 @@
 #include "utils.h"
 #include "list.h"
 #include "hash.h"
+#include "frame.h"
 #include "boxed_value.h"
 #include "stdlib.h"
 #include "stdio.h"
 
 Env *create_env(){
     Env *env = my_malloc(sizeof(Env));
-    env->base = hash_create(string_hash_fn, strings_equal);
-    hash_add(env->base, "NIL", NIL);
-    hash_add(env->base, "TRUE", TRUE);
+    env->base = create_empty_frame();
+    frame_add(env->base, "NIL", NIL);
+    frame_add(env->base, "TRUE", TRUE);
     env->frames = cons(env->base, NULL);
     return env;
 }
@@ -57,18 +58,6 @@ boxed_value *env_lookup(Env *env, char *name){
     }
 }
 
-Hash *frame_create(List *args, List *values){
-    Hash *frame = hash_create(string_hash_fn, strings_equal);
-    while (args != NULL && values != NULL){
-        hash_add(frame, strdup(args->car), values->car);
-        inc_ref_count((boxed_value *)values->car);
-        args = args->cdr;
-        values = values->cdr;
-    }
-    die_unless(args == NULL && values == NULL, "Arg names and values have different lengths");
-    return frame;
-}
-
 void inc_hash_value_ref_count(Hash *hash){
     List *values = hash_values(hash);
     list_for_each(values, (for_each_fn_ptr)inc_ref_count);
@@ -93,7 +82,7 @@ int has_binding(Env *env, char *name){
 }
 
 Hash *collapse_to_single_frame(Env *env){
-    Hash *single_frame = frame_create(NULL, NULL);
+    Hash *single_frame = create_empty_frame();
     void add_values_from_frame(Hash *frame){
         List *keys = hash_keys(frame);
         List *keys2 = keys;
@@ -114,4 +103,19 @@ void free_env(Env *env){
         env_drop_frame(env, 1);
 }
 
+void set_value_in_env(Env *env, char *key, boxed_value *value){
+    List *frames = env->frames;
+    while (frames != NULL){
+        Hash *frame = (Hash *)frames->car;
+        if (hash_contains(frame, key)){
+            boxed_value *existing_value = hash_value(frame, key);
+            dec_ref_count(existing_value);
+            hash_add(frame, key, value);
+            inc_ref_count(value);
+            return;
+        } else {
+            frames = frames->cdr;
+        }
+    }
+}
 

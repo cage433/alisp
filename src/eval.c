@@ -4,6 +4,7 @@
 #include "expression.h"
 #include "primitives.h"
 #include "boxed_value.h"
+#include "frame.h"
 
 char *PRIMITIVES[11] = {"+", "*", "-", "/", "cons", "car", "cdr", "eq", "if", "and", "or"};
 int is_primitive(char *identifier){
@@ -92,6 +93,7 @@ boxed_value *apply_primitive(Env *env, char *op_name, List *arg_exps){
 }
 boxed_value *apply(Env *env, expression *func_exp, List *arg_exps){
     boxed_value *value;
+
     if (func_exp->type == exp_identifier && is_primitive(func_exp->identifier_value))
         value = apply_primitive(env, func_exp->identifier_value, arg_exps);
     else {

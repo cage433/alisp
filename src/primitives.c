@@ -150,3 +150,13 @@ boxed_value *apply_cdr(boxed_value *v1){
     die_unless(v1->type == boxed_cons, "can only get cdr of a cons");
     return v1->cons_value.cdr;
 }
+
+boxed_value *apply_progn(Env *env, List *exps){
+    boxed_value *result = NIL;
+    while (exps != NULL){
+        result = eval(env, exps->car);
+        exps = exps->cdr;
+    }
+    return result;
+}
+

@@ -79,10 +79,18 @@ boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr){
 }
 void free_boxed_value(boxed_value *b);
 
+int constant_value(boxed_value *v){
+    return v == NIL || v == TRUE;
+}
+
 void inc_ref_count(boxed_value *v){
+    if (constant_value(v))
+        return;
     v->ref_count += 1;
 }
 void dec_ref_count(boxed_value *v){
+    if (constant_value(v))
+        return;
     v->ref_count -= 1;
     if (v->ref_count == 0)
         free_boxed_value(v);
