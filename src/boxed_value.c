@@ -37,7 +37,7 @@ int boxed_values_equal(const void *b1, const void *b2){
 boxed_value *make_boxed_int(int num){
     boxed_value *box = my_malloc(sizeof(boxed_value));
     box->type = boxed_int;
-    box->ref_count = 1;
+    box->ref_count = 0;
     box->int_value = num;
     return box;
 }

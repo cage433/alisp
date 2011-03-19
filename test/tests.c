@@ -15,6 +15,7 @@ int main ()
     srunner_add_suite (sr, test_boxed_value_suite());
     srunner_add_suite (sr, test_hash_suite());
     srunner_add_suite (sr, test_eval_suite());
+    srunner_add_suite (sr, test_frame_suite());
     srunner_run_all (sr, CK_NORMAL);
     number_failed = srunner_ntests_failed (sr);
     srunner_free (sr);

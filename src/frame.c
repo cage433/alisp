@@ -6,6 +6,13 @@ Hash *create_empty_frame(){
 }
 
 void frame_add(Hash *frame, char *key, boxed_value *value){
+    if (hash_contains(frame, key)){
+        boxed_value *current_value = hash_value(frame, key);
+        if (value == current_value)
+            return;
+        else
+            dec_ref_count(current_value);
+    }
     inc_ref_count(value);
     hash_add(frame, strdup(key), value);
 }
@@ -36,7 +43,7 @@ Hash *copy_frame(Hash *frame){
 
     void add_key_value(void *key){
         void *value = hash_value(frame, key);
-        hash_add(copy, key, value);
+        frame_add(copy, key, value);
     }
     List *keys = hash_keys(frame);
     list_for_each(keys, add_key_value);
