@@ -34,7 +34,7 @@ void env_add_frame(Env *env, Hash *frame){
     env->frames = cons(frame, env->frames);
 }
 static void free_binding(KeyValuePair *kv){
-    //my_free(kv->key);
+    my_free(kv->key);
     dec_ref_count((boxed_value *)kv->value);
     my_free(kv);
 }
@@ -68,8 +68,6 @@ Env *copy_env(Env *env){
     Env *copy = malloc(sizeof(Env));
     copy->base = copy_frame(env->base);
     copy->frames = list_map(env->frames, (map_fn_ptr)copy_frame);
-    //inc_hash_value_ref_count(copy->base);
-    //list_map(copy->frames, (map_fn_ptr)inc_hash_value_ref_count);
     return copy;
 }
 

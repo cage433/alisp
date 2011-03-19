@@ -28,6 +28,10 @@ START_TEST(test_ref_count2){
     fail_unless(v1->ref_count == 2);
     frame_add(frame2, key, v2);
     fail_unless(v1->ref_count == 1);
+    frame_add(frame2, key, v1);
+    fail_unless(v1->ref_count == 2);
+    //free_frame(frame1);
+    //fail_unless(v1->ref_count == 1);
 }
 END_TEST
 
