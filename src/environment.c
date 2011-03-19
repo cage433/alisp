@@ -33,15 +33,10 @@ void print_env(Env *env, int indent){
 void env_add_frame(Env *env, Hash *frame){
     env->frames = cons(frame, env->frames);
 }
-static void free_binding(KeyValuePair *kv){
-    my_free(kv->key);
-    dec_ref_count((boxed_value *)kv->value);
-    my_free(kv);
-}
 
-void env_drop_frame(Env *env, int free_frame){
-    if (free_frame)
-        free_hash(env->frames->car, free_binding);
+void env_drop_frame(Env *env, int do_free_frame){
+    if (do_free_frame)
+        free_frame(env->frames->car);
     env->frames = env->frames->cdr;
 }
 

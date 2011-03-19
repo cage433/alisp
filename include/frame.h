@@ -10,4 +10,5 @@ void frame_add(Hash *frame, char *key, boxed_value *value);
 Hash *frame_create(List *args, List *values);
 
 Hash *copy_frame(Hash *frame);
+void free_frame(Hash *frame);
 #endif

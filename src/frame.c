@@ -17,11 +17,14 @@ void frame_add(Hash *frame, char *key, boxed_value *value){
     hash_add(frame, strdup(key), value);
 }
 
+void free_key_value_pair(KeyValuePair *kv){
+    my_free(kv->key);
+    dec_ref_count(kv->value);
+    my_free(kv);
+}
 void frame_remove(Hash *frame, char *key){
     KeyValuePair *kv = hash_remove(frame, key);
-    free(kv->key);
-    dec_ref_count(kv->value);
-    free(kv);
+    free_key_value_pair(kv);
 }
 
 Hash *frame_create(List *args, List *values){
@@ -49,6 +52,10 @@ Hash *copy_frame(Hash *frame){
     list_for_each(keys, add_key_value);
     free_list(keys, nop_free_fn);
     return copy;
+}
+
+void free_frame(Hash *frame){
+    free_hash(frame, free_key_value_pair);
 }
 
 

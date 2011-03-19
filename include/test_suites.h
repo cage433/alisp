@@ -10,5 +10,6 @@ Suite *test_parser_suite();
 Suite *test_boxed_value_suite();
 Suite *test_hash_suite();
 Suite *test_eval_suite();
+Suite *test_frame_suite();
 
 #endif
