@@ -31,6 +31,5 @@ Hash *hash_create(
 List *hash_keys(Hash *hash);
 List *hash_values(Hash *hash);
 void free_hash(Hash *hash, void(*key_value_free_fn)(KeyValuePair *));
-Hash *copy_hash(Hash *hash);
 void print_hash(Hash *hash, int indent);
 #endif

@@ -31,3 +31,17 @@ Hash *frame_create(List *args, List *values){
     return frame;
 }
 
+Hash *copy_frame(Hash *frame){
+    Hash *copy = create_empty_frame();
+
+    void add_key_value(void *key){
+        void *value = hash_value(frame, key);
+        hash_add(copy, key, value);
+    }
+    List *keys = hash_keys(frame);
+    list_for_each(keys, add_key_value);
+    free_list(keys, nop_free_fn);
+    return copy;
+}
+
+

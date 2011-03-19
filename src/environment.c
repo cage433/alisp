@@ -66,8 +66,8 @@ void inc_hash_value_ref_count(Hash *hash){
 
 Env *copy_env(Env *env){
     Env *copy = malloc(sizeof(Env));
-    copy->base = copy_hash(env->base);
-    copy->frames = list_map(env->frames, (map_fn_ptr)copy_hash);
+    copy->base = copy_frame(env->base);
+    copy->frames = list_map(env->frames, (map_fn_ptr)copy_frame);
     inc_hash_value_ref_count(copy->base);
     list_map(copy->frames, (map_fn_ptr)inc_hash_value_ref_count);
     return copy;
