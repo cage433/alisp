@@ -90,7 +90,7 @@ void free_env(Env *env){
         env_drop_frame(env, 1);
 }
 
-void set_value_in_env(Env *env, char *key, boxed_value *value){
+void set_value_in_env(Env *env, char *key, boxed_value *value, int can_create_new_value){
     List *frames = env->frames;
     while (frames != NULL){
         Hash *frame = (Hash *)frames->car;
@@ -101,6 +101,9 @@ void set_value_in_env(Env *env, char *key, boxed_value *value){
             frames = frames->cdr;
         }
     }
-    frame_add(env->frames->car, key, value);
+    if (can_create_new_value)
+        frame_add(env->frames->car, key, value);
+    else
+        die("No existing value to set");
 }
 

@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct {
     char *name;
-    function_expression function;
+    struct expression *exp;
 } definition_expression;
 
 typedef struct {
@@ -47,7 +47,7 @@ expression *make_integer_expression(int num);
 expression *make_double_expression(double num);
 expression *make_identifier_expression(char *identifier);
 expression *make_call_expression(struct expression *name, List *exps);
-expression *make_definition_expression(char *name, List *args, expression *body);
+expression *make_definition_expression(char *name, struct expression *exp);
 expression *make_function_expression(List *args, expression *body);
 
 int expressions_equal(const void *exp1, const void *exp2);

@@ -17,4 +17,5 @@ boxed_value *apply_cons(boxed_value *v1, boxed_value *v2);
 boxed_value *apply_car(boxed_value *v1);
 boxed_value *apply_cdr(boxed_value *v1);
 boxed_value *apply_progn(Env *env, List *exps);
+boxed_value *apply_set(Env *env, expression *id, boxed_value *value);
 #endif

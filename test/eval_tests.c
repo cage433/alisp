@@ -222,11 +222,22 @@ END_TEST
 START_TEST(test_variable_shadowed)
 {
     Env *env = create_env();
-    expression *exp;
-    exp = parse_expression_from_string("(def foo(n) (lambda (n) n))");
+    expression *exp = parse_expression_from_string("(def foo(n) (lambda (n) n))");
     eval(env, exp);
     exp = parse_expression_from_string("((foo 5) 4)");
     fail_unless(boxed_values_equal(make_boxed_int(4), eval(env, exp)));
+}
+END_TEST
+
+START_TEST(test_set)
+{
+    Env *env = create_env();
+    expression *exp = parse_expression_from_string("(def x 20)");
+    eval(env, exp);
+    exp = parse_expression_from_string("(set! x 10)");
+    eval(env, exp);
+    exp = parse_expression_from_string("x");
+    fail_unless(boxed_values_equal(make_boxed_int(10), eval(env, exp)));
 }
 END_TEST
 
@@ -254,6 +265,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_lambdas_can_be_returned_by_functions);
     tcase_add_test (tc_core, test_closure);
     tcase_add_test (tc_core, test_variable_shadowed);
+    tcase_add_test (tc_core, test_set);
     suite_add_tcase (s, tc_core);
 
     return s;

@@ -34,12 +34,11 @@ expression *make_call_expression(expression *func, List *exps){
     return exp;
 }
 
-expression *make_definition_expression(char *name, List *args, expression *body){
+expression *make_definition_expression(char *name, expression *definee){
     expression *exp = my_malloc(sizeof(expression));
     exp->type = exp_definition;
     exp->definition_value.name = name;
-    exp->definition_value.function.args = args;
-    exp->definition_value.function.body = body;
+    exp->definition_value.exp = definee;
     return exp;
 }
 
@@ -67,9 +66,12 @@ int expressions_equal(const void *e1, const void *e2){
         return exps_same;
     } else if (exp1->type == exp_definition){
         int name_same = (strcmp(exp1->definition_value.name, exp2->definition_value.name) == 0);
-        int args_same = lists_equal(exp1->definition_value.function.args, exp2->definition_value.function.args, strings_equal);
-        int body_same = expressions_equal(exp1->definition_value.function.body, exp2->definition_value.function.body);
-        return name_same && args_same && body_same;
+        int defined_exp_same = expressions_equal(exp1->definition_value.exp, exp2->definition_value.exp);
+        return name_same && defined_exp_same;
+    } else if (exp1->type == exp_function){
+        int args_same = lists_equal(exp1->function_value.args, exp2->function_value.args, strings_equal);
+        int body_same = expressions_equal(exp1->function_value.body, exp2->function_value.body);
+        return args_same && body_same;
     } else {
         printf("File %s, line %d\n", __FILE__, __LINE__); 
         printf("Unimplemented expressions_equal\n");
@@ -159,7 +161,7 @@ char *expression_to_string(expression *exp){
     } else if (exp->type == exp_definition){
         sprintf(buf2, "(def %s ", exp->definition_value.name);
         append(buf2);
-        append_func(exp->definition_value.function);
+        append(expression_to_string(exp->definition_value.exp));
         append(")");
     } else if (exp->type == exp_function){
         append_func(exp->function_value);
