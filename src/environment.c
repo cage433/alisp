@@ -53,12 +53,6 @@ boxed_value *env_lookup(Env *env, char *name){
     }
 }
 
-void inc_hash_value_ref_count(Hash *hash){
-    List *values = hash_values(hash);
-    list_for_each(values, (for_each_fn_ptr)inc_ref_count);
-    free_list(values, nop_free_fn);
-}
-
 Env *copy_env(Env *env){
     Env *copy = malloc(sizeof(Env));
     copy->base = copy_frame(env->base);
@@ -101,12 +95,12 @@ void set_value_in_env(Env *env, char *key, boxed_value *value){
     while (frames != NULL){
         Hash *frame = (Hash *)frames->car;
         if (hash_contains(frame, key)){
-            frame_remove(frame, key);
             frame_add(frame, key, value);
             return;
         } else {
             frames = frames->cdr;
         }
     }
+    frame_add(env->frames->car, key, value);
 }
 

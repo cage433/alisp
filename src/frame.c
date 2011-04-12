@@ -22,17 +22,10 @@ void free_key_value_pair(KeyValuePair *kv){
     dec_ref_count(kv->value);
     my_free(kv);
 }
-void frame_remove(Hash *frame, char *key){
-    KeyValuePair *kv = hash_remove(frame, key);
-    free_key_value_pair(kv);
-}
 
 Hash *frame_create(List *args, List *values){
     Hash *frame = create_empty_frame();
     while (args != NULL && values != NULL){
-        if (hash_contains(frame, args->car))
-            frame_remove(frame, args->car);
-
         frame_add(frame, args->car, values->car);
         args = args->cdr;
         values = values->cdr;

@@ -34,4 +34,4 @@ endfunction
 
 command! NextCFile :call NextCFile()
 
-map <F4> :NextCFile<CR>
+map <F5> :NextCFile<CR>
