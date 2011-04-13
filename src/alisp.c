@@ -4,11 +4,14 @@
 #include "environment.h"
 #include "expression.h"
 #include "eval.h"
+#include "parser.h"
+#include "boxed_value.h"
 
-int main(){
+void repl(){
     char *buf = malloc(10000 * sizeof(char));
     char *exp_buf = malloc(10000 * sizeof(char));
     char *slashpos = NULL;
+    expression *exp;
     Env *env = create_env();
     printf("> ");
     while (1){
@@ -19,7 +22,7 @@ int main(){
             printf("   ");
         } else {
             strcat(exp_buf, buf);
-            expression *exp = parse_expression_from_string(exp_buf);
+            exp = parse_expression_from_string(exp_buf);
             boxed_value *val = eval(env, exp);
             printf("  ");
             print_boxed_value(val, 0);
@@ -27,4 +30,22 @@ int main(){
             printf("> ");
         }
     }
+}
+int main(int ARGC, char **ARGV){
+    die_unless(ARGC == 2, "Expect one argument");
+    if (strcmp(ARGV[1], "-i") == 0)
+        repl();
+    else {
+        FILE *f = fopen(ARGV[1], "r");
+        List *exps = parse_expressions(f);
+        Env *env = create_env();
+        while (exps != NULL){
+            boxed_value *val = eval(env, exps->car);
+            printf("  ");
+            print_boxed_value(val, 0);
+            exps = exps->cdr;
+        }
+
+    }
+
 }
