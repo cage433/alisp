@@ -17,19 +17,27 @@ obj_files = (src_files + test_files).collect{|f| obj_file(f)}
 
 
 file "tests" => obj_files do
-    obj = (obj_files - ['obj/main.o']).join(" ")
+    obj = (obj_files - ['obj/main.o', 'obj/repl.o']).join(" ")
   sh "gcc -rdynamic -ggdb3 -lcheck -ldl #{obj} -o tests"
 end
 
 file "main" => obj_files do
-    obj = (obj_files - ['obj/tests.o']).join(" ")
+    obj = (obj_files - ['obj/tests.o', 'obj/repl.o']).join(" ")
   sh "gcc -rdynamic -ggdb3 -lcheck -ldl #{obj} -o main"
 end
 
+file "repl" => obj_files do
+    obj = (obj_files - ['obj/tests.o', 'obj/main.o']).join(" ")
+  sh "gcc -rdynamic -ggdb3 -lcheck -ldl #{obj} -o repl"
+end
 task :run_tests => ["tests"] do
   system('./tests')
 end
 
 task :run_main => ["main"] do
   system('./main')
+end
+
+task :run_repl => ["repl"] do
+  system('./repl')
 end

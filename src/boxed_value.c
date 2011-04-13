@@ -128,24 +128,23 @@ void print_boxed_value(boxed_value *v, int indent){
         switch (v->type){
             case boxed_int:
                 print_tabs(indent);
-                printf("Boxed int %d\n", v->int_value);
+                printf("%d\n", v->int_value);
                 break;
             case boxed_double:
                 print_tabs(indent);
-                printf("Boxed double %.6f\n", v->double_value);
+                printf("%.6f\n", v->double_value);
                 break;
             case boxed_string:
                 print_tabs(indent);
-                printf("Boxed string %s\n", v->string_value);
+                printf("%s\n", v->string_value);
                 break;
             case boxed_closure:
                 print_tabs(indent);
-                printf("Boxed closure\n");
-                print_hash(v->closure_value.frame, indent);
+                printf("closure\n");
                 break;
             case boxed_cons:
                 print_tabs(indent);
-                printf("Boxed cons\n");
+                printf("cons\n");
                 print_boxed_value(v->cons_value.car, indent + 1);
                 print_boxed_value(v->cons_value.cdr, indent + 1);
                 break;
