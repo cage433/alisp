@@ -256,6 +256,8 @@ START_TEST(test_def_inside_lambda){
     exp = parse_expression_from_string("(foo)");
     boxed_value *v = eval(env, exp);
     fail_unless(boxed_values_equal(make_boxed_int(10), v));
+    v = eval(env, parse_expression_from_string("x"));
+    fail_unless(boxed_values_equal(make_boxed_int(10), v));
 }
 END_TEST
 

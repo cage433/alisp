@@ -44,7 +44,7 @@ boxed_value *eval(Env *env, expression *exp){
             } else {
                 value = eval(env, def.exp);
             }
-            set_value_in_env(env, def.name, value, 1);
+            define_value_in_env(env, def.name, value);
             break;
         case exp_call:
             call = exp->call_value;

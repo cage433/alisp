@@ -21,5 +21,5 @@ Env *copy_env(Env *env);
 int env_has_binding(Env *env, char *name);
 Hash *collapse_to_single_frame(Env *env);
 void free_env(Env *env);
-void set_value_in_env(Env *env, char *key, struct boxed_value *value, int set_value_in_env);
+void set_value_in_env(Env *env, char *key, struct boxed_value *value);
 #endif

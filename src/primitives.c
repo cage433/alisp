@@ -105,7 +105,7 @@ boxed_value *apply_if(Env *env, expression *predicate, expression *consequent, e
 
 boxed_value *apply_set(Env *env, expression *id, boxed_value *value){
     die_unless(id->type == exp_identifier, "first argument must be an identifier");
-    set_value_in_env(env, id->identifier_value, value, 0);
+    set_value_in_env(env, id->identifier_value, value);
     return value;
 }
 boxed_value *apply_eq(boxed_value *v1, boxed_value *v2){
