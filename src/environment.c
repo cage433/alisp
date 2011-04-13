@@ -61,7 +61,7 @@ Env *copy_env(Env *env){
 }
 
 
-int has_binding(Env *env, char *name){
+int env_has_binding(Env *env, char *name){
     int frame_has_binding(Hash *frame){
         return hash_contains(frame, name);
     }

@@ -62,8 +62,7 @@ void eat_identifier(List **tokens, char *name){
 
 expression *consume_expression(List **tokens);
 
-List *consume_expression_list(List **tokens){
-    eat_left_paren(tokens);
+List *consume_upto_right_paren(List **tokens){
     List *exps = NULL;
     while ((*tokens) != NULL && token_car(*tokens)->type != tok_right_paren){
         exps = cons(consume_expression(tokens), exps);
@@ -83,8 +82,17 @@ expression *construct_call_exp(List *exps){
 }
 
 expression *consume_call_exp(List **tokens){
-    List *exps = consume_expression_list(tokens);
+    eat_left_paren(tokens);
+    List *exps = consume_upto_right_paren(tokens);
     return construct_call_exp(exps);
+}
+
+expression *consume_progn_expression(List **tokens){
+    eat_left_paren(tokens);
+    eat_identifier(tokens, "progn");
+    List *exps = consume_upto_right_paren(tokens);
+    expression *progn = make_progn_expression(exps);
+    return progn;
 }
 
 /**
@@ -98,11 +106,14 @@ expression *consume_definition_exp(List **tokens){
     eat_identifier(tokens, "def");
     char *name = consume_identifier_exp(tokens)->identifier_value;
     if (next_token_is_left_paren(tokens)){
-        List *exps = consume_expression_list(tokens);
+        eat_left_paren(tokens);
+        List *exps = consume_upto_right_paren(tokens);
         if (next_token_is_right_paren(tokens)){
+            // second case
             eat_right_paren(tokens);
             return make_definition_expression(name, construct_call_exp(exps));
         } else {
+            // third case
             char *identifier_name(expression *exp){
                 die_unless(exp->type == exp_identifier, "Expected identifier expression");
                 return strdup(exp->identifier_value);
@@ -114,16 +125,19 @@ expression *consume_definition_exp(List **tokens){
             return make_definition_expression(name, function);
         }
     } else {
+        // first case
         expression *exp = consume_expression(tokens);
         eat_right_paren(tokens);
         return make_definition_expression(name, exp);
     }
 }
 
+
 expression *consume_lambda_expression(List **tokens){
     eat_left_paren(tokens);
     eat_identifier(tokens, "lambda");
-    List *arg_exps = consume_expression_list(tokens);
+    eat_left_paren(tokens);
+    List *arg_exps = consume_upto_right_paren(tokens);
     char *identifier_name(expression *exp){
         die_unless(exp->type == exp_identifier, "Expected identifier expression");
         return strdup(exp->identifier_value);
@@ -136,6 +150,7 @@ expression *consume_lambda_expression(List **tokens){
     eat_right_paren(tokens);
     return make_function_expression(args, body);
 }
+
 expression *consume_expression(List **tokens){
     typed_token *tok = token_car(*tokens);
     if (tok->type == tok_integer)
@@ -153,6 +168,8 @@ expression *consume_expression(List **tokens){
                 return consume_definition_exp(tokens);
             else if (strings_equal(nexttok->identifier_value, "lambda"))
                 return consume_lambda_expression(tokens);
+            else if (strings_equal(nexttok->identifier_value, "progn"))
+                return consume_progn_expression(tokens);
             else
                 return consume_call_exp(tokens);
         } else if (nexttok->type == tok_left_paren){

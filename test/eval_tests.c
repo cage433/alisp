@@ -241,6 +241,23 @@ START_TEST(test_set)
 }
 END_TEST
 
+START_TEST(test_progn){
+    Env *env = create_env();
+    expression *exp = parse_expression_from_string("(progn 3 4)");
+    boxed_value *val = eval(env, exp);
+    fail_unless(boxed_values_equal(make_boxed_int(4), val));
+}
+END_TEST
+
+START_TEST(test_def_inside_lambda){
+    Env *env = create_env();
+    expression *exp = parse_expression_from_string("(def foo() (progn (def x 10) x))");
+    eval(env, exp);
+    exp = parse_expression_from_string("(foo)");
+    boxed_value *v = eval(env, exp);
+    fail_unless(boxed_values_equal(make_boxed_int(10), v));
+}
+END_TEST
 
 Suite *test_eval_suite ()
 {
@@ -266,6 +283,8 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_closure);
     tcase_add_test (tc_core, test_variable_shadowed);
     tcase_add_test (tc_core, test_set);
+    tcase_add_test (tc_core, test_progn);
+    tcase_add_test (tc_core, test_def_inside_lambda);
     suite_add_tcase (s, tc_core);
 
     return s;

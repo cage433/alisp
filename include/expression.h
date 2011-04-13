@@ -9,7 +9,8 @@ typedef enum {
     exp_identifier,
     exp_definition,
     exp_call,
-    exp_function
+    exp_function,
+    exp_progn
 } expression_type;
 
 struct expression;
@@ -30,6 +31,10 @@ typedef struct {
     List *exps;
 } call_expression;
 
+typedef struct {
+    List *exps;
+} progn_expression;
+
 typedef struct expression {
     expression_type type;
     union {
@@ -39,6 +44,7 @@ typedef struct expression {
         definition_expression definition_value;
         call_expression call_value;
         function_expression function_value;
+        progn_expression progn_value;
     };
     char *text;
 } expression;
@@ -49,6 +55,7 @@ expression *make_identifier_expression(char *identifier);
 expression *make_call_expression(struct expression *name, List *exps);
 expression *make_definition_expression(char *name, struct expression *exp);
 expression *make_function_expression(List *args, expression *body);
+expression *make_progn_expression(List *exps);
 
 int expressions_equal(const void *exp1, const void *exp2);
 void print_expression(int depth, expression *exp);

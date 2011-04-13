@@ -50,6 +50,13 @@ expression *make_function_expression(List *args, expression *body){
     return exp;
 }
 
+expression *make_progn_expression(List *exps){
+    expression *exp = my_malloc(sizeof(expression));
+    exp->type = exp_progn;
+    exp->progn_value.exps = exps;
+}
+
+
 int expressions_equal(const void *e1, const void *e2){
     expression *exp1 = (expression *)e1;
     expression *exp2 = (expression *)e2;

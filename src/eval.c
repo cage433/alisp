@@ -20,6 +20,7 @@ boxed_value *eval(Env *env, expression *exp){
     definition_expression def;
     call_expression call;
     boxed_value *value;
+    List *exps;
     switch(exp->type){
         case exp_integer:
             value = make_boxed_int(exp->int_value);
@@ -32,14 +33,18 @@ boxed_value *eval(Env *env, expression *exp){
             break;
         case exp_definition:
             def = exp->definition_value;
+            if (env_has_binding(env, def.name)){
+                char *buf = malloc(1000 * sizeof(char));
+                snprintf(buf, 1000, "Already have binding for %s", def.name);
+                die(buf);
+            }
             if (def.exp->type == exp_function){
                 boxed_value *boxed_fun = make_boxed_closure(create_env(), def.exp->function_value);
-                hash_add(env->base, def.name, boxed_fun);
                 value = boxed_fun;
             } else {
-                boxed_value *value = eval(env, def.exp);
-                hash_add(env->base, def.name, value);
+                value = eval(env, def.exp);
             }
+            set_value_in_env(env, def.name, value, 1);
             break;
         case exp_call:
             call = exp->call_value;
@@ -47,6 +52,13 @@ boxed_value *eval(Env *env, expression *exp){
             break;
         case exp_function:
             value = make_boxed_closure(env, exp->function_value);
+            break;
+        case exp_progn:
+            exps = exp->progn_value.exps;
+            while (exps != NULL){
+                value = eval(env, exps->car);
+                exps = exps->cdr;
+            }
             break;
         default:
             die("Unexpected expression type");
