@@ -82,7 +82,7 @@ boxed_value *apply_primitive(Env *env, char *op_name, List *arg_exps){
     } else if (strings_equal(op_name, "set!")){
         die_unless(listlen(arg_exps) == 2, "set! requires one identifier and one variable");
         expression *id = nthelt(arg_exps, 0);
-        boxed_value *value = eval_exp(nthelt(arg_exps, 1));
+        value = eval_exp(nthelt(arg_exps, 1));
         apply_set(env, id, value);
     } else {
         List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
