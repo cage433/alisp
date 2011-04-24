@@ -149,6 +149,7 @@ expression *consume_lambda_expression(List **tokens){
 }
 
 expression *consume_tagbody_expression(List **tokens){
+    eat_left_paren(tokens);
     List *exps = NULL;
     while (!next_token_is_right_paren(tokens)){
         exps = cons(consume_expression(tokens), exps);
@@ -159,7 +160,7 @@ expression *consume_tagbody_expression(List **tokens){
     Hash *hash = hash_create_with_string_keys();
 
     while (exps != NULL){
-        expression *exp = consume_expression(tokens);
+        expression *exp = exps->car;
         if (exp->type == exp_identifier){
             hash_add(hash, exp->identifier_value, make_progn_expression(progn_exps));
         } else {
