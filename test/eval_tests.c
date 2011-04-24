@@ -263,6 +263,14 @@ END_TEST
 
 START_TEST(test_tagbody){
     List *env = create_env();
+    expression *exp = parse_expression_from_string("(tagbody)");
+    boxed_value *v = eval(env, NULL, exp);
+    fail_unless(boxed_values_equal(NIL, v));
+}
+END_TEST
+
+START_TEST(test_tagbody2){
+    List *env = create_env();
     expression *exp = parse_expression_from_string("(tagbody foo 3)");
     boxed_value *v = eval(env, NULL, exp);
     fail_unless(boxed_values_equal(NIL, v));
@@ -296,6 +304,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_progn);
     tcase_add_test (tc_core, test_def_inside_lambda);
     tcase_add_test (tc_core, test_tagbody);
+    tcase_add_test (tc_core, test_tagbody2);
     suite_add_tcase (s, tc_core);
 
     return s;
