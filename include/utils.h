@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+char *make_msg(char *fmt, ...);
 void die(char *msg);
 
 void die_if(int predicate, char* message);

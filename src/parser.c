@@ -143,12 +143,39 @@ expression *consume_lambda_expression(List **tokens){
         return strdup(exp->identifier_value);
     }
     List *args = list_map(arg_exps, (map_fn_ptr)identifier_name);
-    void print_it(void *x){
-        printf("%s\n", (char *)x);
-    }
     expression *body = consume_expression(tokens);
     eat_right_paren(tokens);
     return make_function_expression(args, body);
+}
+
+expression *consume_tagbody_expression(List **tokens){
+    List *exps = NULL;
+    while (!next_token_is_right_paren(tokens)){
+        exps = cons(consume_expression(tokens), exps);
+    }
+    
+
+    List *progn_exps = NULL;
+    Hash *hash = hash_create_with_string_keys();
+
+    while (exps != NULL){
+        expression *exp = consume_expression(tokens);
+        if (exp->type == exp_identifier){
+            hash_add(hash, exp->identifier_value, make_progn_expression(progn_exps));
+        } else {
+            progn_exps = cons(exp, progn_exps);
+        }
+        exps = exps->cdr;
+    }
+
+    eat_right_paren(tokens);
+
+    expression *tagbody = make_tagbody_expression(
+        make_progn_expression(progn_exps),
+        hash
+    );
+    free_list(exps, nop_free_fn);
+    return tagbody;
 }
 
 expression *consume_expression(List **tokens){
@@ -170,6 +197,8 @@ expression *consume_expression(List **tokens){
                 return consume_lambda_expression(tokens);
             else if (strings_equal(nexttok->identifier_value, "progn"))
                 return consume_progn_expression(tokens);
+            else if (strings_equal(nexttok->identifier_value, "tagbody"))
+                return consume_tagbody_expression(tokens);
             else
                 return consume_call_exp(tokens);
         } else if (nexttok->type == tok_left_paren){

@@ -4,58 +4,63 @@
 #include "stdio.h"
 #include "utils.h"
 
+expression *make_empty_expression(int exp_type){
+    expression *exp = my_malloc(sizeof(expression));
+    exp->type = exp_type;
+    return exp;
+}
+
 
 expression *make_integer_expression(int num){
-    expression *exp = my_malloc(sizeof(expression));
-    exp->type = exp_integer;
+    expression *exp = make_empty_expression(exp_integer);
     exp->int_value = num;
     return exp;
 }
 
 expression *make_double_expression(double num){
-    expression *exp = my_malloc(sizeof(expression));
-    exp->type = exp_double;
+    expression *exp = make_empty_expression(exp_double);
     exp->double_value = num;
     return exp;
 }
 
 expression *make_identifier_expression(char *identifier){
-    expression *exp = my_malloc(sizeof(expression));
-    exp->type = exp_identifier;
+    expression *exp = make_empty_expression(exp_identifier);
     exp->identifier_value = strdup(identifier);
     return exp;
 }
 
 expression *make_call_expression(expression *func, List *exps){
-    expression *exp = my_malloc(sizeof(expression));
-    exp->type = exp_call;
+    expression *exp = make_empty_expression(exp_call);
     exp->call_value.func = func;
     exp->call_value.exps = exps;
     return exp;
 }
 
 expression *make_definition_expression(char *name, expression *definee){
-    expression *exp = my_malloc(sizeof(expression));
-    exp->type = exp_definition;
+    expression *exp = make_empty_expression(exp_definition);
     exp->definition_value.name = name;
     exp->definition_value.exp = definee;
     return exp;
 }
 
 expression *make_function_expression(List *args, expression *body){
-    expression *exp = my_malloc(sizeof(expression));
-    exp->type = exp_function;
+    expression *exp = make_empty_expression(exp_function);
     exp->function_value.args = args;
     exp->function_value.body = body;
     return exp;
 }
 
 expression *make_progn_expression(List *exps){
-    expression *exp = my_malloc(sizeof(expression));
-    exp->type = exp_progn;
+    expression *exp = make_empty_expression(exp_progn);
     exp->progn_value.exps = exps;
 }
 
+expression *make_tagbody_expression(expression *whole_progn, Hash *tag_progn_map){
+    expression *exp = make_empty_expression(exp_tagbody);
+    exp->tagbody_value.whole_progn = whole_progn;
+    exp->tagbody_value.tag_progn_map = tag_progn_map;
+    return exp;
+}
 
 int expressions_equal(const void *e1, const void *e2){
     expression *exp1 = (expression *)e1;
@@ -79,6 +84,12 @@ int expressions_equal(const void *e1, const void *e2){
         int args_same = lists_equal(exp1->function_value.args, exp2->function_value.args, strings_equal);
         int body_same = expressions_equal(exp1->function_value.body, exp2->function_value.body);
         return args_same && body_same;
+    } else if (exp1->type == exp_progn){
+        return lists_equal(exp1->progn_value.exps, exp2->progn_value.exps, expressions_equal);
+    } else if (exp1->type == exp_tagbody){
+        int whole_progn_same = expressions_equal(exp1->tagbody_value.whole_progn, exp2->tagbody_value.whole_progn);
+        // TODO - return the correct answer
+        return whole_progn_same;
     } else {
         printf("File %s, line %d\n", __FILE__, __LINE__); 
         printf("Unimplemented expressions_equal\n");
@@ -87,6 +98,9 @@ int expressions_equal(const void *e1, const void *e2){
 }
 
 void print_expression(int depth, expression *exp){
+    void print_sub_expression(expression *sub_exp){
+        print_expression(depth + 1, sub_exp);
+    }
     print_tabs(depth);
     if (exp->type == exp_integer)
         printf("Integer Expression %d\n", exp->int_value);
@@ -94,26 +108,24 @@ void print_expression(int depth, expression *exp){
         printf("Double expression %.2f\n", exp->double_value);
     else if (exp->type == exp_call){
         printf("Call expression\n");
-        print_expression(depth + 1, exp->call_value.func);
-        List *l = exp->call_value.exps;
-        while (l != NULL){
-            print_expression(depth + 1, (expression *)l->car);
-            l = l->cdr;
-        }
+        print_sub_expression(exp->call_value.func);
+        list_for_each(exp->call_value.exps, (for_each_fn_ptr)print_sub_expression);
     } else if (exp->type == exp_identifier){
         printf("Identifier expression %s\n", exp->identifier_value);
     } else if (exp->type == exp_definition){
         printf("Definition expression%s\n", exp->definition_value.name);
     } else if (exp->type == exp_function){
-        printf("Function expression\n");
-        List *l = exp->function_value.args;
-        while (l != NULL){
-            print_tabs(depth + 1);
-            printf("Arg %s\n", (char *)(l->car));
-        }
+        printf("Function expression\nArgs\n");
+        list_for_each(exp->function_value.args, (for_each_fn_ptr)print_sub_expression);
         print_tabs(depth + 1);
         printf("Body\n");
         print_expression(depth + 1, exp->function_value.body);
+    } else if(exp->type == exp_progn){
+        printf("Progn expression\n");
+        list_for_each(exp->progn_value.exps, (for_each_fn_ptr)print_sub_expression);
+    } else if(exp->type == exp_tagbody){
+        printf("tagbody\n");
+        print_sub_expression(exp->tagbody_value.whole_progn);
     } else {
         printf("expression.c unimplemented\n");
         exit(-1);
@@ -141,6 +153,16 @@ char *expression_to_string(expression *exp){
         append(")");
     }
 
+    void append_sub_exps(List *l){
+        while (l != NULL){
+            append(" ");
+            char *arg = expression_to_string((expression *)l->car);
+            append(arg);
+            free(arg);
+            l = l->cdr;
+        }
+    }
+
     if (exp->type == exp_integer){
         sprintf(buf2, "%d", exp->int_value);
         append(buf2);
@@ -153,14 +175,7 @@ char *expression_to_string(expression *exp){
         char *caller = expression_to_string(exp->call_value.func);
         append(caller);
         free(caller);
-        l = exp->call_value.exps;
-        while (l != NULL){
-            append(" ");
-            char *arg = expression_to_string((expression *)l->car);
-            append(arg);
-            free(arg);
-            l = l->cdr;
-        }
+        append_sub_exps(exp->call_value.exps);
         append(")");
     } else if (exp->type == exp_identifier){
         sprintf(buf2, "%s", exp->identifier_value);
@@ -172,6 +187,14 @@ char *expression_to_string(expression *exp){
         append(")");
     } else if (exp->type == exp_function){
         append_func(exp->function_value);
+    } else if (exp->type == exp_progn){
+        append("(progn\n");
+        append_sub_exps(exp->progn_value.exps);
+        append(")");
+    } else if (exp->type == exp_tagbody){
+        append("(tagbody\n");
+        append(expression_to_string(exp->tagbody_value.whole_progn));
+        append(")\n");
     } else {
         printf("expression.c unimplemented\n");
         exit(-1);

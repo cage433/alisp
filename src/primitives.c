@@ -95,15 +95,15 @@ boxed_value *apply_divide(List *values){
         return list_fold(values->cdr, copy_boxed_number(values->car), (fold_fn_ptr)divide_values);
 }
 
-boxed_value *apply_if(Env *env, expression *predicate, expression *consequent, expression *alternative){
-    boxed_value *predicate_value = eval(env, predicate);
+boxed_value *apply_if(List *env, List *tagbody_env_pairs, expression *predicate, expression *consequent, expression *alternative){
+    boxed_value *predicate_value = eval(env, tagbody_env_pairs, predicate);
     if (boxed_values_equal(predicate_value, NIL))
-        return eval(env, alternative);
+        return eval(env, tagbody_env_pairs, alternative);
     else
-        return eval(env, consequent);
+        return eval(env, tagbody_env_pairs, consequent);
 }
 
-boxed_value *apply_set(Env *env, expression *id, boxed_value *value){
+boxed_value *apply_set(List *env, expression *id, boxed_value *value){
     die_unless(id->type == exp_identifier, "first argument must be an identifier");
     set_value_in_env(env, id->identifier_value, value);
     return value;
@@ -117,10 +117,10 @@ boxed_value *apply_eq(boxed_value *v1, boxed_value *v2){
 }
 
 // TODO - Deal with the memory leak 
-boxed_value *apply_and(Env *env, List *exps){
+boxed_value *apply_and(List *env, List *tagbody_env_pairs, List *exps){
     boxed_value *result = TRUE;
     while (exps != NULL){
-        boxed_value *v = eval(env, exps->car);
+        boxed_value *v = eval(env, tagbody_env_pairs, exps->car);
         if (boxed_values_equal(v, NIL)){
             return NIL;
         }
@@ -132,9 +132,9 @@ boxed_value *apply_and(Env *env, List *exps){
 }
 
 // TODO - Deal with the memory leak 
-boxed_value *apply_or(Env *env, List *exps){
+boxed_value *apply_or(List *env, List *tagbody_env_pairs, List *exps){
     while (exps != NULL){
-        boxed_value *v = eval(env, exps->car);
+        boxed_value *v = eval(env, tagbody_env_pairs, exps->car);
         if (!boxed_values_equal(v, NIL))
             return v;
         exps = exps->cdr;
@@ -156,10 +156,10 @@ boxed_value *apply_cdr(boxed_value *v1){
     return v1->cons_value.cdr;
 }
 
-boxed_value *apply_progn(Env *env, List *exps){
+boxed_value *apply_progn(List *env, List *tagbody_env_pairs, List *exps){
     boxed_value *result = NIL;
     while (exps != NULL){
-        result = eval(env, exps->car);
+        result = eval(env, tagbody_env_pairs, exps->car);
         exps = exps->cdr;
     }
     return result;

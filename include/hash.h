@@ -28,8 +28,10 @@ Hash *hash_create(
         long(*hashfn)(const void *key), 
         int(*keyeq_fn)(const void *key1, const void *key2)
 );
+Hash *hash_create_with_string_keys();
 List *hash_keys(Hash *hash);
 List *hash_values(Hash *hash);
 void free_hash(Hash *hash, void(*key_value_free_fn)(KeyValuePair *));
 void print_hash(Hash *hash, int indent);
+Hash *copy_hash(Hash *h);
 #endif

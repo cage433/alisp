@@ -58,7 +58,7 @@ boxed_value *make_boxed_string(char *str){
     return box;
 }
 
-boxed_value *make_boxed_closure(Env *env, function_expression func){
+boxed_value *make_boxed_closure(List *env, function_expression func){
     boxed_value *box = my_malloc(sizeof(boxed_value));
     box->type = boxed_closure;
     box->ref_count = 1;

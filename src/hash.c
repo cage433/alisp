@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "utils.h"
 #include "boxed_value.h"
+#include "list.h"
 
 Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key1, const void *key2)){
     Hash *hash = my_malloc(sizeof(Hash));
@@ -13,6 +14,10 @@ Hash *hash_create(long(*hashfn)(const void *key), int(*keyeq_fn)(const void *key
     hash->hashfn = hashfn;
     hash->keyeq_fn = keyeq_fn;
     return hash;
+}
+
+Hash *hash_create_with_string_keys(){
+    return hash_create(string_hash_fn, strings_equal);
 }
 
 long string_hash_fn(const void *key){
@@ -46,7 +51,11 @@ KeyValuePair *hash_key_value_pair(Hash *hash, void *key){
     int key_matches(KeyValuePair *kv){
         return hash->keyeq_fn(key, kv->key);
     }
-    return list_find(hash->array[i], (predicate_fn_ptr)key_matches);
+    List *l = list_find(hash->array[i], (predicate_fn_ptr)key_matches);
+    if (l == NULL)
+        return NULL;
+    else
+        return (KeyValuePair *)(l->car);
 }
 
 KeyValuePair* hash_remove(Hash *hash, void *key){
@@ -127,7 +136,7 @@ List *hash_keys(Hash *hash){
 
 void *hash_value(Hash *hash, void *key){
     KeyValuePair *kv = hash_key_value_pair(hash, key);
-    die_unless(kv != NULL, "Key not found");
+    die_unless(kv != NULL, make_msg("Keyb %s not found", key));
     return kv->value;
 }
 
@@ -159,5 +168,17 @@ void print_hash(Hash *hash, int indent){
     }
     list_for_each(keys, (for_each_fn_ptr)print_key_and_value);
     free_list(keys, nop_free_fn);
+}
+
+Hash *copy_hash(Hash *hash){
+    Hash *copy = hash_create(hash->hashfn, hash->keyeq_fn);
+    List *keys = hash_keys(hash);
+    List *keys_iter = keys;
+    while (keys_iter != NULL){
+        hash_add(copy, keys_iter->car, hash_value(hash, keys_iter->car));
+        keys_iter = keys_iter->cdr;
+    }
+    free_list(keys, nop_free_fn);
+    return copy;
 }
 

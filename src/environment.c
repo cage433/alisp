@@ -7,68 +7,64 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-Env *create_env(){
-    Env *env = my_malloc(sizeof(Env));
-    env->base = create_empty_frame();
-    frame_add(env->base, "NIL", NIL);
-    frame_add(env->base, "TRUE", TRUE);
-    env->frames = cons(env->base, NULL);
-    return env;
+List *create_env(){
+    Hash *base = create_empty_frame();
+    frame_add(base, "NIL", NIL);
+    frame_add(base, "TRUE", TRUE);
+    return cons(base, NULL);
 }
-void print_env(Env *env, int indent){
-    List *frames = env->frames;
-    while (frames != NULL){
+
+void print_env(List *env, int indent){
+    while (env != NULL){
         print_tabs(indent);
-        printf("Frame no %d\n", listlen(frames));
+        printf("Frame no %d\n", listlen(env));
         void print_key_and_value(char *key){
             print_tabs(indent + 1);
             printf("Key %s, value ", key);
-            print_boxed_value((boxed_value *)hash_value(frames->car, key), 0);
+            print_boxed_value((boxed_value *)hash_value(env->car, key), 0);
         }
-        list_for_each(hash_keys(frames->car), (for_each_fn_ptr)print_key_and_value);
-        frames = frames->cdr;
+        list_for_each(hash_keys(env->car), (for_each_fn_ptr)print_key_and_value);
+        env = env->cdr;
     }
 }
 
-void env_add_frame(Env *env, Hash *frame){
-    env->frames = cons(frame, env->frames);
+List *env_add_frame(List *env, Hash *frame){
+    return cons(frame, env);
 }
 
-void env_drop_frame(Env *env, int do_free_frame){
-    if (do_free_frame)
-        free_frame(env->frames->car);
-    env->frames = env->frames->cdr;
+List *env_drop_frame(List *env){
+    free_frame(env->car);
+    List *cdr = env->cdr;
+    free(env);
+    die_if(cdr == NULL, "dropping base frame");
+    return cdr;
 }
 
-boxed_value *env_lookup(Env *env, char *name){
+boxed_value *env_lookup(List *env, char *name){
     int hash_contains_name(Hash *hash){
         return hash_contains(hash, name);
     }
-    Hash *frame = list_find(env->frames, (predicate_fn_ptr)hash_contains_name);
+    Hash *frame = list_find(env, (predicate_fn_ptr)hash_contains_name)->car;
     if (frame == NULL){
-        printf("Looking for %s\n", name);
-        die("Value not found in environment");
+        die(make_msg("Value %s not found in environment", name));
     } else {
         return hash_value(frame, name);
     }
 }
 
-Env *copy_env(Env *env){
-    Env *copy = malloc(sizeof(Env));
-    copy->base = copy_frame(env->base);
-    copy->frames = list_map(env->frames, (map_fn_ptr)copy_frame);
-    return copy;
+List *copy_env(List *env){
+    return list_map(env, (map_fn_ptr)copy_frame);
 }
 
 
-int env_has_binding(Env *env, char *name){
+int env_has_binding(List *env, char *name){
     int frame_has_binding(Hash *frame){
         return hash_contains(frame, name);
     }
-    return list_some(env->frames, (predicate_fn_ptr)frame_has_binding) || hash_contains(env->base, name);
+    return list_some(env, (predicate_fn_ptr)frame_has_binding);
 }
 
-Hash *collapse_to_single_frame(Env *env){
+Hash *collapse_to_single_frame(List *env){
     Hash *single_frame = create_empty_frame();
     void add_values_from_frame(Hash *frame){
         List *keys = hash_keys(frame);
@@ -81,37 +77,32 @@ Hash *collapse_to_single_frame(Env *env){
         }
         free_list(keys, nop_free_fn);
     }
-    list_for_each(env->frames, (for_each_fn_ptr)add_values_from_frame);
+    list_for_each(env, (for_each_fn_ptr)add_values_from_frame);
     return single_frame;
 }
 
-void free_env(Env *env){
-    while (env->frames != NULL)
-        env_drop_frame(env, 1);
+void free_env(List *env){
+    while (env != NULL)
+        env = env_drop_frame(env);
 }
 
-void define_value_in_env(Env *env, char *key, boxed_value *value){
-    if (hash_contains(env->base, key)){
-        char *buf = malloc(1000 * sizeof(char));
-        snprintf(buf, 1000, "Trying to redefine value for %s", key);
-        die(buf);
-    }
-    frame_add(env->base, key, value);
+void define_value_in_env(List *env, char *key, boxed_value *value){
+    Hash *base = list_last_element(env);
+    if (hash_contains(base, key))
+        die(make_msg("Trying to redefine value for %s", key));
+    frame_add(base, key, value);
 }
 
-void set_value_in_env(Env *env, char *key, boxed_value *value){
-    List *frames = env->frames;
-    while (frames != NULL){
-        Hash *frame = (Hash *)frames->car;
+void set_value_in_env(List *env, char *key, boxed_value *value){
+    while (env != NULL){
+        Hash *frame = (Hash *)env->car;
         if (hash_contains(frame, key)){
             frame_add(frame, key, value);
             return;
         } else {
-            frames = frames->cdr;
+            env = env->cdr;
         }
     }
-    char *buf = malloc(1000 * sizeof(char));
-    snprintf(buf, 1000, "No existing value of %s to set", key);
-    die(buf);
+    die(make_msg("No existing value of %s to set", key));
 }
 

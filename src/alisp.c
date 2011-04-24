@@ -12,7 +12,7 @@ void repl(){
     char *exp_buf = malloc(10000 * sizeof(char));
     char *slashpos = NULL;
     expression *exp;
-    Env *env = create_env();
+    List *env = create_env();
     printf("> ");
     while (1){
         fgets(buf, 10000, stdin);
@@ -23,7 +23,7 @@ void repl(){
         } else {
             strcat(exp_buf, buf);
             exp = parse_expression_from_string(exp_buf);
-            boxed_value *val = eval(env, exp);
+            boxed_value *val = eval(env, NULL, exp);
             printf("  ");
             print_boxed_value(val, 0);
             strcpy(exp_buf, "");
@@ -38,9 +38,9 @@ int main(int ARGC, char **ARGV){
     else {
         FILE *f = fopen(ARGV[1], "r");
         List *exps = parse_expressions(f);
-        Env *env = create_env();
+        List *env = create_env();
         while (exps != NULL){
-            boxed_value *val = eval(env, exps->car);
+            boxed_value *val = eval(env, NULL, exps->car);
             printf("  ");
             print_boxed_value(val, 0);
             exps = exps->cdr;

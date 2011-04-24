@@ -120,11 +120,52 @@ int list_all(List *l, predicate_fn_ptr predicate){
     return 1;
 }
 
-void *list_find(List *l, predicate_fn_ptr predicate){
+List *list_find(List *l, predicate_fn_ptr predicate){
     while (l != NULL){
         if (predicate(l->car))
-            return l->car;
+            return l;
         l = l->cdr;
     }
     return NULL;
+}
+
+List *list_filter(List *l, predicate_fn_ptr predicate){
+    List *rev_result = NULL;
+    while (l != NULL){
+        if (predicate(l->car))
+            rev_result = cons(l->car, rev_result);
+    }
+    List *result = reverse_list(rev_result);
+    free_list(rev_result, nop_free_fn);
+    return result;
+}
+
+List *list_filter_not(List *l, predicate_fn_ptr predicate){
+    int not_predicate(void *thing){
+        if (predicate(thing) == 0)
+            return 1;
+        else
+            return 0;
+    }
+    return list_filter(l, not_predicate);
+}
+
+void *list_last_element(List *l){
+    die_if(l == NULL, "List is empty");
+    while (l->cdr != NULL)
+        l = l->cdr;
+    return l->car;
+}
+
+List *list_drop_with_free_fn(List *l, free_fn_ptr free_fn){
+    die_if(l == NULL, "Can't drop head of empty list");
+    List *l2 = l->cdr;
+    free_fn(l->car);
+    free(l->car);
+    free(l);
+    return l2;
+}
+
+List *list_drop(List *l){
+    list_drop_with_free_fn(l, nop_free_fn);
 }

@@ -48,5 +48,6 @@ extern boxed_value *TRUE;
 void print_boxed_value(boxed_value *v, int indent);
 void inc_ref_count(boxed_value *v);
 void dec_ref_count(boxed_value *v);
-boxed_value *make_boxed_closure(Env *env, function_expression def);
+boxed_value *make_boxed_closure(List *env, function_expression def);
+
 #endif

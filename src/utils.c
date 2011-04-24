@@ -3,6 +3,19 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+#include "stdarg.h"
+
+char *make_msg(char *fmt, ...){
+    char *buf = malloc(1000 * sizeof(char));
+    va_list(ap);
+    va_start(ap, fmt);
+    vsnprintf(buf, 1000, fmt, ap);
+    va_end(ap);
+
+    char *smallbuf = strdup(buf);
+    free(buf);
+    return smallbuf;
+}
 
 void die(char *msg){
     printf("Exiting: %s\n", msg);
@@ -10,9 +23,9 @@ void die(char *msg){
 }
 
 
-void die_if(int predicate, char* message){
+void die_if(int predicate, char* msg){
     if(predicate)
-        die(message);
+        die(msg);
 }
 
 void die_unless(int predicate, char* message){

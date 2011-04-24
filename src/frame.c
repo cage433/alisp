@@ -2,7 +2,7 @@
 #include "utils.h"
 
 Hash *create_empty_frame(){
-    return hash_create(string_hash_fn, strings_equal);
+    return hash_create_with_string_keys();
 }
 
 void frame_add(Hash *frame, char *key, boxed_value *value){
