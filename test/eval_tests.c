@@ -277,6 +277,16 @@ START_TEST(test_tagbody2){
 }
 END_TEST
 
+START_TEST(test_tagbody3){
+    List *env = create_env();
+    eval(env, NULL, parse_expression_from_string("(def x 3)"));
+    eval(env, NULL, parse_expression_from_string("(tagbody foo (if (eq x 10) 77 (progn (set! x (+ x 1)) (go foo))))")); 
+    expression *exp = parse_expression_from_string("x");
+    boxed_value *v = eval(env, NULL, exp);
+    fail_unless(boxed_values_equal(make_boxed_int(10), v));
+}
+END_TEST
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -305,6 +315,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_def_inside_lambda);
     tcase_add_test (tc_core, test_tagbody);
     tcase_add_test (tc_core, test_tagbody2);
+    tcase_add_test (tc_core, test_tagbody3);
     suite_add_tcase (s, tc_core);
 
     return s;

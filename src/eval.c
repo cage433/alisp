@@ -112,6 +112,30 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
         expression *id = nthelt(arg_exps, 0);
         value = eval_exp(nthelt(arg_exps, 1));
         apply_set(env, id, value);
+    } else if (op_name_equals("go")) {
+            die_unless(listlen(arg_exps) == 1, "go requires one value");
+
+            char *label = ((expression *)(arg_exps->car))->identifier_value;
+            pair *p;
+            Hash *h;
+            while (tagbody_env_pairs != NULL){
+                p = tagbody_env_pairs->car;
+                h = (Hash *)(p->rhs);
+                if (hash_contains(h, label)){
+                    break;
+                } else {
+                    tagbody_env_pairs = list_drop(tagbody_env_pairs);
+                }
+            }
+            die_if(tagbody_env_pairs == NULL, make_msg("Can't find label %s", label));
+            List *tagbody_env = (List *)(p->lhs);
+            while (env != NULL && env != tagbody_env){
+                if (env == tagbody_env)
+                    break;
+                die_if(env == NULL, "Env should have contained tagbody env");
+                env = env_drop_frame(env);
+            }
+            value = eval(tagbody_env, tagbody_env_pairs, (expression *)(hash_value(h, label)));
     } else {
         List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
         if (op_name_equals("eq")){
@@ -134,30 +158,6 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
         } else if (op_name_equals("cdr")) {
             die_unless(listlen(arg_values) == 1, "cdr requires one value");
             value = apply_cdr(nthelt(arg_values, 0));
-        } else if (op_name_equals("go")) {
-            die_unless(listlen(arg_values) == 1, "go requires one value");
-
-            char *label = ((boxed_value *)(arg_values->car))->string_value;
-            pair *p;
-            Hash *h;
-            while (tagbody_env_pairs != NULL){
-                p = tagbody_env_pairs->car;
-                h = (Hash *)(p->rhs);
-                if (hash_contains(h, label)){
-                    break;
-                } else {
-                    tagbody_env_pairs = list_drop(tagbody_env_pairs);
-                }
-            }
-            die_if(tagbody_env_pairs == NULL, make_msg("Can't find label %s", label));
-            List *tagbody_env = (List *)(p->lhs);
-            while (env != NULL && env != tagbody_env){
-                if (env == tagbody_env)
-                    break;
-                die_if(env == NULL, "Env should have contained tagbody env");
-                env = env_drop_frame(env);
-            }
-            value = eval(tagbody_env, tagbody_env_pairs, (expression *)(hash_value(h, label)));
         } else {
             die("Unexpected primitive");
         }

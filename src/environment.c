@@ -44,11 +44,11 @@ boxed_value *env_lookup(List *env, char *name){
     int hash_contains_name(Hash *hash){
         return hash_contains(hash, name);
     }
-    Hash *frame = list_find(env, (predicate_fn_ptr)hash_contains_name)->car;
-    if (frame == NULL){
+    List *frames = list_find(env, (predicate_fn_ptr)hash_contains_name);
+    if (frames == NULL){
         die(make_msg("Value %s not found in environment", name));
     } else {
-        return hash_value(frame, name);
+        return hash_value(frames->car, name);
     }
 }
 
