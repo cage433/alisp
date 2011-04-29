@@ -108,12 +108,47 @@ boxed_value *apply_set(List *env, expression *id, boxed_value *value){
     set_value_in_env(env, id->identifier_value, value);
     return value;
 }
+
 boxed_value *apply_eq(boxed_value *v1, boxed_value *v2){
     if (boxed_values_equal(v1, v2))
         return TRUE;
     else {
         return NIL;
     }
+}
+
+boxed_value *apply_numeric_comparator(char* comp, List *values){
+    double asDouble(boxed_value *v){
+        if (v->type == boxed_int)
+            return 0.0 + v->int_value;
+        else if (v->type == boxed_double)
+            return v->double_value;
+        else
+            die("non numeric comparator");
+    }
+
+    boxed_value *compare (boxed_value *v1, boxed_value *v2){
+        double d1 = asDouble(v1);
+        double d2 = asDouble(v2);
+
+        if (strings_equal(comp, "<"))
+            return d1 < d2 ? TRUE : NIL;
+        else if (strings_equal(comp, ">"))
+            return d1 > d2 ? TRUE : NIL;
+        else if (strings_equal(comp, "<="))
+            return d1 <= d2 ? TRUE : NIL;
+        else if (strings_equal(comp, ">="))
+            return d1 >= d2 ? TRUE : NIL;
+        else
+            die(make_msg("unexpected comparator %s", comp));
+    }
+    while (values->cdr != NULL){
+        boxed_value *comp = compare(values->car, values->cdr->car);
+        if (boxed_values_equal(comp, NIL))
+            return comp;
+        values = values->cdr;
+    }
+    return TRUE;
 }
 
 // TODO - Deal with the memory leak 

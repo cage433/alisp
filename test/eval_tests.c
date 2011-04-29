@@ -287,6 +287,40 @@ START_TEST(test_tagbody3){
 }
 END_TEST
 
+START_TEST(test_comparators){
+    List *env = create_env();
+    int num_trues = 4;
+    char *true_expressions[4] = {
+        "(< 3 4)",
+        "(<= 3 4)",
+        "(<= 3 3)",
+        "(< 3 4 5)"
+    };
+    int i;
+    for (i = 0; i < num_trues; ++i){
+        fail_unless(boxed_values_equal(
+            TRUE,
+            eval(env, NULL, parse_expression_from_string(true_expressions[i]))
+        ));
+    }
+    int num_falses = 5;
+    char *false_expressions[5] = {
+        "(< 3 3)",
+        "(< 3.0 3.0)",
+        "(> 3 3)",
+        "(> 3 3.0)",
+        "(< 3 4 5 3)"
+    };
+
+    for (i = 0; i < num_falses; ++i){
+        fail_unless(boxed_values_equal(
+            NIL,
+            eval(env, NULL, parse_expression_from_string(false_expressions[i]))
+        ));
+    }
+}
+END_TEST
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -316,6 +350,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_tagbody);
     tcase_add_test (tc_core, test_tagbody2);
     tcase_add_test (tc_core, test_tagbody3);
+    tcase_add_test (tc_core, test_comparators);
     suite_add_tcase (s, tc_core);
 
     return s;

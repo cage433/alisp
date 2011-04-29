@@ -7,15 +7,27 @@
 #include "frame.h"
 #include "pair.h"
 
-char *PRIMITIVES[13] = {
+char *PRIMITIVES[17] = {
     "+", "*", "-", "/", "cons", 
     "car", "cdr", "eq", "if", 
-    "and", "or", "set!", "go"
+    "and", "or", "set!", "go",
+    "<", ">", "<=", ">="
 };
 int is_primitive(char *identifier){
     int i;
-    for (i = 0; i < 13; ++i)
+    for (i = 0; i < 17; ++i)
         if (strings_equal(PRIMITIVES[i], identifier))
+            return 1;
+    return 0;
+}
+
+char *COMPARATORS[4] = {
+    "<", ">", "<=", ">="
+};
+int is_comparator(char *identifier){
+    int i;
+    for (i = 0; i < 4; ++i)
+        if (strings_equal(COMPARATORS[i], identifier))
             return 1;
     return 0;
 }
@@ -158,6 +170,9 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
         } else if (op_name_equals("cdr")) {
             die_unless(listlen(arg_values) == 1, "cdr requires one value");
             value = apply_cdr(nthelt(arg_values, 0));
+        } else if (is_comparator(op_name)){
+            die_unless(listlen(arg_values) >= 2, "numeirc comparisons require at least two values");
+            value = apply_numeric_comparator(op_name, arg_values);
         } else {
             die("Unexpected primitive");
         }
