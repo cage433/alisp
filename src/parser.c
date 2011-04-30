@@ -7,13 +7,27 @@
 #include "assert.h"
 #include "string.h"
 #include "utils.h"
-
-typed_token *token_car(List *tokens){
-    return (typed_token *)(tokens->car);
+//
+//intermediate_expression *consume_intermediate_expression(List **tokens){
+//    
+//}
+//List *consume_program_as_list_of_intermediate_expressions(List **tokens){
+//
+//    List *list = NULL;
+//    while (*tokens->car != NULL){
+//        list = cons(consume_intermediate_expression(tokens), list);
+//    }
+//    List *result = reverse_list(list);
+//    free_list(list, nop_free_fn);
+//    return result;
+//}
+//
+token *token_car(List *tokens){
+    return (token *)(tokens->car);
 }
 
 expression *consume_integer_exp(List **tokens){
-    typed_token *tok = token_car(*tokens);
+    token *tok = token_car(*tokens);
     int num = tok->int_value;
     *tokens = (*tokens)->cdr;
     expression *exp = make_integer_expression(num);
@@ -21,7 +35,7 @@ expression *consume_integer_exp(List **tokens){
 }
     
 expression *consume_double_exp(List **tokens){
-    typed_token *tok = token_car(*tokens);
+    token *tok = token_car(*tokens);
     double num = tok->double_value;
     *tokens = (*tokens)->cdr;
     expression *exp = make_double_expression(num);
@@ -29,7 +43,7 @@ expression *consume_double_exp(List **tokens){
 }
 
 expression *consume_identifier_exp(List **tokens){
-    typed_token *tok = token_car(*tokens);
+    token *tok = token_car(*tokens);
     char *identifier = tok->identifier_value;
     *tokens = (*tokens)->cdr;
     expression *exp = make_identifier_expression(identifier);
@@ -55,7 +69,7 @@ void eat_right_paren(List **tokens){
 }
 
 void eat_identifier(List **tokens, char *name){
-    typed_token *car = token_car(*tokens);
+    token *car = token_car(*tokens);
     die_unless(car->type == tok_identifier && strcmp(car->identifier_value, name) == 0, "Expected identifier");
     *tokens = (*tokens)->cdr;
 }
@@ -93,6 +107,14 @@ expression *consume_progn_expression(List **tokens){
     List *exps = consume_upto_right_paren(tokens);
     expression *progn = make_progn_expression(exps);
     return progn;
+}
+
+void print_remaining_tokens(List **tokens){
+    List *toks = *tokens;
+    while (toks != NULL){
+        printtoken(toks->car);
+        toks = toks->cdr;
+    }
 }
 
 /**
@@ -180,7 +202,7 @@ expression *consume_tagbody_expression(List **tokens){
 }
 
 expression *consume_expression(List **tokens){
-    typed_token *tok = token_car(*tokens);
+    token *tok = token_car(*tokens);
     if (tok->type == tok_integer)
         return consume_integer_exp(tokens);
     else if (tok->type == tok_double)
@@ -188,7 +210,7 @@ expression *consume_expression(List **tokens){
     else if (tok->type == tok_identifier)
         return consume_identifier_exp(tokens);
     else if (tok->type == tok_left_paren){
-        typed_token *nexttok = (typed_token *)nthelt(*tokens, 1);
+        token *nexttok = (token *)nthelt(*tokens, 1);
         if (nexttok == NULL)
             die("Expected more tokens");
         else if (nexttok->type == tok_identifier) {
@@ -227,7 +249,7 @@ List *parse_expressions(FILE *stream){
     }
     List *result = reverse_list(expressions);
     free_list(expressions, nop_free_fn);
-    free_list(tokens, free_token);
+    free_list(tokens, (free_fn_ptr)free_token);
     return result;
 }
 

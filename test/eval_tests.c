@@ -335,6 +335,26 @@ START_TEST(test_comparators){
 }
 END_TEST
 
+START_TEST(test_tagbody_factorial){
+    List *env = create_env();
+    char *exp = "(def fact(n)                               \
+                    ((lambda (i acc)                        \
+                        (tagbody                            \
+                            label                           \
+                            (if (< i n)                     \
+                                (progn                      \
+                                    (set! acc (* i acc))    \
+                                    (set! i (+ i 1))        \
+                                    (go label))))           \
+                            acc)                            \
+                    1 1))";
+
+    eval(env, NULL, parse_expression_from_string(exp));
+    boxed_value *v = eval(env, NULL, parse_expression_from_string("(fact 4)")); 
+    fail_unless(boxed_values_equal(make_boxed_int(24), v));
+}
+END_TEST
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -366,6 +386,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_tagbody2);
     tcase_add_test (tc_core, test_tagbody3);
     tcase_add_test (tc_core, test_comparators);
+//    tcase_add_test (tc_core, test_tagbody_factorial);
     suite_add_tcase (s, tc_core);
 
     return s;

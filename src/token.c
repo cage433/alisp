@@ -5,37 +5,37 @@
 #include "token.h"
 #include "utils.h"
 
-typed_token *integer_token(int num, char *text){
-    typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
+token *integer_token(int num, char *text){
+    token *tok = (token *)my_malloc(sizeof(token));
     tok->type = tok_integer;
     tok->int_value = num;
     tok->text = strdup(text);
     return tok;
 }
 
-typed_token *double_token(double num, char *text){
-    typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
+token *double_token(double num, char *text){
+    token *tok = (token *)my_malloc(sizeof(token));
     tok->type = tok_double;
     tok->double_value = num;
     tok->text = strdup(text);
     return tok;
 }
 
-typed_token *identifier_token(char *identifier, char *text){
-    typed_token *tok = (typed_token *)my_malloc(sizeof(typed_token));
+token *identifier_token(char *identifier, char *text){
+    token *tok = (token *)my_malloc(sizeof(token));
     tok->type = tok_identifier;
     tok->identifier_value = strdup(identifier);
     tok->text = strdup(text);
     return tok;
 }
 
-void printtoken(typed_token *tok){
+void printtoken(token *tok){
     printf("Token %s\n", tok->text);
 }
 
 int tokens_equal(const void *t1, const void *t2){
-    typed_token *tok1 = (typed_token *)t1;
-    typed_token *tok2 = (typed_token *)t2;
+    token *tok1 = (token *)t1;
+    token *tok2 = (token *)t2;
     switch(tok1->type){
         case tok_left_paren:
             return tok2->type == tok_left_paren;
@@ -59,19 +59,18 @@ int tokens_equal(const void *t1, const void *t2){
     }
 }
 
-void free_token(void *token){
-    typed_token *tok = token;
-    switch (tok->type){
+void free_token(token *token){
+    switch (token->type){
         case tok_left_paren:
         case tok_right_paren:
             break;
         case tok_identifier:
-            my_free(tok->identifier_value);
-            my_free(tok);
+            my_free(token->identifier_value);
+            my_free(token);
             break;
         case tok_double:
         case tok_integer:
-            my_free(tok);
+            my_free(token);
             break;
         default:
             die("Unrecognised token");

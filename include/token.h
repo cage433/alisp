@@ -19,17 +19,17 @@ typedef struct {
         char* identifier_value;
     };
     char *text;
-} typed_token;
+} token;
 
-typed_token *integer_token(int num, char *text);
-typed_token *double_token(double num, char *text);
-typed_token *identifier_token(char *identifier, char *text);
+token *integer_token(int num, char *text);
+token *double_token(double num, char *text);
+token *identifier_token(char *identifier, char *text);
 
-static typed_token LEFT_PAREN = {tok_left_paren, 0, "("};
-static typed_token RIGHT_PAREN = {tok_right_paren, 0, ")"};
+static token LEFT_PAREN = {tok_left_paren, 0, "("};
+static token RIGHT_PAREN = {tok_right_paren, 0, ")"};
 
 int tokens_equal(const void *tok1, const void *tok2);
-void free_token(void *typed_token);
+void free_token(token *token);
 
 #endif
 

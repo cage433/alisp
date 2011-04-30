@@ -15,8 +15,17 @@ typedef enum {
     exp_tagbody
 } expression_type;
 
+
 struct expression;
 struct expression_list;
+
+typedef struct {
+    int type;
+    union {
+        struct expression *exp;
+        List *list;
+    };
+} intermediate_expression;
 
 typedef struct {
     List *args;                 // List of char*

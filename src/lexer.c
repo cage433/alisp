@@ -68,10 +68,10 @@ token_type consume_integer(FILE *buf, FILE *stream){
     return tok_integer;
 }
 
-typed_token *consume_token(FILE *stream){
+token *consume_token(FILE *stream){
     // We know here that stream is not at EOF, 
     // nor is its next character whitespace
-    typed_token *tok;
+    token *tok;
     int ch;
     ch = getc(stream);
     if (ch == '(')
@@ -116,7 +116,7 @@ List *getTokens(FILE *stream){
     if (isspace(ch)){
     } else {
         ungetc(ch, stream);
-        typed_token *tok = consume_token(stream);
+        token *tok = consume_token(stream);
         x = cons(tok, x);
     }
     }
