@@ -95,12 +95,17 @@ boxed_value *apply_divide(List *values){
         return list_fold(values->cdr, copy_boxed_number(values->car), (fold_fn_ptr)divide_values);
 }
 
-boxed_value *apply_if(List *env, List *tagbody_env_pairs, expression *predicate, expression *consequent, expression *alternative){
-    boxed_value *predicate_value = eval(env, tagbody_env_pairs, predicate);
+boxed_value *apply_if(List *env, List *tagbody_env_pairs, List *expressions){
+    int num_exps = listlen(expressions);
+    die_if(num_exps < 2 || num_exps > 3, "if expressions need 2 or 3 sub expressions");
+    boxed_value *predicate_value = eval(env, tagbody_env_pairs, expressions->car);
     if (boxed_values_equal(predicate_value, NIL))
-        return eval(env, tagbody_env_pairs, alternative);
+        if (num_exps == 2)
+            return NIL;
+        else
+            return eval(env, tagbody_env_pairs, nthelt(expressions, 2));
     else
-        return eval(env, tagbody_env_pairs, consequent);
+        return eval(env, tagbody_env_pairs, nthelt(expressions, 1));
 }
 
 boxed_value *apply_set(List *env, expression *id, boxed_value *value){

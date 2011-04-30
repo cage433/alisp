@@ -9,7 +9,7 @@ boxed_value *apply_plus(List *values);
 boxed_value *apply_times(List *values);
 boxed_value *apply_minus(List *values);
 boxed_value *apply_divide(List *values);
-boxed_value *apply_if(List *env, List *tagbody_env_pairs, expression *predicate, expression *consequent, expression *alternative);
+boxed_value *apply_if(List *env, List *tagbody_env_pairs, List *expressions);
 boxed_value *apply_eq(boxed_value *v1, boxed_value *v2);
 boxed_value *apply_numeric_comparator(char* comp, List *values);
 boxed_value *apply_and(List *env, List *tagbody_env_pairs, List *exps);

@@ -121,6 +121,20 @@ START_TEST(test_if_and_equals)
 }
 END_TEST
 
+START_TEST(test_if_with_no_alternative)
+{
+    List *env = create_env();
+    expression *exp = parse_expression_from_string("(def foo (n) (if (eq n 1) 10))");
+    eval(env, NULL, exp);
+    exp = parse_expression_from_string("(foo 5)");
+    boxed_value *v = eval(env, NULL, exp);
+    fail_unless(boxed_values_equal(v, NIL));
+
+    exp = parse_expression_from_string("(foo 1)");
+    v = eval(env, NULL, exp);
+    fail_unless(boxed_values_equal(v, make_boxed_int(10)));
+}
+END_TEST
 
 START_TEST(test_factorial)
 {
@@ -337,6 +351,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_eval_int);
     tcase_add_test (tc_core, test_factorial);
     tcase_add_test (tc_core, test_if_and_equals);
+    tcase_add_test (tc_core, test_if_with_no_alternative);
     tcase_add_test (tc_core, test_and);
     tcase_add_test (tc_core, test_or);
     tcase_add_test (tc_core, test_cons);

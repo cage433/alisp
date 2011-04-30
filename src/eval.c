@@ -113,8 +113,7 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
     }
 
     if (op_name_equals("if")){
-        die_unless(listlen(arg_exps) == 3, "If requires three arguments exactly");
-        value = apply_if(env, tagbody_env_pairs, nthelt(arg_exps, 0), nthelt(arg_exps, 1), nthelt(arg_exps, 2));
+        value = apply_if(env, tagbody_env_pairs, arg_exps);
     } else if (op_name_equals("and")){
         value = apply_and(env, tagbody_env_pairs, arg_exps);
     } else if (op_name_equals("or")){
@@ -171,7 +170,7 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
             die_unless(listlen(arg_values) == 1, "cdr requires one value");
             value = apply_cdr(nthelt(arg_values, 0));
         } else if (is_comparator(op_name)){
-            die_unless(listlen(arg_values) >= 2, "numeirc comparisons require at least two values");
+            die_unless(listlen(arg_values) >= 2, "numeric comparisons require at least two values");
             value = apply_numeric_comparator(op_name, arg_values);
         } else {
             die("Unexpected primitive");
