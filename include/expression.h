@@ -12,20 +12,14 @@ typedef enum {
     exp_call,
     exp_function,
     exp_progn,
-    exp_tagbody
+    exp_tagbody,
+    exp_list        // This is only an intermediate representation
+                    // It will be eventually converted into some kind
+                    // of call
 } expression_type;
 
 
 struct expression;
-struct expression_list;
-
-typedef struct {
-    int type;
-    union {
-        struct expression *exp;
-        List *list;
-    };
-} intermediate_expression;
 
 typedef struct {
     List *args;                 // List of char*
@@ -62,6 +56,7 @@ typedef struct expression {
         function_expression function_value;
         progn_expression progn_value;
         tagbody_expression tagbody_value;
+        List *list_value;
     };
     char *text;
 } expression;
@@ -74,10 +69,12 @@ expression *make_definition_expression(char *name, struct expression *exp);
 expression *make_function_expression(List *args, expression *body);
 expression *make_progn_expression(List *exps);
 expression *make_tagbody_expression(expression *whole_progn, Hash *tag_progn_map);
+expression *make_list_expression(List *list);
 
 
 int expressions_equal(const void *exp1, const void *exp2);
 void print_expression(int depth, expression *exp);
 char *expression_to_string(expression *exp);
+int is_identifier(void *exp);
 
 #endif

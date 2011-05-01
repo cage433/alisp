@@ -85,7 +85,7 @@ END_TEST
 START_TEST(test_eval_def)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def foo (x) (+ x 1))");
+    expression *exp = parse_expression_from_string("(def (foo x) (+ x 1))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("(foo 10)");
     boxed_value *v = eval(env, NULL, exp);
@@ -96,9 +96,9 @@ END_TEST
 START_TEST(test_eval_def2)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def foo (x) (+ x 1))");
+    expression *exp = parse_expression_from_string("(def (foo x) (+ x 1))");
     eval(env, NULL, exp);
-    exp = parse_expression_from_string("(def bar (x y) (+ x (foo y)))");
+    exp = parse_expression_from_string("(def (bar x y) (+ x (foo y)))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("(bar 10 20)");
     boxed_value *v = eval(env, NULL, exp);
@@ -109,7 +109,7 @@ END_TEST
 START_TEST(test_if_and_equals)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def foo (n) (if (eq n 1) 10 20))");
+    expression *exp = parse_expression_from_string("(def (foo n) (if (eq n 1) 10 20))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("(foo 5)");
     boxed_value *v = eval(env, NULL, exp);
@@ -124,7 +124,7 @@ END_TEST
 START_TEST(test_if_with_no_alternative)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def foo (n) (if (eq n 1) 10))");
+    expression *exp = parse_expression_from_string("(def (foo n) (if (eq n 1) 10))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("(foo 5)");
     boxed_value *v = eval(env, NULL, exp);
@@ -139,7 +139,7 @@ END_TEST
 START_TEST(test_factorial)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def factorial (n) (if (eq n 1) 1 (* (factorial (- n 1)) n)))");
+    expression *exp = parse_expression_from_string("(def (factorial n) (if (eq n 1) 1 (* (factorial (- n 1)) n)))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("(factorial 5)");
     boxed_value *v = eval(env, NULL, exp);
@@ -215,7 +215,7 @@ START_TEST(test_lambdas_can_be_returned_by_functions)
 {
     List *env = create_env();
     expression *exp;
-    exp = parse_expression_from_string("(def inc() (lambda (x) (+ x 10)))");
+    exp = parse_expression_from_string("(def (inc) (lambda (x) (+ x 10)))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("((inc) 4)");
     fail_unless(boxed_values_equal(make_boxed_int(14), eval(env, NULL, exp)));
@@ -226,7 +226,7 @@ START_TEST(test_closure)
 {
     List *env = create_env();
     expression *exp;
-    exp = parse_expression_from_string("(def inc(n) (lambda (x) (+ x n)))");
+    exp = parse_expression_from_string("(def (inc n) (lambda (x) (+ x n)))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("((inc 5) 4)");
     fail_unless(boxed_values_equal(make_boxed_int(9), eval(env, NULL, exp)));
@@ -236,7 +236,7 @@ END_TEST
 START_TEST(test_variable_shadowed)
 {
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def foo(n) (lambda (n) n))");
+    expression *exp = parse_expression_from_string("(def (foo n) (lambda (n) n))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("((foo 5) 4)");
     fail_unless(boxed_values_equal(make_boxed_int(4), eval(env, NULL, exp)));
@@ -265,7 +265,7 @@ END_TEST
 
 START_TEST(test_def_inside_lambda){
     List *env = create_env();
-    expression *exp = parse_expression_from_string("(def foo() (progn (def x 10) x))");
+    expression *exp = parse_expression_from_string("(def (foo) (progn (def x 10) x))");
     eval(env, NULL, exp);
     exp = parse_expression_from_string("(foo)");
     boxed_value *v = eval(env, NULL, exp);
@@ -337,20 +337,21 @@ END_TEST
 
 START_TEST(test_tagbody_factorial){
     List *env = create_env();
-    char *exp = "(def fact(n)                               \
+    char *exp = "(def (fact n)                               \
                     ((lambda (i acc)                        \
-                        (tagbody                            \
+                        (progn (tagbody                            \
                             label                           \
-                            (if (< i n)                     \
+                            (if (<= i n)                     \
                                 (progn                      \
                                     (set! acc (* i acc))    \
                                     (set! i (+ i 1))        \
                                     (go label))))           \
-                            acc)                            \
-                    1 1))";
+                        acc))                            \
+                    1 1) )";
 
     eval(env, NULL, parse_expression_from_string(exp));
     boxed_value *v = eval(env, NULL, parse_expression_from_string("(fact 4)")); 
+    print_boxed_value(v, 0);
     fail_unless(boxed_values_equal(make_boxed_int(24), v));
 }
 END_TEST
@@ -386,7 +387,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_tagbody2);
     tcase_add_test (tc_core, test_tagbody3);
     tcase_add_test (tc_core, test_comparators);
-//    tcase_add_test (tc_core, test_tagbody_factorial);
+    tcase_add_test (tc_core, test_tagbody_factorial);
     suite_add_tcase (s, tc_core);
 
     return s;

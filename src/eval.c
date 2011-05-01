@@ -97,7 +97,7 @@ boxed_value *eval(List *env, List* tagbody_env_pairs, expression *exp){
             }
             break;
         default:
-            die("Unexpected expression type");
+            die(make_msg("Unexpected expression type %d", exp->type));
     }
     indent -=1;
     return value;

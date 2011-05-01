@@ -18,8 +18,8 @@ static char* codes[] = {
     "(foo 1)",
     "(foo 1 9.5)",
     "(foo 1 (bar mike))",
-    "(def foo (x) x)",
-    "(def foo (x y) (+ x y))"
+    "(def (foo x) x)",
+    "(def (foo x y) (+ x y))"
 };
 static List **expected = NULL;
 
@@ -44,12 +44,16 @@ void initialise_expected(){
                         make_call_expression(make_identifier_expression("bar"), 
                             make_list(1, 
                                 make_identifier_expression("mike"))))));
-    expected[10] = make_list(1, make_definition_expression("foo", make_function_expression(make_list(1, "x"), make_identifier_expression("x"))));
+    expected[10] = make_list(1, make_definition_expression("foo", make_function_expression(make_list(1, "x"), 
+                    make_progn_expression(make_list(1, make_identifier_expression("x"))))));
     expected[11] = make_list(1, make_definition_expression(
                                     "foo", 
                                     make_function_expression(
                                         make_list(2, "x", "y"), 
-                                        make_call_expression(make_identifier_expression("+"), make_list(2, make_identifier_expression("x"), make_identifier_expression("y")))
+                                        make_progn_expression(
+                                            make_list(
+                                                1, 
+                                                make_call_expression(make_identifier_expression("+"), make_list(2, make_identifier_expression("x"), make_identifier_expression("y")))))
                                     )
                                     ));
 }

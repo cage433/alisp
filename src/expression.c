@@ -62,6 +62,13 @@ expression *make_tagbody_expression(expression *whole_progn, Hash *tag_progn_map
     return exp;
 }
 
+expression *make_list_expression(List *list){
+    expression *exp = make_empty_expression(exp_list);
+    exp->list_value = list;
+    return exp;
+}
+
+
 int expressions_equal(const void *e1, const void *e2){
     expression *exp1 = (expression *)e1;
     expression *exp2 = (expression *)e2;
@@ -113,10 +120,10 @@ void print_expression(int depth, expression *exp){
     } else if (exp->type == exp_identifier){
         printf("Identifier expression %s\n", exp->identifier_value);
     } else if (exp->type == exp_definition){
-        printf("Definition expression%s\n", exp->definition_value.name);
+        printf("Definition expression %s\n", exp->definition_value.name);
+        print_sub_expression(exp->definition_value.exp);
     } else if (exp->type == exp_function){
-        printf("Function expression\nArgs\n");
-        list_for_each(exp->function_value.args, (for_each_fn_ptr)print_sub_expression);
+        printf("Function expression %d args\n", listlen(exp->function_value.args));
         print_tabs(depth + 1);
         printf("Body\n");
         print_expression(depth + 1, exp->function_value.body);
@@ -126,8 +133,11 @@ void print_expression(int depth, expression *exp){
     } else if(exp->type == exp_tagbody){
         printf("tagbody\n");
         print_sub_expression(exp->tagbody_value.whole_progn);
+    } else if (exp->type == exp_list){
+        printf("list expression\n");
+        list_for_each(exp->list_value, (for_each_fn_ptr)print_sub_expression);
     } else {
-        printf("expression.c unimplemented\n");
+        printf("expression.c unimplemented %d\n", exp->type);
         exit(-1);
     }
 }
@@ -200,4 +210,8 @@ char *expression_to_string(expression *exp){
         exit(-1);
     }
     return strdup(buf);
+}
+
+int is_identifier(void *exp){
+    return ((expression *)exp)->type == exp_identifier;
 }
