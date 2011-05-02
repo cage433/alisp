@@ -56,7 +56,7 @@ expression *build_function_expression(List *list){
     expression *args_exp = list->car;
     die_unless(args_exp->type == exp_list, "Expected list of arguments");
     List *arguments = list_map(args_exp->list_value, (map_fn_ptr)identifier_name);
-    expression *body = process_expression(nthelt(list, 1));
+    expression *body = make_progn_expression(list_map(list->cdr, (map_fn_ptr)process_expression));
     return make_function_expression(arguments, body);
 }
 

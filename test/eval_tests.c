@@ -339,14 +339,14 @@ START_TEST(test_tagbody_factorial){
     List *env = create_env();
     char *exp = "(def (fact n)                               \
                     ((lambda (i acc)                        \
-                        (progn (tagbody                            \
+                        (tagbody                            \
                             label                           \
                             (if (<= i n)                     \
                                 (progn                      \
                                     (set! acc (* i acc))    \
                                     (set! i (+ i 1))        \
                                     (go label))))           \
-                        acc))                            \
+                        acc)                            \
                     1 1) )";
 
     eval(env, NULL, parse_expression_from_string(exp));
