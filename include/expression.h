@@ -8,42 +8,12 @@ typedef enum {
     exp_integer,
     exp_double,
     exp_identifier,
-    exp_definition,
-    exp_call,
-    exp_function,
-    exp_progn,
-    exp_tagbody,
-    exp_list        // This is only an intermediate representation
-                    // It will be eventually converted into some kind
-                    // of call
+    exp_list        
 } expression_type;
 
 
 struct expression;
 
-typedef struct {
-    List *args;                 // List of char*
-    struct expression *body;
-} function_expression;
-
-typedef struct {
-    char *name;
-    struct expression *exp;
-} definition_expression;
-
-typedef struct {
-    struct expression *func;
-    List *exps;
-} call_expression;
-
-typedef struct {
-    List *exps;
-} progn_expression;
-
-typedef struct {
-    struct expression *whole_progn;
-    Hash *tag_progn_map;
-} tagbody_expression;
 
 typedef struct expression {
     expression_type type;
@@ -51,11 +21,6 @@ typedef struct expression {
         int int_value;
         double double_value;
         char* identifier_value;
-        definition_expression definition_value;
-        call_expression call_value;
-        function_expression function_value;
-        progn_expression progn_value;
-        tagbody_expression tagbody_value;
         List *list_value;
     };
     char *text;
