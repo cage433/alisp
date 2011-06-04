@@ -34,40 +34,43 @@ int boxed_values_equal(const void *b1, const void *b2){
     }
 }
 
-boxed_value *create_box(int type){
-    boxed_value *box = my_malloc(sizeof(boxed_value));
-    box->type = type;
-    box->ref_count = 1;
-    return box;
-}
-
-
 boxed_value *make_boxed_int(int num){
-    boxed_value *box = create_box(boxed_int);
+    boxed_value *box = my_malloc(sizeof(boxed_value));
+    box->type = boxed_int;
+    box->ref_count = 0;
     box->int_value = num;
     return box;
 }
 
 boxed_value *make_boxed_double(double num){
-    boxed_value *box = create_box(boxed_double);
+    boxed_value *box = my_malloc(sizeof(boxed_value));
+    box->type = boxed_double;
+    box->ref_count = 1;
     box->double_value = num;
     return box;
 }
 
 boxed_value *make_boxed_string(char *str){
-    boxed_value *box = create_box(boxed_string);
+    boxed_value *box = my_malloc(sizeof(boxed_value));
+    box->type = boxed_string;
+    box->ref_count = 1;
     box->string_value = str;
     return box;
 }
 
-boxed_value *make_boxed_symbol(char *str){
-    boxed_value *box = create_box(boxed_symbol);
-    box->symbol_value = str;
+boxed_value *make_boxed_closure(List *env, function_expression func){
+    boxed_value *box = my_malloc(sizeof(boxed_value));
+    box->type = boxed_closure;
+    box->ref_count = 1;
+    box->closure_value.frame = collapse_to_single_frame(env);
+    box->closure_value.function = func;
     return box;
 }
 
 boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr){
-    boxed_value *box = create_box(boxed_cons);
+    boxed_value *box = my_malloc(sizeof(boxed_value));
+    box->type = boxed_cons;
+    box->ref_count = 1;
     box->cons_value.car = car;
     box->cons_value.cdr = cdr;
     inc_ref_count(car);
@@ -104,6 +107,9 @@ void free_boxed_value(boxed_value *b){
         case boxed_cons:
             dec_ref_count(b->cons_value.car);
             dec_ref_count(b->cons_value.cdr);
+            break;
+        case boxed_closure:
+            //free_hash(b->closure_value.env);
             break;
         default:
             printf("Box type %d\n", b->type);
