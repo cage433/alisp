@@ -15,10 +15,14 @@ TODO
        quote
        atom?
        cons?
-    function compilation
+#    function compilation
     external functions
     macros
 #    lambda
     let - implement as macro?
 #    improve debugging of eval
     improve debugging of malloc/free
+
+    Evaluated values need to have the same type as
+    expressions
+

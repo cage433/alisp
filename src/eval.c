@@ -4,6 +4,7 @@
 #include "expression.h"
 #include "primitives.h"
 #include "boxed_value.h"
+#include "compiler.h"
 #include "frame.h"
 #include "pair.h"
 
