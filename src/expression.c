@@ -212,6 +212,3 @@ char *expression_to_string(expression *exp){
     return strdup(buf);
 }
 
-int is_identifier(void *exp){
-    return ((expression *)exp)->type == exp_identifier;
-}

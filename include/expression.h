@@ -8,14 +8,14 @@ typedef enum {
     exp_integer,
     exp_double,
     exp_identifier,
+    exp_list,       // This is only an intermediate representation
+                    // It will be eventually compiled into one
+                    // of the expressions below
     exp_definition,
     exp_call,
     exp_function,
     exp_progn,
-    exp_tagbody,
-    exp_list        // This is only an intermediate representation
-                    // It will be eventually converted into some kind
-                    // of call
+    exp_tagbody
 } expression_type;
 
 
@@ -75,6 +75,5 @@ expression *make_list_expression(List *list);
 int expressions_equal(const void *exp1, const void *exp2);
 void print_expression(int depth, expression *exp);
 char *expression_to_string(expression *exp);
-int is_identifier(void *exp);
 
 #endif
