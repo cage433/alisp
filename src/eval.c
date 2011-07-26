@@ -8,15 +8,15 @@
 #include "frame.h"
 #include "pair.h"
 
-char *PRIMITIVES[17] = {
+char *PRIMITIVES[18] = {
     "+", "*", "-", "/", "cons", 
     "car", "cdr", "eq", "if", 
     "and", "or", "set!", "go",
-    "<", ">", "<=", ">="
+    "<", ">", "<=", ">=", "quote"
 };
 int is_primitive(char *identifier){
     int i;
-    for (i = 0; i < 17; ++i)
+    for (i = 0; i < 18; ++i)
         if (strings_equal(PRIMITIVES[i], identifier))
             return 1;
     return 0;
@@ -43,67 +43,84 @@ List *free_innermost_tagbody(List *tagbody_env_pairs){
     return cdr;
 }
 
-// Tagbodies always returb NIL, hence the void
+boxed_value *eval_exp(List *env, List* tagbody_env_pairs, expression *exp){
+    return eval_boxed(env, tagbody_env_pairs, make_boxed_expression(exp));
+}
+
+// Tagbodies always return NIL, hence the void
 // return type
 void eval_tagbody(List *env, List *tagbody_pairs, expression *tagbody_exp){
     tagbody_pairs = cons(make_pair(env, tagbody_exp->tagbody_value.tag_progn_map), tagbody_pairs);
-    eval(env, tagbody_pairs, tagbody_exp->tagbody_value.whole_progn);
+    eval_exp(env, tagbody_pairs, tagbody_exp->tagbody_value.whole_progn);
     list_drop(tagbody_pairs);
 }
 
-boxed_value *eval(List *env, List* tagbody_env_pairs, expression *exp){
+boxed_value *eval_boxed(List *env, List* tagbody_env_pairs, boxed_value *bv){
     definition_expression def;
     call_expression call;
     boxed_value *value;
     expression *compiled_expression;
     List *exps;
-    switch(exp->type){
-        case exp_tagbody:
-            eval_tagbody(env, tagbody_env_pairs, exp);
-            value = NIL;
+    expression *exp;
+    switch(bv->type){
+        case boxed_int:
+        case boxed_double:
+        case boxed_string:
+        case boxed_closure:
+        case boxed_cons:
+        case boxed_nil:
+            value = bv;
             break;
-        case exp_integer:
-            value = make_boxed_int(exp->int_value);
-            break;
-        case exp_double:
-            value = make_boxed_double(exp->double_value);
-            break;
-        case exp_identifier:
-            value = env_lookup(env, exp->identifier_value);
-            break;
-        case exp_definition:
-            def = exp->definition_value;
-            if (env_has_binding(env, def.name))
-                die(make_msg("Already have binding for %s", def.name));
+        case boxed_expression:
+            exp = bv->expression_value;
+            switch(exp->type){
+                case exp_tagbody:
+                    eval_tagbody(env, tagbody_env_pairs, exp);
+                    value = NIL;
+                    break;
+                case exp_integer:
+                    value = make_boxed_int(exp->int_value);
+                    break;
+                case exp_double:
+                    value = make_boxed_double(exp->double_value);
+                    break;
+                case exp_identifier:
+                    value = env_lookup(env, exp->identifier_value);
+                    break;
+                case exp_definition:
+                    def = exp->definition_value;
+                    if (env_has_binding(env, def.name))
+                        die(make_msg("Already have binding for %s", def.name));
 
-            if (def.exp->type == exp_function){
-                boxed_value *boxed_fun = make_boxed_closure(create_env(), def.exp->function_value);
-                value = boxed_fun;
-            } else {
-                value = eval(env, tagbody_env_pairs, def.exp);
+                    if (def.exp->type == exp_function){
+                        boxed_value *boxed_fun = make_boxed_closure(create_env(), def.exp->function_value);
+                        value = boxed_fun;
+                    } else {
+                        value = eval_exp(env, tagbody_env_pairs, def.exp);
+                    }
+                    define_value_in_env(env, def.name, value);
+                    break;
+                case exp_call:
+                    call = exp->call_value;
+                    value = apply(env, tagbody_env_pairs, call.func, call.exps);
+                    break;
+                case exp_function:
+                    value = make_boxed_closure(env, exp->function_value);
+                    break;
+                case exp_progn:
+                    exps = exp->progn_value.exps;
+                    while (exps != NULL){
+                        value = eval_exp(env, tagbody_env_pairs, exps->car);
+                        exps = exps->cdr;
+                    }
+                    break;
+                case exp_list:
+                    compiled_expression = compile_expression(exp);
+                    value = eval_exp(env, tagbody_env_pairs, compiled_expression);
+                    break;
+                default:
+                    die(make_msg("Unexpected expression type %d", exp->type));
             }
-            define_value_in_env(env, def.name, value);
-            break;
-        case exp_call:
-            call = exp->call_value;
-            value = apply(env, tagbody_env_pairs, call.func, call.exps);
-            break;
-        case exp_function:
-            value = make_boxed_closure(env, exp->function_value);
-            break;
-        case exp_progn:
-            exps = exp->progn_value.exps;
-            while (exps != NULL){
-                value = eval(env, tagbody_env_pairs, exps->car);
-                exps = exps->cdr;
-            }
-            break;
-        case exp_list:
-            compiled_expression = compile_expression(exp);
-            value = eval(env, tagbody_env_pairs, compiled_expression);
-            break;
-        default:
-            die(make_msg("Unexpected expression type %d", exp->type));
     }
     indent -=1;
     return value;
@@ -111,8 +128,8 @@ boxed_value *eval(List *env, List* tagbody_env_pairs, expression *exp){
 
 boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, List *arg_exps){
     boxed_value *value;
-    boxed_value *eval_exp(expression *exp){
-        return eval(env, tagbody_env_pairs, exp);
+    boxed_value *eval_sub_exp(expression *exp){
+        return eval_exp(env, tagbody_env_pairs, exp);
     }
     int op_name_equals(char *name){
         return strings_equal(op_name, name);
@@ -127,34 +144,37 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
     } else if (op_name_equals("set!")){
         die_unless(listlen(arg_exps) == 2, "set! requires one identifier and one variable");
         expression *id = nthelt(arg_exps, 0);
-        value = eval_exp(nthelt(arg_exps, 1));
+        value = eval_sub_exp(nthelt(arg_exps, 1));
         apply_set(env, id, value);
     } else if (op_name_equals("go")) {
-            die_unless(listlen(arg_exps) == 1, "go requires one value");
+        die_unless(listlen(arg_exps) == 1, "go requires one value");
 
-            char *label = ((expression *)(arg_exps->car))->identifier_value;
-            pair *p;
-            Hash *h;
-            while (tagbody_env_pairs != NULL){
-                p = tagbody_env_pairs->car;
-                h = (Hash *)(p->rhs);
-                if (hash_contains(h, label)){
-                    break;
-                } else {
-                    tagbody_env_pairs = list_drop(tagbody_env_pairs);
-                }
+        char *label = ((expression *)(arg_exps->car))->identifier_value;
+        pair *p;
+        Hash *h;
+        while (tagbody_env_pairs != NULL){
+            p = tagbody_env_pairs->car;
+            h = (Hash *)(p->rhs);
+            if (hash_contains(h, label)){
+                break;
+            } else {
+                tagbody_env_pairs = list_drop(tagbody_env_pairs);
             }
-            die_if(tagbody_env_pairs == NULL, make_msg("Can't find label %s", label));
-            List *tagbody_env = (List *)(p->lhs);
-            while (env != NULL && env != tagbody_env){
-                if (env == tagbody_env)
-                    break;
-                die_if(env == NULL, "Env should have contained tagbody env");
-                env = env_drop_frame(env);
-            }
-            value = eval(tagbody_env, tagbody_env_pairs, (expression *)(hash_value(h, label)));
+        }
+        die_if(tagbody_env_pairs == NULL, make_msg("Can't find label %s", label));
+        List *tagbody_env = (List *)(p->lhs);
+        while (env != NULL && env != tagbody_env){
+            if (env == tagbody_env)
+                break;
+            die_if(env == NULL, "Env should have contained tagbody env");
+            env = env_drop_frame(env);
+        }
+        value = eval_exp(tagbody_env, tagbody_env_pairs, (expression *)(hash_value(h, label)));
+    } else if (op_name_equals("quote")) {
+        die_unless(listlen(arg_exps) == 1, "quote requires one value");
+        value = make_boxed_expression(arg_exps->car);
     } else {
-        List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
+        List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_sub_exp);
         if (op_name_equals("eq")){
             die_unless(listlen(arg_values) == 2, "Eq requires two arguments exactly");
             value = apply_eq(nthelt(arg_values, 0), nthelt(arg_values, 1));
@@ -190,16 +210,16 @@ boxed_value *apply(List *env, List *tagbody_env_pairs, expression *func_exp, Lis
     if (func_exp->type == exp_identifier && is_primitive(func_exp->identifier_value))
         value = apply_primitive(env, tagbody_env_pairs, func_exp->identifier_value, arg_exps);
     else {
-        boxed_value *func = eval(env, tagbody_env_pairs, func_exp);
-        boxed_value *eval_exp(expression *exp){
-            return eval(env, tagbody_env_pairs, exp);
+        boxed_value *func = eval_exp(env, tagbody_env_pairs, func_exp);
+        boxed_value *eval_sub_exp(expression *exp){
+            return eval_exp(env, tagbody_env_pairs, exp);
         }
-        List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_exp);
+        List *arg_values = list_map(arg_exps, (map_fn_ptr)eval_sub_exp);
 
         env = env_add_frame(env, copy_frame(func->closure_value.frame));
         Hash *frame = frame_create(func->closure_value.function.args, arg_values);
         env = env_add_frame(env, frame);
-        value = eval(env, tagbody_env_pairs, func->closure_value.function.body);
+        value = eval_exp(env, tagbody_env_pairs, func->closure_value.function.body);
         env = env_drop_frame(env);
         env = env_drop_frame(env);
     }

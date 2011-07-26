@@ -12,7 +12,8 @@ typedef enum {
     boxed_string,
     boxed_closure,
     boxed_cons,
-    boxed_nil
+    boxed_nil,
+    boxed_expression
 } boxed_value_type;
 
 struct boxed_value;
@@ -35,6 +36,7 @@ typedef struct boxed_value{
         char *string_value;
         struct boxed_closure closure_value;
         struct boxed_cons cons_value;
+        expression *expression_value;
     };
 } boxed_value;
 
@@ -43,6 +45,7 @@ boxed_value *make_boxed_int(int num);
 boxed_value *make_boxed_double(double num);
 boxed_value *make_boxed_string(char *str);
 boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr);
+boxed_value *make_boxed_expression(expression *exp);
 extern boxed_value *NIL;
 extern boxed_value *TRUE;
 void print_boxed_value(boxed_value *v, int indent);

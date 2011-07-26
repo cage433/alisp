@@ -25,6 +25,8 @@ int boxed_values_equal(const void *b1, const void *b2){
     else if (box1->type == boxed_cons)
         return boxed_values_equal(box1->cons_value.car, box2->cons_value.car) &&
                 boxed_values_equal(box1->cons_value.cdr, box2->cons_value.cdr); 
+    else if (box1->type == boxed_expression)
+        return expressions_equal(box1->expression_value, box2->expression_value);
     else if (box1->type == boxed_nil)
         return 1;
     else {
@@ -33,44 +35,47 @@ int boxed_values_equal(const void *b1, const void *b2){
         exit(-1);
     }
 }
+boxed_value *initialise_box_value(int type){
+    boxed_value *box = my_malloc(sizeof(boxed_value));
+    box->type = type;
+    box->ref_count = 0;
+    return box;
+}
+
 
 boxed_value *make_boxed_int(int num){
-    boxed_value *box = my_malloc(sizeof(boxed_value));
-    box->type = boxed_int;
-    box->ref_count = 0;
+    boxed_value *box = initialise_box_value(boxed_int);
     box->int_value = num;
     return box;
 }
 
 boxed_value *make_boxed_double(double num){
-    boxed_value *box = my_malloc(sizeof(boxed_value));
-    box->type = boxed_double;
-    box->ref_count = 1;
+    boxed_value *box = initialise_box_value(boxed_double);
     box->double_value = num;
     return box;
 }
 
 boxed_value *make_boxed_string(char *str){
-    boxed_value *box = my_malloc(sizeof(boxed_value));
-    box->type = boxed_string;
-    box->ref_count = 1;
+    boxed_value *box = initialise_box_value(boxed_string);
     box->string_value = str;
     return box;
 }
 
+boxed_value *make_boxed_expression(expression *exp){
+    boxed_value *box = initialise_box_value(boxed_expression);
+    box->expression_value = exp;
+    return box;
+}
+
 boxed_value *make_boxed_closure(List *env, function_expression func){
-    boxed_value *box = my_malloc(sizeof(boxed_value));
-    box->type = boxed_closure;
-    box->ref_count = 1;
+    boxed_value *box = initialise_box_value(boxed_closure);
     box->closure_value.frame = collapse_to_single_frame(env);
     box->closure_value.function = func;
     return box;
 }
 
 boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr){
-    boxed_value *box = my_malloc(sizeof(boxed_value));
-    box->type = boxed_cons;
-    box->ref_count = 1;
+    boxed_value *box = initialise_box_value(boxed_cons);
     box->cons_value.car = car;
     box->cons_value.cdr = cdr;
     inc_ref_count(car);

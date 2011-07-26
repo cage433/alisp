@@ -98,14 +98,14 @@ boxed_value *apply_divide(List *values){
 boxed_value *apply_if(List *env, List *tagbody_env_pairs, List *expressions){
     int num_exps = listlen(expressions);
     die_if(num_exps < 2 || num_exps > 3, "if expressions need 2 or 3 sub expressions");
-    boxed_value *predicate_value = eval(env, tagbody_env_pairs, expressions->car);
+    boxed_value *predicate_value = eval_exp(env, tagbody_env_pairs, expressions->car);
     if (boxed_values_equal(predicate_value, NIL))
         if (num_exps == 2)
             return NIL;
         else
-            return eval(env, tagbody_env_pairs, nthelt(expressions, 2));
+            return eval_exp(env, tagbody_env_pairs, nthelt(expressions, 2));
     else
-        return eval(env, tagbody_env_pairs, nthelt(expressions, 1));
+        return eval_exp(env, tagbody_env_pairs, nthelt(expressions, 1));
 }
 
 boxed_value *apply_set(List *env, expression *id, boxed_value *value){
@@ -160,7 +160,7 @@ boxed_value *apply_numeric_comparator(char* comp, List *values){
 boxed_value *apply_and(List *env, List *tagbody_env_pairs, List *exps){
     boxed_value *result = TRUE;
     while (exps != NULL){
-        boxed_value *v = eval(env, tagbody_env_pairs, exps->car);
+        boxed_value *v = eval_exp(env, tagbody_env_pairs, exps->car);
         if (boxed_values_equal(v, NIL)){
             return NIL;
         }
@@ -174,7 +174,7 @@ boxed_value *apply_and(List *env, List *tagbody_env_pairs, List *exps){
 // TODO - Deal with the memory leak 
 boxed_value *apply_or(List *env, List *tagbody_env_pairs, List *exps){
     while (exps != NULL){
-        boxed_value *v = eval(env, tagbody_env_pairs, exps->car);
+        boxed_value *v = eval_exp(env, tagbody_env_pairs, exps->car);
         if (!boxed_values_equal(v, NIL))
             return v;
         exps = exps->cdr;
@@ -199,7 +199,7 @@ boxed_value *apply_cdr(boxed_value *v1){
 boxed_value *apply_progn(List *env, List *tagbody_env_pairs, List *exps){
     boxed_value *result = NIL;
     while (exps != NULL){
-        result = eval(env, tagbody_env_pairs, exps->car);
+        result = eval_exp(env, tagbody_env_pairs, exps->car);
         exps = exps->cdr;
     }
     return result;
