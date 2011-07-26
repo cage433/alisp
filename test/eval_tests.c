@@ -356,6 +356,15 @@ START_TEST(test_tagbody_factorial){
 }
 END_TEST
 
+START_TEST(test_quote){
+    List *env = create_env();
+    char *exp = "(quote 4)";
+    boxed_value *v = eval_exp(env, NULL, parse_expression_from_string(exp));
+    boxed_value *v2 = eval_boxed(env, NULL, v);
+    fail_unless(boxed_values_equal(make_boxed_int(4), v2));
+}
+END_TEST
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -388,6 +397,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_tagbody3);
     tcase_add_test (tc_core, test_comparators);
     tcase_add_test (tc_core, test_tagbody_factorial);
+    tcase_add_test (tc_core, test_quote);
     suite_add_tcase (s, tc_core);
 
     return s;
