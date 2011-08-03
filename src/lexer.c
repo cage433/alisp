@@ -113,12 +113,12 @@ List *getTokens(FILE *stream){
     List *x = NULL;
     int ch;
     while ((ch = getc(stream)) != EOF){
-    if (isspace(ch)){
-    } else {
-        ungetc(ch, stream);
-        token *tok = consume_token(stream);
-        x = cons(tok, x);
-    }
+        if (isspace(ch)){
+        } else {
+            ungetc(ch, stream);
+            token *tok = consume_token(stream);
+            x = cons(tok, x);
+        }
     }
     List *result = reverse_list(x);
     free_list(x, nop_free_fn);

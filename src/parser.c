@@ -72,24 +72,16 @@ expression *consume_expression(List **tokens){
 
 
 List *parse_expressions(FILE *stream){
-    
-    List *tokens = getTokens(stream);
-    List *tokens2 = tokens;
-    List *expressions = NULL;
-    while (tokens2 != NULL){
-        expressions = cons(consume_expression(&tokens2), expressions);
-    }
-    List *uncompiled_expressions = reverse_list(expressions);
-    free_list(expressions, nop_free_fn);
-    free_list(tokens, (free_fn_ptr)free_token);
-    return uncompiled_expressions;
-    /*if (do_compilation){*/
-    /*List *compiled_expressions = compile(uncompiled_expressions);*/
-    /*free_list(uncompiled_expressions, nop_free_fn);*/
-    /*return compiled_expressions;*/
-    /*} else {*/
-    /*return uncompiled_expressions;*/
-    /*}*/
+   List *tokens = getTokens(stream);
+   List *tokens2 = tokens;
+   List *expressions = NULL;
+   while (tokens2 != NULL){
+       expressions = cons(consume_expression(&tokens2), expressions);
+   }
+   List *uncompiled_expressions = reverse_list(expressions);
+   free_list(expressions, nop_free_fn);
+   free_list(tokens, (free_fn_ptr)free_token);
+   return uncompiled_expressions;
 }
 
 List *parse_expressions_from_string(char *text){
