@@ -7,7 +7,7 @@
 #include "expression.h"
 #include "compiler.h"
 
-static int num_tests = 12;
+static int num_tests = 13;
 static char* codes[] = {
     "10", 
     "10 12",
@@ -20,7 +20,8 @@ static char* codes[] = {
     "(foo 1 9.5)",
     "(foo 1 (bar mike))",
     "(def (foo x) x)",
-    "(def (foo x y) (+ x y))"
+    "(def (foo x y) (+ x y))",
+    "\"fred\""
 };
 static List **expected = NULL;
 
@@ -57,6 +58,7 @@ void initialise_expected(){
                                                 make_call_expression(make_identifier_expression("+"), make_list(2, make_identifier_expression("x"), make_identifier_expression("y")))))
                                     )
                                     ));
+    expected[12] = make_list(1, make_string_expression("fred"));
 }
 
 List *expected_list(int i){

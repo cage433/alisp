@@ -29,6 +29,12 @@ expression *make_identifier_expression(char *identifier){
     return exp;
 }
 
+expression *make_string_expression(char *text){
+    expression *exp = make_empty_expression(exp_string);
+    exp->string_value = strdup(text);
+    return exp;
+}
+
 expression *make_call_expression(expression *func, List *exps){
     expression *exp = make_empty_expression(exp_call);
     exp->call_value.func = func;
@@ -80,6 +86,8 @@ int expressions_equal(const void *e1, const void *e2){
         return exp1->double_value == exp2->double_value;
     else if (exp1->type == exp_identifier)
         return strcmp(exp1->identifier_value, exp2->identifier_value) == 0;
+    else if (exp1->type == exp_string)
+        return strcmp(exp1->string_value, exp2->string_value) == 0;
     else if (exp1->type == exp_call){
         int exps_same = lists_equal(exp1->call_value.exps, exp2->call_value.exps, expressions_equal);
         return exps_same;
@@ -119,6 +127,8 @@ void print_expression(int depth, expression *exp){
         list_for_each(exp->call_value.exps, (for_each_fn_ptr)print_sub_expression);
     } else if (exp->type == exp_identifier){
         printf("Identifier expression %s\n", exp->identifier_value);
+    } else if (exp->type == exp_string){
+        printf("String expression %s\n", exp->string_value);
     } else if (exp->type == exp_definition){
         printf("Definition expression %s\n", exp->definition_value.name);
         print_sub_expression(exp->definition_value.exp);

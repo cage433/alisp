@@ -8,6 +8,7 @@ typedef enum {
     exp_integer,
     exp_double,
     exp_identifier,
+    exp_string,
     exp_list,       // This is only an intermediate representation
                     // It will be eventually compiled into one
                     // of the expressions below
@@ -50,7 +51,8 @@ typedef struct expression {
     union {
         int int_value;
         double double_value;
-        char* identifier_value;
+        char *identifier_value;
+        char *string_value;
         definition_expression definition_value;
         call_expression call_value;
         function_expression function_value;

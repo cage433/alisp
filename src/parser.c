@@ -48,6 +48,13 @@ expression *consume_identifier_exp(List **tokens){
     return exp;
 }
 
+expression *consume_string_exp(List **tokens){
+    token *tok = token_car(*tokens);
+    char *text = tok->string_value;
+    *tokens = (*tokens)->cdr;
+    expression *exp = make_string_expression(text);
+    return exp;
+}
 
 expression *consume_expression(List **tokens){
     token *tok = token_car(*tokens);
@@ -57,6 +64,8 @@ expression *consume_expression(List **tokens){
         return consume_double_exp(tokens);
     else if (tok->type == tok_identifier)
         return consume_identifier_exp(tokens);
+    else if (tok->type == tok_string)
+        return consume_string_exp(tokens);
     else if (tok->type == tok_left_paren){
         eat_left_paren(tokens);
         List *list = NULL;

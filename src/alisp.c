@@ -39,8 +39,7 @@ int main(int ARGC, char **ARGV){
     while((c = getopt(ARGC, ARGV, "if:")) != -1){
         switch(c){
             case 'f':
-                file_to_load = malloc((strlen(optarg) + 1) * sizeof(char));
-                strcpy(file_to_load, optarg);
+                file_to_load = strdup(optarg);
                 break;
             case 'i':
                 run_repl = 1;

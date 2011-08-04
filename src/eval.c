@@ -84,6 +84,9 @@ boxed_value *eval_boxed(List *env, List* tagbody_env_pairs, boxed_value *bv){
                 case exp_double:
                     value = make_boxed_double(exp->double_value);
                     break;
+                case exp_string:
+                    value = make_boxed_string(exp->string_value);
+                    break;
                 case exp_identifier:
                     value = env_lookup(env, exp->identifier_value);
                     break;

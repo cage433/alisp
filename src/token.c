@@ -29,6 +29,14 @@ token *identifier_token(char *identifier, char *text){
     return tok;
 }
 
+token *string_token(char *text){
+    token *tok = (token *)my_malloc(sizeof(token));
+    tok->type = tok_string;
+    tok->string_value = strdup(text);
+    tok->text = strdup(text);
+    return tok;
+}
+
 void printtoken(token *tok){
     printf("Token %s\n", tok->text);
 }
@@ -56,6 +64,11 @@ int tokens_equal(const void *t1, const void *t2){
                 return strcmp(tok1->identifier_value, tok2->identifier_value) == 0;
             else
                 return 0;
+        case tok_string:
+            if (tok2->type == tok_string)
+                return strcmp(tok1->string_value, tok2->string_value) == 0;
+            else
+                return 0;
     }
 }
 
@@ -66,6 +79,10 @@ void free_token(token *token){
             break;
         case tok_identifier:
             my_free(token->identifier_value);
+            my_free(token);
+            break;
+        case tok_string:
+            my_free(token->string_value);
             my_free(token);
             break;
         case tok_double:
