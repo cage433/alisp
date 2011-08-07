@@ -24,7 +24,9 @@ static char *codes[] = {
         x\
         (\
         ",
-    "\"fred\""
+    "\"fred\"",
+    "#\\a",
+    "( #\\x #\\y )"
 };
 List *expected_lists(int i){
     switch (i){
@@ -42,6 +44,10 @@ List *expected_lists(int i){
             return make_list(3, &LEFT_PAREN, identifier_token("x", "x"), &LEFT_PAREN);
         case 7:
             return make_list(1, string_token("fred"));
+        case 8:
+            return make_list(1, char_token('a'));
+        case 9:
+            return make_list(4, &LEFT_PAREN, char_token('x'), char_token('y'), &RIGHT_PAREN);
     }
 }
 
@@ -64,7 +70,7 @@ Suite *test_token_suite (void)
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
     tcase_add_test (tc_core, test_make_token_list);
-    tcase_add_loop_test (tc_core, test_lexer, 0, 8);
+    tcase_add_loop_test (tc_core, test_lexer, 0, 10);
     suite_add_tcase (s, tc_core);
 
     return s;

@@ -9,7 +9,8 @@ typedef enum {
     tok_integer,
     tok_double,
     tok_right_paren,
-    tok_string
+    tok_string,
+    tok_char
 } token_type;
 
 typedef struct {
@@ -19,6 +20,7 @@ typedef struct {
         double double_value;
         char *identifier_value;
         char *string_value;
+        char char_value;
     };
     char *text;
 } token;
@@ -27,6 +29,7 @@ token *integer_token(int num, char *text);
 token *double_token(double num, char *text);
 token *identifier_token(char *identifier, char *text);
 token *string_token(char *text);
+token *char_token(char c);
 
 static token LEFT_PAREN = {tok_left_paren, 0, "("};
 static token RIGHT_PAREN = {tok_right_paren, 0, ")"};

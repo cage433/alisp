@@ -37,6 +37,15 @@ token *string_token(char *text){
     return tok;
 }
 
+token *char_token(char c){
+    token *tok = (token *)my_malloc(sizeof(token));
+    tok->type = tok_char;
+    tok->char_value = c;
+    tok->text = malloc(2 * sizeof(char));
+    sprintf(tok->text, "%c", c);
+    return tok;
+}
+
 void printtoken(token *tok){
     printf("Token %s\n", tok->text);
 }

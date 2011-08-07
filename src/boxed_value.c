@@ -27,6 +27,8 @@ int boxed_values_equal(const void *b1, const void *b2){
                 boxed_values_equal(box1->cons_value.cdr, box2->cons_value.cdr); 
     else if (box1->type == boxed_expression)
         return expressions_equal(box1->expression_value, box2->expression_value);
+    else if (box1->type == boxed_stream)
+        return box1->stream_value == box2->stream_value;
     else if (box1->type == boxed_nil)
         return 1;
     else {
@@ -82,6 +84,20 @@ boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr){
     inc_ref_count(cdr);
     return box;
 }
+
+boxed_value *make_boxed_stream(FILE *stream){
+    boxed_value *box = initialise_box_value(boxed_stream);
+    box->stream_value == stream;
+    return box;
+}
+
+boxed_value *make_boxed_char(char c){
+    boxed_value *box = initialise_box_value(boxed_char);
+    box->char_value = c;
+    return box;
+}
+
+
 void free_boxed_value(boxed_value *b);
 
 int constant_value(boxed_value *v){
@@ -89,12 +105,12 @@ int constant_value(boxed_value *v){
 }
 
 void inc_ref_count(boxed_value *v){
-    if (constant_value(v))
+    if (constant_value(v) || v->type == boxed_stream)
         return;
     v->ref_count += 1;
 }
 void dec_ref_count(boxed_value *v){
-    if (constant_value(v))
+    if (constant_value(v) || v->type == boxed_stream)
         return;
     v->ref_count -= 1;
     if (v->ref_count == 0)
@@ -130,28 +146,27 @@ void print_boxed_value(boxed_value *v, int indent){
         print_tabs(indent);
         printf("Boxed TRUE\n");
     } else {
+        print_tabs(indent);
         switch (v->type){
             case boxed_int:
-                print_tabs(indent);
                 printf("%d\n", v->int_value);
                 break;
             case boxed_double:
-                print_tabs(indent);
                 printf("%.6f\n", v->double_value);
                 break;
             case boxed_string:
-                print_tabs(indent);
                 printf("%s\n", v->string_value);
                 break;
             case boxed_closure:
-                print_tabs(indent);
                 printf("closure\n");
                 break;
             case boxed_cons:
-                print_tabs(indent);
                 printf("cons\n");
                 print_boxed_value(v->cons_value.car, indent + 1);
                 print_boxed_value(v->cons_value.cdr, indent + 1);
+                break;
+            case boxed_stream:
+                printf("stream\n");
                 break;
             default:
                 printf("File %s, line %d\n", __FILE__, __LINE__); 

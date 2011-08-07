@@ -10,16 +10,16 @@
 #include "utils.h"
 
 
-char *PRIMITIVES[19] = {
+char *PRIMITIVES[20] = {
     "+", "*", "-", "/", "cons", 
     "car", "cdr", "eq", "if", 
     "and", "or", "set!", "go",
     "<", ">", "<=", ">=", "quote",
-    "list"
+    "list", "fopen"
 };
 int is_primitive(char *identifier){
     int i;
-    for (i = 0; i < 19; ++i)
+    for (i = 0; i < 20; ++i)
         if (strings_equal(PRIMITIVES[i], identifier))
             return 1;
     return 0;
@@ -221,6 +221,13 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
                 l = l->cdr;
             }
             free_list(l, nop_free_fn);
+        } else if (op_name_equals("fopen")) {
+            die_unless(listlen(arg_values) == 2, "fopen requires two values");
+            boxed_value *file_name = nthelt(arg_values, 0);
+            boxed_value *mode = nthelt(arg_values, 1);
+            die_unless(file_name->type == boxed_string && mode->type == boxed_string, "fopen requires string types");
+            FILE *f = fopen(file_name->string_value, "r");
+            value = make_boxed_stream(f);
         } else {
             die("Unexpected primitive");
         }

@@ -74,6 +74,18 @@ token_type consume_integer(FILE *buf, FILE *stream){
     return tok_integer;
 }
 
+token_type consume_hash_symbol(FILE *buf, FILE *stream){
+    int ch;
+    ch = getc(stream);
+    if (ch == '\\'){
+        ch = getc(stream);
+        putc(ch, buf);
+        return tok_char;
+    } else {
+        die("Unexpected character");
+    }
+}
+
 token *consume_token(FILE *stream){
     // We know here that stream is not at EOF, 
     // nor is its next character whitespace
@@ -95,6 +107,8 @@ token *consume_token(FILE *stream){
         } else if (ch == '"'){
             token_type = tok_string;
             consume_string(buf, stream);
+        } else if (ch == '#'){
+            token_type = consume_hash_symbol(buf, stream);
         } else {
             putc(ch, buf);
             token_type = consume_identifier(buf, stream);
@@ -112,6 +126,9 @@ token *consume_token(FILE *stream){
                 break;
             case tok_string:
                 tok = string_token(p);
+                break;
+            case tok_char:
+                tok = char_token(*p);
                 break;
         }
         fclose(buf);
