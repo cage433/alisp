@@ -23,7 +23,7 @@ void repl(List *env){
         } else {
             strcat(exp_buf, buf);
             exp = parse_expression_from_string(exp_buf);
-            boxed_value *val = eval_exp(env, NULL, exp);
+            boxed_value *val = eval_exp_handling_exception(env, NULL, exp);
             printf("  ");
             print_boxed_value(val, 0);
             strcpy(exp_buf, "");
@@ -51,7 +51,7 @@ int main(int ARGC, char **ARGV){
         FILE *f = fopen(file_to_load, "r");
         List *exps = parse_expressions(f);
         while (exps != NULL){
-            boxed_value *val = eval_exp(env, NULL, exps->car);
+            boxed_value *val = eval_exp_handling_exception(env, NULL, exps->car);
             printf("  ");
             print_boxed_value(val, 0);
             exps = exps->cdr;

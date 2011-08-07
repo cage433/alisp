@@ -66,6 +66,7 @@ typedef struct expression {
 expression *make_integer_expression(int num);
 expression *make_double_expression(double num);
 expression *make_identifier_expression(char *identifier);
+expression *make_string_expression(char *text);
 expression *make_call_expression(struct expression *name, List *exps);
 expression *make_definition_expression(char *name, struct expression *exp);
 expression *make_function_expression(List *args, expression *body);

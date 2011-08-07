@@ -7,16 +7,19 @@
 #include "compiler.h"
 #include "frame.h"
 #include "pair.h"
+#include "utils.h"
 
-char *PRIMITIVES[18] = {
+
+char *PRIMITIVES[19] = {
     "+", "*", "-", "/", "cons", 
     "car", "cdr", "eq", "if", 
     "and", "or", "set!", "go",
-    "<", ">", "<=", ">=", "quote"
+    "<", ">", "<=", ">=", "quote",
+    "list"
 };
 int is_primitive(char *identifier){
     int i;
-    for (i = 0; i < 18; ++i)
+    for (i = 0; i < 19; ++i)
         if (strings_equal(PRIMITIVES[i], identifier))
             return 1;
     return 0;
@@ -43,6 +46,15 @@ List *free_innermost_tagbody(List *tagbody_env_pairs){
     return cdr;
 }
 
+jmp_buf buf;
+boxed_value *eval_exp_handling_exception(List *env, List* tagbody_env_pairs, expression *exp){
+    if (!setjmp(buf)){
+        return eval_exp(env, tagbody_env_pairs, exp);
+    } else {
+        printf("An error occured\n");
+        return NIL;
+    }
+}
 boxed_value *eval_exp(List *env, List* tagbody_env_pairs, expression *exp){
     return eval_boxed(env, tagbody_env_pairs, make_boxed_expression(exp));
 }
@@ -201,9 +213,18 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
         } else if (is_comparator(op_name)){
             die_unless(listlen(arg_values) >= 2, "numeric comparisons require at least two values");
             value = apply_numeric_comparator(op_name, arg_values);
+        } else if (op_name_equals("list")) {
+            List *l = reverse_list(arg_values);
+            value = NIL;
+            while(l != NULL){
+                value = make_boxed_cons(l->car, value);
+                l = l->cdr;
+            }
+            free_list(l, nop_free_fn);
         } else {
             die("Unexpected primitive");
         }
+        free_list(arg_values, nop_free_fn);
     }
     return value;
 }

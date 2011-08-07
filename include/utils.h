@@ -3,6 +3,7 @@
 
 #include "stdio.h"
 #include "stdlib.h"
+#include "setjmp.h"
 
 char *make_msg(char *fmt, ...);
 void die(char *msg);
@@ -15,4 +16,5 @@ void nop_free_fn(void *);
 void *my_malloc(size_t size);
 void *my_free(void *ptr);
 void print_tabs(int n);
+extern jmp_buf buf;
 #endif

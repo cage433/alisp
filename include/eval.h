@@ -9,6 +9,7 @@
 
 boxed_value *eval_boxed(List *env, List *tagbody_env_pairs, boxed_value *exp);
 boxed_value *eval_exp(List *env, List *tagbody_env_pairs, expression *exp);
+boxed_value *eval_exp_handling_exception(List *env, List* tagbody_env_pairs, expression *exp);
 boxed_value *apply(List *env, List *tagbody_env_pairs, expression *func, List *args);
 
 #endif
