@@ -16,5 +16,5 @@ void nop_free_fn(void *);
 void *my_malloc(size_t size);
 void *my_free(void *ptr);
 void print_tabs(int n);
-extern jmp_buf buf;
+extern jmp_buf jmp_buffer;
 #endif

@@ -46,9 +46,9 @@ List *free_innermost_tagbody(List *tagbody_env_pairs){
     return cdr;
 }
 
-jmp_buf buf;
+jmp_buf jmp_buffer;
 boxed_value *eval_exp_handling_exception(List *env, List* tagbody_env_pairs, expression *exp){
-    if (!setjmp(buf)){
+    if (!setjmp(jmp_buffer)){
         return eval_exp(env, tagbody_env_pairs, exp);
     } else {
         printf("An error occured\n");

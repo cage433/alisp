@@ -19,8 +19,7 @@ char *make_msg(char *fmt, ...){
 
 void die(char *msg){
     printf("Exiting: %s\n", msg);
-    longjmp(buf, 1);
-    //exit(-1);
+    longjmp(jmp_buffer, 1);
 }
 
 
