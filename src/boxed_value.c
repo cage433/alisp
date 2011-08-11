@@ -31,6 +31,8 @@ int boxed_values_equal(const void *b1, const void *b2){
         return box1->stream_value == box2->stream_value;
     else if (box1->type == boxed_nil)
         return 1;
+    else if (box1->type == boxed_char)
+        return box1->char_value == box2->char_value;
     else {
         printf("File %s, line %d\n", __FILE__, __LINE__); 
         printf("Unexpected box type %d\n", box1->type);
@@ -87,7 +89,7 @@ boxed_value *make_boxed_cons(boxed_value *car, boxed_value *cdr){
 
 boxed_value *make_boxed_stream(FILE *stream){
     boxed_value *box = initialise_box_value(boxed_stream);
-    box->stream_value == stream;
+    box->stream_value = stream;
     return box;
 }
 

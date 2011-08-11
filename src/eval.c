@@ -10,16 +10,16 @@
 #include "utils.h"
 
 
-char *PRIMITIVES[20] = {
+char *PRIMITIVES[22] = {
     "+", "*", "-", "/", "cons", 
     "car", "cdr", "eq", "if", 
     "and", "or", "set!", "go",
     "<", ">", "<=", ">=", "quote",
-    "list", "fopen"
+    "list", "fopen", "getc", "fmemopen"
 };
 int is_primitive(char *identifier){
     int i;
-    for (i = 0; i < 20; ++i)
+    for (i = 0; i < 22; ++i)
         if (strings_equal(PRIMITIVES[i], identifier))
             return 1;
     return 0;
@@ -226,8 +226,22 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
             boxed_value *file_name = nthelt(arg_values, 0);
             boxed_value *mode = nthelt(arg_values, 1);
             die_unless(file_name->type == boxed_string && mode->type == boxed_string, "fopen requires string types");
-            FILE *f = fopen(file_name->string_value, "r");
+            FILE *f = fopen(file_name->string_value, mode->string_value);
             value = make_boxed_stream(f);
+        } else if (op_name_equals("getc")) {
+            die_unless(listlen(arg_values) == 1, "fopen requires a single");
+            boxed_value *stream = nthelt(arg_values, 0);
+            die_unless(stream->type == boxed_stream, "getc requires a stream argument");
+            int c = getc(stream->stream_value);
+            die_unless(c != EOF, "EOF reached");
+            value = make_boxed_char(c);
+        } else if (op_name_equals("fmemopen")) {
+            die_unless(listlen(arg_values) == 2, "fmemopen requires three arguments");
+            boxed_value *text = nthelt(arg_values, 0);
+            boxed_value *mode = nthelt(arg_values, 1);
+            die_unless(text->type == boxed_string  && mode->type == boxed_string, "fmemopen requires two string arguments");
+            FILE *s = fmemopen(text->string_value, strlen(text->string_value), mode->string_value);
+            value = make_boxed_stream(s);
         } else {
             die("Unexpected primitive");
         }

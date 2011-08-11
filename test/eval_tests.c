@@ -374,6 +374,14 @@ START_TEST(test_quote2){
 }
 END_TEST
 
+START_TEST(test_reader){
+    List *env = create_env();
+    char *exp = "(getc (fmemopen \"foo\" \"r\"))";
+    boxed_value *v = eval_exp(env, NULL, parse_expression_from_string(exp));
+    fail_unless(boxed_values_equal(make_boxed_char('f'), v));
+}
+END_TEST
+
 Suite *test_eval_suite ()
 {
     Suite *s = suite_create ("eval");
@@ -408,6 +416,7 @@ Suite *test_eval_suite ()
     tcase_add_test (tc_core, test_tagbody_factorial);
     tcase_add_test (tc_core, test_quote);
     tcase_add_test (tc_core, test_quote2);
+    tcase_add_test (tc_core, test_reader);
     suite_add_tcase (s, tc_core);
 
     return s;
