@@ -2,6 +2,7 @@
 #define ALISP_TOKEN
 
 #include "list.h"
+#include "stdio.h"
 
 typedef enum {
     tok_left_paren,
@@ -33,6 +34,7 @@ token *char_token(char c);
 
 static token LEFT_PAREN = {tok_left_paren, 0, "("};
 static token RIGHT_PAREN = {tok_right_paren, 0, ")"};
+static token EOF_TOKEN = {tok_char, EOF, "EOF"};
 
 int tokens_equal(const void *tok1, const void *tok2);
 void free_token(token *token);

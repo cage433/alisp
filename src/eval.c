@@ -8,18 +8,19 @@
 #include "frame.h"
 #include "pair.h"
 #include "utils.h"
+#include "c_functions.h"
 
 
-char *PRIMITIVES[22] = {
+char *PRIMITIVES[19] = {
     "+", "*", "-", "/", "cons", 
     "car", "cdr", "eq", "if", 
     "and", "or", "set!", "go",
     "<", ">", "<=", ">=", "quote",
-    "list", "fopen", "getc", "fmemopen"
+    "list", 
 };
 int is_primitive(char *identifier){
     int i;
-    for (i = 0; i < 22; ++i)
+    for (i = 0; i < 19; ++i)
         if (strings_equal(PRIMITIVES[i], identifier))
             return 1;
     return 0;
@@ -221,27 +222,8 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
                 l = l->cdr;
             }
             free_list(l, nop_free_fn);
-        } else if (op_name_equals("fopen")) {
-            die_unless(listlen(arg_values) == 2, "fopen requires two values");
-            boxed_value *file_name = nthelt(arg_values, 0);
-            boxed_value *mode = nthelt(arg_values, 1);
-            die_unless(file_name->type == boxed_string && mode->type == boxed_string, "fopen requires string types");
-            FILE *f = fopen(file_name->string_value, mode->string_value);
-            value = make_boxed_stream(f);
-        } else if (op_name_equals("getc")) {
-            die_unless(listlen(arg_values) == 1, "fopen requires a single");
-            boxed_value *stream = nthelt(arg_values, 0);
-            die_unless(stream->type == boxed_stream, "getc requires a stream argument");
-            int c = getc(stream->stream_value);
-            die_unless(c != EOF, "EOF reached");
-            value = make_boxed_char(c);
-        } else if (op_name_equals("fmemopen")) {
-            die_unless(listlen(arg_values) == 2, "fmemopen requires three arguments");
-            boxed_value *text = nthelt(arg_values, 0);
-            boxed_value *mode = nthelt(arg_values, 1);
-            die_unless(text->type == boxed_string  && mode->type == boxed_string, "fmemopen requires two string arguments");
-            FILE *s = fmemopen(text->string_value, strlen(text->string_value), mode->string_value);
-            value = make_boxed_stream(s);
+        } else if (is_c_function(op_name)) {
+            value = apply_c_function(op_name, arg_values);
         } else {
             die("Unexpected primitive");
         }
@@ -252,7 +234,7 @@ boxed_value *apply_primitive(List *env, List *tagbody_env_pairs, char *op_name, 
 boxed_value *apply(List *env, List *tagbody_env_pairs, expression *func_exp, List *arg_exps){
     boxed_value *value;
 
-    if (func_exp->type == exp_identifier && is_primitive(func_exp->identifier_value))
+    if (func_exp->type == exp_identifier && (is_primitive(func_exp->identifier_value) ||is_c_function(func_exp->identifier_value)))
         value = apply_primitive(env, tagbody_env_pairs, func_exp->identifier_value, arg_exps);
     else {
         boxed_value *func = eval_exp(env, tagbody_env_pairs, func_exp);
